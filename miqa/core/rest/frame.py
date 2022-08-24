@@ -44,18 +44,13 @@ class FrameSerializer(serializers.ModelSerializer):
     download_url = serializers.SerializerMethodField('get_download_url')
 
     def get_extension(self, obj):
-        if obj.content:
-            filename = obj.content.name
-        else:
-            filename = obj.raw_path
+        filename = obj.content.name if obj.content else obj.raw_path
         return ''.join(Path(filename).suffixes)
 
     def get_download_url(self, obj: Frame) -> Optional[str]:
         if obj.storage_mode == StorageMode.CONTENT_STORAGE:
             return obj.content.url
-        if obj.storage_mode == StorageMode.S3_PATH:
-            return obj.s3_download_url
-        return None
+        return obj.s3_download_url if obj.storage_mode == StorageMode.S3_PATH else None
 
 
 def is_valid_experiment(experiment_id):

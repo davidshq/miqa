@@ -349,11 +349,10 @@ def test_create_scan_decision_without_lock_fails(user_api_client, scan, user):
             'decision': 'U',
         },
     )
-    if not has_review_perm(get_perms(user, scan.experiment.project)):
-        assert resp.status_code == 403
-    else:
-        assert resp.status_code == 403
+    if has_review_perm(get_perms(user, scan.experiment.project)):
         assert resp.data['detail'] == 'You must lock the experiment before performing this action.'
+
+    assert resp.status_code == 403
 
 
 @pytest.mark.django_db

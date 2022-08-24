@@ -74,7 +74,7 @@ class ProjectTaskOverviewSerializer(serializers.ModelSerializer):
         return obj.experiments.count()
 
     def get_total_scans(self, obj):
-        return sum([exp.scans.count() for exp in obj.experiments.all()])
+        return sum(exp.scans.count() for exp in obj.experiments.all())
 
     def get_my_project_role(self, obj):
         return obj.get_user_role(self.context['user'])

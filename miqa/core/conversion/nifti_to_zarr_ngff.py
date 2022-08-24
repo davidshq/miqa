@@ -7,8 +7,7 @@ from celery import shared_task
 
 def convert_to_store_path(nifti_file: str) -> Path:
     """Provide the Zarr store Path for a Nifti path."""
-    store_path = Path(nifti_file + '.zarr')
-    return store_path
+    return Path(f'{nifti_file}.zarr')
 
 
 @shared_task
@@ -27,15 +26,15 @@ def nifti_to_zarr_ngff(nifti_file: str) -> str:
     store_path = convert_to_store_path(nifti_file)
     if store_path.exists():
         return str(store_path)
-    image = itk.imread(str(nifti_file))
+    image = itk.imread(nifti_file)
     da = itk.xarray_from_image(image)
     da.name = 'image'
 
     scale_factors = [2, 2, 2, 2]
     multiscale = spatial_image_multiscale.to_multiscale(da, scale_factors)
 
-    store_path = Path(str(nifti_file) + '.zarr')
-    store = zarr.NestedDirectoryStore(str(nifti_file) + '.zarr')
+    store_path = Path(f'{nifti_file}.zarr')
+    store = zarr.NestedDirectoryStore(f'{nifti_file}.zarr')
     spatial_image_ngff.imwrite(multiscale, store)
 
     # celery tasks must return a serializable type; using string here

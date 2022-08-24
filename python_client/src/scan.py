@@ -54,12 +54,12 @@ class Scan:
 
     def add_frames_from_paths(self, *paths: List[str]):
         new_frames = []
+        api_path = 'frames'
         for index, path in enumerate(paths):
             field_value = self._upload_file(
                 path,
                 'core.Frame.content',
             )
-            api_path = 'frames'
             response = requests.post(
                 f"{self.experiment.project.MIQA.url}/{api_path}",
                 headers=self.experiment.project.MIQA.headers,
@@ -83,13 +83,13 @@ class Scan:
         present_artifacts: List[str] = [],
         absent_artifacts: List[str] = [],
     ):
-        if decision.lower() in ['usable', 'u']:
+        if decision.lower() in {'usable', 'u'}:
             decision = 'U'
-        elif decision.lower() in ['unusable', 'un']:
+        elif decision.lower() in {'unusable', 'un'}:
             decision = 'UN'
-        elif decision.lower() in ['questionable', 'q?']:
+        elif decision.lower() in {'questionable', 'q?'}:
             decision = 'Q?'
-        elif decision.lower() in ['usable-extra', 'usable extra', 'ue']:
+        elif decision.lower() in {'usable-extra', 'usable extra', 'ue'}:
             decision = 'UE'
         else:
             raise MIQAAPIError(
@@ -106,9 +106,9 @@ class Scan:
             )
         if (
             decision != 'U'
-            and len(note) < 1
-            and len(present_artifacts) < 1
-            and len(absent_artifacts) < 1
+            and not note
+            and not present_artifacts
+            and not absent_artifacts
         ):
             raise MIQAAPIError(
                 'Decisions other than "usable" must have some explanatory note or selection of present artifacts.'
@@ -149,7 +149,7 @@ class Scan:
         return new_scan_decision
 
     def print_all_objects(self, indent=0):
-        print(" " * indent, str(self))
+        print(" " * indent, self)
         print(" " * indent, "|Decisions:  ", self.decisions)
         print(" " * indent, "|Frames:  ", self.frames)
 

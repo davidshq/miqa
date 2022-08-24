@@ -81,10 +81,10 @@ class Experiment:
             },
         )
         response.raise_for_status()
-        return True if response else False
+        return bool(response)
 
     def print_all_objects(self, indent=0):
-        print(" " * indent, str(self))
+        print(" " * indent, self)
         for scan in self.scans:
             scan.print_all_objects(indent=indent + 2)
 

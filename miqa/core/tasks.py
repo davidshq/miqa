@@ -136,8 +136,7 @@ def import_data(project_id: Optional[str]):
             if import_path.startswith('s3://'):
                 buf = _download_from_s3(import_path, s3_public).decode('utf-8')
             else:
-                with open(import_path) as fd:
-                    buf = fd.read()
+                buf = Path(import_path).read_text()
             import_dict = import_dataframe_to_dict(
                 pandas.read_csv(StringIO(buf), index_col=False, na_filter=False).astype(str),
                 project,
@@ -339,10 +338,9 @@ def perform_export(project_id: Optional[str]):
                     frame_object.scan.session_id,
                     frame_object.scan.scan_link,
                 ]
-                # if a last decision exists for the scan, encode that decision on this row
-                # ... U, reviewer@miqa.dev, note; with; commas; replaced, artifact_1;artifact_2
-                last_decision = frame_object.scan.decisions.order_by('created').last()
-                if last_decision:
+                if last_decision := frame_object.scan.decisions.order_by(
+                    'created'
+                ).last():
                     location = ''
                     if last_decision.location:
                         location = (
@@ -367,7 +365,7 @@ def perform_export(project_id: Optional[str]):
                         location,
                     ]
                 else:
-                    row_data += ['' for i in range(6)]
+                    row_data += ['' for _ in range(6)]
                 data.append(row_data)
             else:
                 export_warnings.append(

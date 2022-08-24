@@ -56,7 +56,7 @@ def sample_scans(samples_dir):
                     scan_id, scan_type = dir.split('_')
                     yield (dirpath, scan_id, scan_type)
 
-    return [scan for scan in generator()]
+    return list(generator())
 
 
 register(ScanDecisionFactory)
