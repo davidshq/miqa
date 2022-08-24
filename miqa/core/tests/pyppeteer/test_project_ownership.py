@@ -68,10 +68,10 @@ async def test_change_project_ownership(page, log_in, webpack_server, user_facto
     # Select the Tier 1 reviewer
     await (
         await page.waitForXPath(
-            f'//div[@class="v-list-item__title"]'
-            f'[.="{tier_1_user.first_name + " " + tier_1_user.last_name}"]'
+            f'//div[@class="v-list-item__title"][.="{tier_1_user.first_name} {tier_1_user.last_name}"]'
         )
     ).click()
+
     # Close the selection menu
     await tier_1_input.press('Escape')
     await page.waitFor(500)
@@ -84,10 +84,10 @@ async def test_change_project_ownership(page, log_in, webpack_server, user_facto
     # Select the Tier 2 reviewer
     await (
         await page.waitForXPath(
-            f'(//div[@class="v-list-item__title"]'
-            f'[.="{tier_2_user.first_name + " " + tier_2_user.last_name}"])[2]'
+            f'(//div[@class="v-list-item__title"][.="{tier_2_user.first_name} {tier_2_user.last_name}"])[2]'
         )
     ).click()
+
     # Close the selection menu
     await tier_2_input.press('Escape')
     await page.waitFor(500)
@@ -109,10 +109,10 @@ async def test_change_project_ownership(page, log_in, webpack_server, user_facto
     # Select the Tier 2 reviewer
     await (
         await page.waitForXPath(
-            f'//div[@class="v-list-item__title"]'
-            f'[.="{collaborator.first_name + " " + collaborator.last_name}"]'
+            f'//div[@class="v-list-item__title"][.="{collaborator.first_name} {collaborator.last_name}"]'
         )
     ).click()
+
     # Close the selection menu
     await collaborators_input.press('Escape')
     await page.waitFor(500)

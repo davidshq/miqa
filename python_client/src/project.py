@@ -64,7 +64,7 @@ class Project:
         return Experiment(**dict(response.json(), project=self))
 
     def print_all_objects(self, indent=0):
-        print(" " * indent, str(self))
+        print(" " * indent, self)
         for exp in self.experiments:
             exp.print_all_objects(indent=indent + 2)
 

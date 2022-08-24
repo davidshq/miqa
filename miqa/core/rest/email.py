@@ -25,16 +25,13 @@ class EmailView(APIView):
 
         for index, screenshot in enumerate(request.data['screenshots']):
 
-            # parse data uri to extract mime type and base64 data
-            # assumptions: mime type is image/jpeg or image/png
-            match = re.fullmatch(
-                r'data:(?P<mime>[\w/\-\.]+);?(\w+),(?P<data>.*)', screenshot['dataURL']
-            )
-
-            if match:
-                b64_data = match.group('data')
+            if match := re.fullmatch(
+                r'data:(?P<mime>[\w/\-\.]+);?(\w+),(?P<data>.*)',
+                screenshot['dataURL'],
+            ):
+                b64_data = match['data']
                 data = b64decode(b64_data)
-                mime = match.group('mime')
+                mime = match['mime']
                 img = MIMEImage(data, mime.split('/')[1])
                 img.add_header('Content-Id', f'<file{index}>')
                 img.add_header(

@@ -94,7 +94,7 @@ def ncanda_construct_data_frame(ncanda_root_dir):
     for path in root.rglob('*.nii.gz'):
         file_path = str(path)
         participant_id = path.parts[root_len + 1]
-        series_type = path.parts[-1][0:-7]
+        series_type = path.parts[-1][:-7]
         qa = 3 if path.parts[root_len] == 'unusable' else 8
         dimensions, lps = get_image_dimension(file_path, False)
 
@@ -116,15 +116,13 @@ def ncanda_construct_data_frame(ncanda_root_dir):
 def construct_path_from_csv_fields(
     participant_id, session_id, series_type, series_number, overall_qa_assessment
 ):
-    sub_num = 'sub-' + str(participant_id).zfill(6)
-    ses_num = 'ses-' + str(session_id)
-    run_num = 'run-' + str(series_number).zfill(3)
-    scan_type = 'PD'
-    if series_type[0] == 'T':  # not PD
-        scan_type = series_type[0:2] + 'w'
+    sub_num = f'sub-{str(participant_id).zfill(6)}'
+    ses_num = f'ses-{str(session_id)}'
+    run_num = f'run-{str(series_number).zfill(3)}'
+    scan_type = series_type[:2] + 'w' if series_type[0] == 'T' else 'PD'
     if overall_qa_assessment < 6:
-        scan_type = 'BAD' + scan_type
-    file_name = (
+        scan_type = f'BAD{scan_type}'
+    return (
         predict_hd_data_root
         + sub_num
         + '/'
@@ -139,7 +137,6 @@ def construct_path_from_csv_fields(
         + scan_type
         + '.nii.gz'
     )
-    return file_name
 
 
 def does_file_exist(file_name):
@@ -229,151 +226,134 @@ class CombinedLoss(torch.nn.Module):
 
 
 def convert_bool_to_int(value: bool):
-    if value is True:
-        return 1
-    elif value is False:
-        return 0
-    else:  # NaN
-        return -1
+    return 1 if value else 0
 
 
 class CustomGhosting(torchio.transforms.RandomGhosting):
     def apply_transform(self, subject: torchio.Subject) -> torchio.Subject:
         original_quality = subject['info'][0]
-        if original_quality < 6 and len(subject.applied_transforms) == 1:  # low quality image
+        if original_quality < 6 and len(subject.applied_transforms) == 1:
             return subject
-        else:  # high-quality image, corrupt it
-            transformed_subject = super().apply_transform(subject)
+        transformed_subject = super().apply_transform(subject)
 
-            # now determine how much quality was reduced
-            applied_params = transformed_subject.applied_transforms[-1][1]
-            intensity = applied_params['intensity']['img']
-            num_ghosts = applied_params['num_ghosts']['img']
-            quality_reduction = 8 * intensity * math.log10(num_ghosts)
+        # now determine how much quality was reduced
+        applied_params = transformed_subject.applied_transforms[-1][1]
+        intensity = applied_params['intensity']['img']
+        num_ghosts = applied_params['num_ghosts']['img']
+        quality_reduction = 8 * intensity * math.log10(num_ghosts)
 
-            # update the ground truth information
-            new_quality = original_quality - quality_reduction
-            transformed_subject['info'][0] = clamp(new_quality, 0, 10)
-            # it definitely has ghosting now
-            transformed_subject['info'][ghosting_motion_index] = 1
+        # update the ground truth information
+        new_quality = original_quality - quality_reduction
+        transformed_subject['info'][0] = clamp(new_quality, 0, 10)
+        # it definitely has ghosting now
+        transformed_subject['info'][ghosting_motion_index] = 1
 
-            return transformed_subject
+        return transformed_subject
 
 
 class CustomMotion(torchio.transforms.RandomMotion):
     def apply_transform(self, subject: torchio.Subject) -> torchio.Subject:
         original_quality = subject['info'][0]
-        if original_quality < 6 and len(subject.applied_transforms) == 1:  # low quality image
+        if original_quality < 6 and len(subject.applied_transforms) == 1:
             return subject
-        else:  # high-quality image, corrupt it
-            transformed_subject = super().apply_transform(subject)
+        transformed_subject = super().apply_transform(subject)
 
-            # now determine how much quality was reduced
-            applied_params = transformed_subject.applied_transforms[-1][1]
-            time = applied_params['times']['img']
-            degrees = np.sum(np.absolute(applied_params['degrees']['img']))
-            translation = np.sum(np.absolute(applied_params['translation']['img']))
-            # motion in the middle of the acquisition process produces the most noticeable artifact
-            quality_reduction = clamp(degrees + translation, 0, 10) * min(time, 1.0 - time)
+        # now determine how much quality was reduced
+        applied_params = transformed_subject.applied_transforms[-1][1]
+        time = applied_params['times']['img']
+        degrees = np.sum(np.absolute(applied_params['degrees']['img']))
+        translation = np.sum(np.absolute(applied_params['translation']['img']))
+        # motion in the middle of the acquisition process produces the most noticeable artifact
+        quality_reduction = clamp(degrees + translation, 0, 10) * min(time, 1.0 - time)
 
-            # update the ground truth information
-            new_quality = original_quality - quality_reduction
-            transformed_subject['info'][0] = clamp(new_quality, 0, 10)
-            if degrees + translation > 1:  # it definitely has motion now
-                transformed_subject['info'][ghosting_motion_index] = 1
+        # update the ground truth information
+        new_quality = original_quality - quality_reduction
+        transformed_subject['info'][0] = clamp(new_quality, 0, 10)
+        if degrees + translation > 1:  # it definitely has motion now
+            transformed_subject['info'][ghosting_motion_index] = 1
 
-            return transformed_subject
+        return transformed_subject
 
 
 class CustomBiasField(torchio.transforms.RandomBiasField):
     def apply_transform(self, subject: torchio.Subject) -> torchio.Subject:
         original_quality = subject['info'][0]
-        if original_quality < 6 and len(subject.applied_transforms) == 1:  # low quality image
+        if original_quality < 6 and len(subject.applied_transforms) == 1:
             return subject
-        else:  # high-quality image, corrupt it
-            transformed_subject = super().apply_transform(subject)
-
-            # now determine how much quality was reduced
-            # applied_params = transformed_subject.applied_transforms[-1][1]
-            # coefficients = applied_params['coefficients']['img']
-            # quality_reduction = 2 + np.linalg.norm(np.asarray(coefficients))
-            quality_reduction = 4  # it is hard to assess impact on image quality
+        transformed_subject = super().apply_transform(subject)
 
             # update the ground truth information
-            new_quality = original_quality - quality_reduction
-            transformed_subject['info'][0] = clamp(new_quality, 0, 10)
-            # it definitely has bias field now
-            transformed_subject['info'][inhomogeneity_index] = 1
+        new_quality = original_quality - 4
+        transformed_subject['info'][0] = clamp(new_quality, 0, 10)
+        # it definitely has bias field now
+        transformed_subject['info'][inhomogeneity_index] = 1
 
-            return transformed_subject
+        return transformed_subject
 
 
 class CustomSpike(torchio.transforms.RandomSpike):
     def apply_transform(self, subject: torchio.Subject) -> torchio.Subject:
         original_quality = subject['info'][0]
-        if original_quality < 6 and len(subject.applied_transforms) == 1:  # low quality image
+        if original_quality < 6 and len(subject.applied_transforms) == 1:
             return subject
-        else:  # high-quality image, corrupt it
-            transformed_subject = super().apply_transform(subject)
+        transformed_subject = super().apply_transform(subject)
 
-            # now determine how much quality was reduced
-            applied_params = transformed_subject.applied_transforms[-1][1]
-            intensity = applied_params['intensity']['img']
-            # spikes_positions = applied_params['spikes_positions']['img']
-            quality_reduction = 0 + 2 * intensity
+        # now determine how much quality was reduced
+        applied_params = transformed_subject.applied_transforms[-1][1]
+        intensity = applied_params['intensity']['img']
+        # spikes_positions = applied_params['spikes_positions']['img']
+        quality_reduction = 0 + 2 * intensity
 
-            # update the ground truth information
-            new_quality = original_quality - quality_reduction
-            transformed_subject['info'][0] = clamp(new_quality, 0, 10)
-            # it definitely has bias field now
-            transformed_subject['info'][inhomogeneity_index] = 1
+        # update the ground truth information
+        new_quality = original_quality - quality_reduction
+        transformed_subject['info'][0] = clamp(new_quality, 0, 10)
+        # it definitely has bias field now
+        transformed_subject['info'][inhomogeneity_index] = 1
 
-            return transformed_subject
+        return transformed_subject
 
 
 class CustomGamma(torchio.transforms.RandomGamma):
     def apply_transform(self, subject: torchio.Subject) -> torchio.Subject:
         original_quality = subject['info'][0]
-        if original_quality < 6 and len(subject.applied_transforms) == 1:  # low quality image
+        if original_quality < 6 and len(subject.applied_transforms) == 1:
             return subject
-        else:  # high-quality image, corrupt it
-            transformed_subject = super().apply_transform(subject)
+        transformed_subject = super().apply_transform(subject)
 
-            # now determine how much quality was reduced
-            applied_params = transformed_subject.applied_transforms[-1][1]
-            gamma = applied_params['gamma']['img'][0]
-            quality_reduction = 10 * abs(1.0 - gamma)
+        # now determine how much quality was reduced
+        applied_params = transformed_subject.applied_transforms[-1][1]
+        gamma = applied_params['gamma']['img'][0]
+        quality_reduction = 10 * abs(1.0 - gamma)
 
-            # update the ground truth information
-            new_quality = original_quality - quality_reduction
-            transformed_subject['info'][0] = clamp(new_quality, 0, 10)
+        # update the ground truth information
+        new_quality = original_quality - quality_reduction
+        transformed_subject['info'][0] = clamp(new_quality, 0, 10)
 
-            return transformed_subject
+        return transformed_subject
 
 
 class CustomNoise(torchio.transforms.RandomNoise):
     def apply_transform(self, subject: torchio.Subject) -> torchio.Subject:
         original_quality = subject['info'][0]
-        if original_quality < 6 and len(subject.applied_transforms) == 1:  # low quality image
+        if original_quality < 6 and len(subject.applied_transforms) == 1:
             return subject
-        else:  # high-quality image, corrupt it
-            transformed_subject = super().apply_transform(subject)
+        transformed_subject = super().apply_transform(subject)
 
-            # make sure we don't have negative intensities after adding noise
-            transformed_subject.img.set_data(
-                torch.clamp(transformed_subject.img.data, min=0.0, max=1.0)
-            )
+        # make sure we don't have negative intensities after adding noise
+        transformed_subject.img.set_data(
+            torch.clamp(transformed_subject.img.data, min=0.0, max=1.0)
+        )
 
-            # now determine how much quality was reduced
-            applied_params = transformed_subject.applied_transforms[-1][1]
-            std = applied_params['std']['img']
-            quality_reduction = 40 * std
+        # now determine how much quality was reduced
+        applied_params = transformed_subject.applied_transforms[-1][1]
+        std = applied_params['std']['img']
+        quality_reduction = 40 * std
 
-            # update the ground truth information
-            new_quality = original_quality - quality_reduction
-            transformed_subject['info'][0] = clamp(new_quality, 0, 10)
+        # update the ground truth information
+        new_quality = original_quality - quality_reduction
+        transformed_subject['info'][0] = clamp(new_quality, 0, 10)
 
-            return transformed_subject
+        return transformed_subject
 
 
 def remove_axis_code_and_its_opposite(axis_list, index):
@@ -649,7 +629,7 @@ def train_and_save_model(df, count_train, save_path, num_epochs, val_interval, o
             logger.info(f'Learning rate after epoch {epoch + 1}: {optimizer.param_groups[0]["lr"]}')
             wandb.log({'learn_rate': optimizer.param_groups[0]['lr']})
 
-    epoch_suffix = '.epoch' + str(num_epochs)
+    epoch_suffix = f'.epoch{str(num_epochs)}'
     torch.save(model.state_dict(), save_path + epoch_suffix)
     torch.save(model.state_dict(), os.path.join(wandb.run.dir, file_name + epoch_suffix))
 

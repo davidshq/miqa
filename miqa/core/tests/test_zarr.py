@@ -9,7 +9,6 @@ from miqa.core.conversion.nifti_to_zarr_ngff import nifti_to_zarr_ngff
 
 def test_convert_to_zarr():
     if not settings.ZARR_SUPPORT:
-        assert True
         return
     script_dir = Path(__file__).resolve().parent
     samples_dir = script_dir / '..' / '..' / '..' / 'samples'
@@ -27,7 +26,7 @@ def test_convert_to_zarr():
     sample = samples[0]
 
     for sample in samples:
-        result = str(sample) + '.zarr'
+        result = f'{str(sample)}.zarr'
         if os.path.exists(result):
             shutil.rmtree(result)
         result_path = nifti_to_zarr_ngff(str(sample))

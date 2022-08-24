@@ -87,7 +87,7 @@ class MIQA:
     def print_all_objects(self, indent=0):
         if len(self.projects) < 1:
             self.get_all_objects()
-        print(" " * indent, str(self))
+        print(" " * indent, self)
         for proj in self.projects:
             proj.print_all_objects(indent=indent)
 

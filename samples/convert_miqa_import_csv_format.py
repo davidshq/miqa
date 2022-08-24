@@ -20,9 +20,9 @@ for file_name in sys.argv[1:]:
     ]
     if len(df.columns) != len(expected_columns) or any(df.columns != expected_columns):
         raise Exception(
-            f"{file_name} is not congruent with the old"
-            f" MIQA import format. Expected columns {str(expected_columns)} but recieved {str(df.columns)}."
+            f"{file_name} is not congruent with the old MIQA import format. Expected columns {expected_columns} but recieved {str(df.columns)}."
         )
+
 
     project_name = str(input("Enter a project name for these scans:\n"))
     print()

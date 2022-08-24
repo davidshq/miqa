@@ -72,9 +72,7 @@ class TiledClassifier(monai.networks.nets.Classifier):
 
                     results.append(super().forward(tile))
 
-        # TODO: do something smarter than mean here
-        average = torch.mean(torch.stack(results), dim=0)
-        return average
+        return torch.mean(torch.stack(results), dim=0)
 
 
 def get_model(file_path=None):
@@ -158,12 +156,11 @@ def get_itk_image_view_from_torchio_image(img):
 def get_torchio_image_from_itk_image(image):
     np_array = itk.array_from_image(image)
     np_array = np.expand_dims(np_array, 0)  # add channel dimension
-    img = torchio.ScalarImage(
+    return torchio.ScalarImage(
         tensor=np_array,
         affine=get_ras_affine_from_itk(image),
         check_nans=False,
     )
-    return img
 
 
 class ReorientAndRescale(torchio.transforms.RescaleIntensity):
@@ -233,38 +230,37 @@ def evaluate_model(model, data_loader, device, writer, epoch, run_name):
                 print(metric_count, flush=True)
         print('')  # new line
 
-        if writer is not None:  # this is not a one-off case
-            logger.info(f'{run_name}_confusion_matrix:\n{confusion_matrix(y_true, y_pred)}')
-            logger.info(f'\n{classification_report(y_true, y_pred)}')
-
-            logger.info(run_name + '_artifact_confusions [TN, FP, FN, TP]:')
-            confusions = {}
-            artifact_cm = []
-            for a in range(len(artifacts)):
-                y_a_true = y_info[:, a].tolist()
-                y_a_out = y_artifacts[:, a].tolist()
-                assert len(y_a_true) == len(y_a_out)
-
-                for i in reversed(range(len(y_a_true))):
-                    if y_a_true[i] == -1:  # ground truth was not provided
-                        y_a_true.pop(i)
-                        y_a_out.pop(i)
-                cm = confusion_matrix(y_a_true, y_a_out)
-                cm_list = list(cm.flat)  # flatten into a list
-                confusions[artifacts[a]] = cm_list
-                artifact_cm.append(cm_list)
-                logger.info(f'{artifacts[a]}: {cm_list}')
-            logger.info(f'artifact_cm:\n{np.array(artifact_cm)}')
-
-            metric = mean_squared_error(y_true, y_pred_continuous, squared=False)
-            writer.add_scalar(run_name + '_RMSE', metric, epoch + 1)
-            wandb.log({run_name + '_RMSE': metric})
-            metric = r2_score(y_true, y_pred_continuous)
-            writer.add_scalar(run_name + '_R2', metric, epoch + 1)
-            wandb.log({run_name + '_R2': metric})
-            return metric
-        else:
+        if writer is None:
             return y_all
+        logger.info(f'{run_name}_confusion_matrix:\n{confusion_matrix(y_true, y_pred)}')
+        logger.info(f'\n{classification_report(y_true, y_pred)}')
+
+        logger.info(f'{run_name}_artifact_confusions [TN, FP, FN, TP]:')
+        confusions = {}
+        artifact_cm = []
+        for a in range(len(artifacts)):
+            y_a_true = y_info[:, a].tolist()
+            y_a_out = y_artifacts[:, a].tolist()
+            assert len(y_a_true) == len(y_a_out)
+
+            for i in reversed(range(len(y_a_true))):
+                if y_a_true[i] == -1:  # ground truth was not provided
+                    y_a_true.pop(i)
+                    y_a_out.pop(i)
+            cm = confusion_matrix(y_a_true, y_a_out)
+            cm_list = list(cm.flat)  # flatten into a list
+            confusions[artifacts[a]] = cm_list
+            artifact_cm.append(cm_list)
+            logger.info(f'{artifacts[a]}: {cm_list}')
+        logger.info(f'artifact_cm:\n{np.array(artifact_cm)}')
+
+        metric = mean_squared_error(y_true, y_pred_continuous, squared=False)
+        writer.add_scalar(f'{run_name}_RMSE', metric, epoch + 1)
+        wandb.log({f'{run_name}_RMSE': metric})
+        metric = r2_score(y_true, y_pred_continuous)
+        writer.add_scalar(f'{run_name}_R2', metric, epoch + 1)
+        wandb.log({f'{run_name}_R2': metric})
+        return metric
 
 
 def label_results(result):
@@ -273,7 +269,7 @@ def label_results(result):
         result_name = artifact_names[artifact_name]
         result_value = clamp(value, 0.0, 1.0)
         if artifact_name not in ['normal_variants', 'full_brain_coverage']:
-            result_name = 'no_' + result_name
+            result_name = f'no_{result_name}'
             result_value = 1 - result_value
         labeled_results[result_name] = result_value
     return labeled_results
@@ -324,10 +320,10 @@ def evaluate_many(model, image_paths):
     evaluation_loader = DataLoader(evaluation_ds, pin_memory=torch.cuda.is_available())
     results = evaluate_model(model, evaluation_loader, device, None, 0, 'evaluate_many')
 
-    labeled_results = {}
-    for index, result in enumerate(results):
-        labeled_results[image_paths[index]] = label_results(result)
-    return labeled_results
+    return {
+        image_paths[index]: label_results(result)
+        for index, result in enumerate(results)
+    }
 
 
 if __name__ == '__main__':
