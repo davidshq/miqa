@@ -16,6 +16,7 @@ module.exports = {
   lintOnSave: false,
   publicPath: process.env.VUE_APP_STATIC_PATH,
   configureWebpack: {
+    devtool: 'eval-source-map',
     plugins: [
       new CopyPlugin({
         patterns: [

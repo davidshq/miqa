@@ -24,19 +24,25 @@ export default {
     screenshotContainer: document.createElement('div'),
   }),
   computed: {
-    ...mapState(['proxyManager',
+    ...mapState([
+      'proxyManager',
       'loadingFrame',
       'showCrosshairs',
-      'sliceLocation',
+      'sliceLocation', // Used?
       'iIndexSlice',
       'jIndexSlice',
       'kIndexSlice',
-      'windowLocked',
+      'windowLocked', // Used?
       'currentWindowWidth',
       'currentWindowLevel',
       'renderOrientation',
     ]),
-    ...mapGetters(['currentFrame', 'currentScan', 'currentViewData']),
+    ...mapGetters([
+      'currentFrame',
+      'currentScan',
+      'currentViewData',
+    ]),
+    // Returning representation from VTK
     representation() {
       return (
         // force add dependency on currentFrame

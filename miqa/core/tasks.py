@@ -122,6 +122,7 @@ def evaluate_data(frames_by_project):
 
 
 def import_data(project_id: Optional[str]):
+    # Global vs Project Import
     if project_id is None:
         project = None
         import_path = GlobalSettings.load().import_path
@@ -131,6 +132,7 @@ def import_data(project_id: Optional[str]):
         import_path = project.import_path
         s3_public = project.s3_public
 
+    # Import CSV or JSON Files from Server / S3
     try:
         if import_path.endswith('.csv'):
             if import_path.startswith('s3://'):
@@ -167,16 +169,18 @@ def perform_import(import_dict):
     new_scan_decisions: List[ScanDecision] = []
 
     for project_name, project_data in import_dict['projects'].items():
+        # Check if project exists
         try:
             project_object = Project.objects.get(name=project_name)
         except Project.DoesNotExist:
             raise APIException(f'Project {project_name} does not exist.')
 
-        # delete old imports of these projects
+        # Delete old imports of these projects
         Experiment.objects.filter(
             project=project_object
         ).delete()  # cascades to scans -> frames, scan_notes
 
+        # Create Experiments
         for experiment_name, experiment_data in project_data['experiments'].items():
             notes = experiment_data.get('notes', '')
             experiment_object = Experiment(
@@ -186,6 +190,7 @@ def perform_import(import_dict):
             )
             new_experiments.append(experiment_object)
 
+            # Create Scans
             for scan_name, scan_data in experiment_data['scans'].items():
                 subject_id = scan_data.get('subject_id', None)
                 session_id = scan_data.get('session_id', None)
@@ -199,6 +204,7 @@ def perform_import(import_dict):
                     scan_link=scan_link,
                 )
 
+                # Create ScanDecisions for Scans
                 if 'last_decision' in scan_data:
                     last_decision_dict = scan_data['last_decision']
                     if (
@@ -255,6 +261,8 @@ def perform_import(import_dict):
                             )
                             new_scan_decisions.append(last_decision)
                 new_scans.append(scan_object)
+
+                # Create Frames
                 for frame_number, frame_data in scan_data['frames'].items():
 
                     if frame_data['file_location']:
@@ -267,26 +275,27 @@ def perform_import(import_dict):
                         if settings.ZARR_SUPPORT and Path(frame_object.raw_path).exists():
                             nifti_to_zarr_ngff.delay(frame_data['file_location'])
 
-    # if any scan has no frames, it should not be created
+    # If any scan has no frames, it should not be created
     new_scans = [
         new_scan
         for new_scan in new_scans
         if any(new_frame.scan == new_scan for new_frame in new_frames)
     ]
-    # if any experiment has no scans, it should not be created
+    # If any experiment has no scans, it should not be created
     new_experiments = [
         new_experiment
         for new_experiment in new_experiments
         if any(new_scan.experiment == new_experiment for new_scan in new_scans)
     ]
 
+    # Bulk create Project and it's children
     Project.objects.bulk_create(new_projects)
     Experiment.objects.bulk_create(new_experiments)
     Scan.objects.bulk_create(new_scans)
     Frame.objects.bulk_create(new_frames)
     ScanDecision.objects.bulk_create(new_scan_decisions)
 
-    # must use str, not UUID, to get sent to celery task properly
+    # Must use str, not UUID, to get sent to celery task properly
     frames_by_project: Dict[str, List[str]] = {}
     for frame in new_frames:
         project_id = str(frame.scan.experiment.project.id)

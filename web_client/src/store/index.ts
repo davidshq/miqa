@@ -34,6 +34,7 @@ const poolSize = Math.floor(navigator.hardwareConcurrency / 2) || 2;
 let taskRunId = -1;
 let savedWorker = null;
 
+// Delete existing proxyManager views
 function shrinkProxyManager(proxyManager) {
   proxyManager.getViews().forEach((view) => {
     view.setContainer(null);
@@ -41,6 +42,8 @@ function shrinkProxyManager(proxyManager) {
   });
 }
 
+// Disable Axes visibility, set interpolationtype to nearest and render
+// each view
 function prepareProxyManager(proxyManager) {
   if (!proxyManager.getViews().length) {
     ['View2D_Z:z', 'View2D_X:x', 'View2D_Y:y'].forEach((type) => {
@@ -56,23 +59,29 @@ function prepareProxyManager(proxyManager) {
   }
 }
 
+// Array name is file name minus last extension, e.g. image.nii.gz => image.nii
 function getArrayName(filename) {
   const idx = filename.lastIndexOf('.');
   const name = idx > -1 ? filename.substring(0, idx) : filename;
   return `Scalars ${name}`;
 }
 
+// Load image data from cache or file
 function getData(id, file, webWorker = null) {
   return new Promise((resolve, reject) => {
+    // Load image from frame cache if available
     if (frameCache.has(id)) {
       resolve({ frameData: frameCache.get(id), webWorker });
     } else {
       const fileName = file.name;
       const io = new FileReader();
 
+      // Once image is loaded
       io.onload = function onLoad() {
+        // Read image with ITK
         readImageArrayBuffer(webWorker, io.result, fileName)
           .then(({ webWorker, image }) => { // eslint-disable-line no-shadow
+            // Convert ITK to VTK image
             const frameData = convertItkToVtkImage(image, {
               scalarArrayName: getArrayName(fileName),
             });
@@ -95,6 +104,7 @@ function getData(id, file, webWorker = null) {
   });
 }
 
+// Download file if cached
 function loadFile(frame, { onDownloadProgress = null } = {}) {
   if (fileCache.has(frame.id)) {
     return { frameId: frame.id, fileP: fileCache.get(frame.id) };
@@ -134,15 +144,18 @@ function loadFileAndGetData(frame, { onDownloadProgress = null } = {}) {
     }));
 }
 
+// Use a worker to download image files
 function poolFunction(webWorker, taskInfo) {
   return new Promise((resolve, reject) => {
     const { frame } = taskInfo;
 
     let filePromise = null;
 
+    // Load file from cache if available
     if (fileCache.has(frame.id)) {
       filePromise = fileCache.get(frame.id);
     } else {
+      // Download image file
       let client = apiClient;
       let downloadURL = `/frames/${frame.id}/download`;
       if (frame.download_url) {
@@ -179,6 +192,8 @@ function progressHandler(completed, total) {
   store.commit.setScanCachedPercentage(percentComplete);
 }
 
+// Creates array of tasks to run then runs tasks
+// in parallel
 function startReaderWorkerPool() {
   const taskArgsArray = readDataQueue.map((taskInfo) => [taskInfo]);
   readDataQueue = [];
@@ -201,7 +216,7 @@ function startReaderWorkerPool() {
     });
 }
 
-// cache frames associated with scans of current experiment
+// Cache frames associated with scans of current experiment
 function checkLoadExperiment(oldValue, newValue) {
   if (
     !newValue
@@ -323,17 +338,24 @@ const {
       return state;
     },
     currentViewData(state) {
+      // Get the current frame
       const currentFrame = state.currentFrameId ? state.frames[state.currentFrameId] : null;
+      // Get the scan for the current frame
       const scan = currentFrame ? state.scans[currentFrame.scan] : undefined;
       if (!scan) {
         // scan was removed from list by review mode; do nothing
         return {};
       }
+      // Get information about experiment associated with current frame
       const experiment = currentFrame.experiment
         ? state.experiments[currentFrame.experiment] : null;
+      // Get the project associated with current experiment
       const project = state.projects.filter((x) => x.id === experiment.project)[0];
+      // Get list of scans for current experiment
       const experimentScansList = state.experimentScans[experiment.id];
+      // Get list of frames associated with current scan
       const scanFramesList = state.scanFrames[scan.id];
+      // ?
       let upTo = currentFrame.firstFrameInPreviousScan;
       let downTo = currentFrame.firstFrameInNextScan;
       if (upTo && !Object.keys(state.scans).includes(state.frames[upTo].scan)) {
