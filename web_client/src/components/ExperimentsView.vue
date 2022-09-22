@@ -111,12 +111,6 @@ export default {
         color,
       };
     },
-    scanIsCurrent(scan) {
-      if (scan === this.currentScan) {
-        return ' current';
-      }
-      return '';
-    },
     scanState(scan) {
       let state;
       if (this.currentTaskOverview) {

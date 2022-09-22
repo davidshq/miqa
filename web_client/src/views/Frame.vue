@@ -105,12 +105,6 @@ export default {
       const frameId = this.currentScanFrames[index];
       this.$router.push(frameId).catch(this.handleNavigationError);
     },
-    advanceLoop() {
-      if (this.scanning) {
-        this.updateFrame();
-        this.nextAnimRequest = window.requestAnimationFrame(this.advanceLoop);
-      }
-    },
     onFrameDownloadProgress(e) {
       this.downloadLoaded = e.loaded;
       this.downloadTotal = e.total;
@@ -148,6 +142,8 @@ export default {
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
+    <!-- Show Loading Message -->
+    <!-- TODO: Extract Loading Message into separate component -->
     <v-layout
       v-if="loadingFrame"
       class="loading-indicator-container"
@@ -178,7 +174,9 @@ export default {
         </v-row>
       </v-col>
     </v-layout>
+    <!-- End Loading Message -->
     <template v-if="currentFrame">
+      <!-- Show VTK Viewers -->
       <v-flex class="layout-container">
         <div class="my-layout">
           <div
@@ -200,6 +198,7 @@ export default {
           </div>
         </v-layout>
       </v-flex>
+      <!-- End Show VTK Viewers -->
       <ControlPanel />
     </template>
   </v-layout>
