@@ -115,6 +115,7 @@ function loadFile(frame, { onDownloadProgress = null } = {}) {
     client = axios.create();
     downloadURL = frame.download_url;
   }
+  // ReaderFactory is from utils/ReaderFactory
   const { promise } = ReaderFactory.downloadFrame(
     client,
     `image${frame.extension}`,

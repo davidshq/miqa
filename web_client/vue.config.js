@@ -15,9 +15,17 @@ module.exports = {
   },
   lintOnSave: false,
   publicPath: process.env.VUE_APP_STATIC_PATH,
-  configureWebpack: {
-    devtool: 'eval-source-map',
-    plugins: [
+  configureWebpack: (config) => {
+    if (process.env.NODE_ENV === 'development') {
+      config.devtool = 'eval-source-map';
+      config.output.devtoolModuleFilenameTemplate = (info) => info.resourcePath.match(/\.vue$/) && !info.identifier.match(/type=script/)
+        ? `webpack-generated:///${info.resourcePath}?${info.hash}`
+        : `webpack-miqa:///${info.resourcePath}`;
+
+      config.output.devtoolFallbackModuleFilenameTemplate = 'webpack:///[resource-path]?[hash]';
+    }
+    config.plugins = [
+      ...config.plugins,
       new CopyPlugin({
         patterns: [
           {
@@ -61,12 +69,11 @@ module.exports = {
           VERSION: JSON.stringify(packageJson.version),
         },
       }),
-    ],
-    performance: {
+    ];
+    config.performance = {
       maxEntrypointSize: 4000000,
       maxAssetSize: 40000000,
-
-    },
+    };
   },
   chainWebpack: (config) => {
     vtkChainWebpack(config);

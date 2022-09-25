@@ -44,11 +44,13 @@ export default {
     orderedExperiments() {
       return this.experimentIds.map((expId) => this.experiments[expId]);
     },
+    // Which loading icon to show
     loadingIcon() {
       return this.loadingExperiment
         ? 'mdi-progress-clock'
         : 'mdi-check-circle-outline';
     },
+    // What color the loading icon should be
     loadingIconColor() {
       return this.loadingExperiment ? 'red' : 'green';
     },
