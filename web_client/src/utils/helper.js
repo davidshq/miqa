@@ -1,3 +1,11 @@
+/**
+ * Calculate the size of the images being downloaded
+ *
+ * @param size
+ * @param base
+ * @param unit
+ * @returns {`${string} B`|`${*}  ${string}B`}
+ */
 export default function formatSize(size, { base = 1024, unit = 'B' } = {}) {
   if (size < base) {
     return `${size} ${unit}`;

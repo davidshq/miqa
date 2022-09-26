@@ -19,6 +19,7 @@ export default {
     ControlPanel,
   },
   inject: ['user'],
+  // This is triggered by Vue Router every time we move between frames
   async beforeRouteUpdate(to, from, next) {
     const toFrame = await this.getFrame({ frameId: to.params.frameId, projectId: undefined });
     next(true);
@@ -29,6 +30,7 @@ export default {
       });
     }
   },
+  // triggered moving between projects and frames
   async beforeRouteLeave(to, from, next) {
     next(true);
   },
@@ -51,9 +53,12 @@ export default {
     currentScanFrames() {
       return this.scanFrames[this.currentScan.id];
     },
+    // Calculate percentage of requested images downloaded
     downloadProgressPercent() {
       return 100 * (this.downloadLoaded / this.downloadTotal);
     },
+    // Show downloading message with percent complete, once downloaded,
+    // show loading image viewer message
     loadProgressMessage() {
       if (this.downloadTotal && this.downloadLoaded === this.downloadTotal) {
         return 'Loading image viewer...';
@@ -76,6 +81,7 @@ export default {
       this.debouncedFrameSliderChange,
       30,
     );
+    // The desired project/frame id's are passed in via the route
     const { projectId, frameId } = this.$route.params;
     const frame = await this.getFrame({ frameId, projectId });
     if (frame) {
@@ -84,6 +90,7 @@ export default {
         onDownloadProgress: this.onFrameDownloadProgress,
       });
     } else {
+      // TODO: There is no function to handleNavigationError
       this.$router.replace('/').catch(this.handleNavigationError);
     }
   },
@@ -105,6 +112,7 @@ export default {
       const frameId = this.currentScanFrames[index];
       this.$router.push(frameId).catch(this.handleNavigationError);
     },
+    // Update download percents for loading bar
     onFrameDownloadProgress(e) {
       this.downloadLoaded = e.loaded;
       this.downloadTotal = e.total;

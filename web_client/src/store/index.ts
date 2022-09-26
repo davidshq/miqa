@@ -42,7 +42,7 @@ function shrinkProxyManager(proxyManager) {
   });
 }
 
-// Disable Axes visibility, set interpolationtype to nearest and render
+// Disable Axes visibility, set InterpolationType to nearest and render
 // each view
 function prepareProxyManager(proxyManager) {
   if (!proxyManager.getViews().length) {
@@ -104,7 +104,7 @@ function getData(id, file, webWorker = null) {
   });
 }
 
-// Download file if cached
+// Load file from cache if possible
 function loadFile(frame, { onDownloadProgress = null } = {}) {
   if (fileCache.has(frame.id)) {
     return { frameId: frame.id, fileP: fileCache.get(frame.id) };
@@ -745,10 +745,19 @@ const {
         },
       });
     },
+    /**
+     * Get the desired frame
+     *
+     * @param state       Object   Contains the entire Vuex store for MIQA
+     * @param dispatch
+     * @param frameId     string   ID of the frame to load, e.g. de0f2e0a-3dfb-47b7-831b-9dd562caa6cf
+     * @param projectId   string   ID of the currently loaded project, e.g., 2dd4e46d-0a34-4267-be8c-3ccfbd4e9fcc
+     */
     async getFrame({ state, dispatch }, { frameId, projectId }) {
       if (!frameId) {
         return undefined;
       }
+      // If currently loaded frameId does not match frameId to load
       if (!state.frames[frameId]) {
         await dispatch('loadProjects');
         const targetProject = state.projects.filter((proj) => proj.id === projectId)[0];
@@ -759,6 +768,7 @@ const {
     async setCurrentFrame({ commit }, frameId) {
       commit('setCurrentFrameId', frameId);
     },
+    // This is a key function
     async swapToFrame({
       state, dispatch, getters, commit,
     }, { frame, onDownloadProgress = null }) {
@@ -772,13 +782,12 @@ const {
       commit('setErrorLoadingFrame', false);
       const oldScan = getters.currentScan;
       const newScan = state.scans[frame.scan];
-      const oldExperiment = getters.currentExperiment
-        ? getters.currentExperiment
-        : null;
+      const oldExperiment = getters.currentExperiment ?? null;
       const newExperimentId = state.scans[frame.scan].experiment;
       const newExperiment = state.experiments[newExperimentId];
 
       // Check if we should cancel the currently loading experiment
+      // e.g., if user is attempting to load a new experiment that is different from the current experiment
       if (
         newExperiment
         && oldExperiment
@@ -805,6 +814,8 @@ const {
         newProxyManager = true;
       }
 
+      // vtkProxyManager is from VTK.js
+      // If it doesn't exist, create new instance of proxyManager
       if (!state.proxyManager || newProxyManager) {
         state.proxyManager = vtkProxyManager.newInstance({
           proxyConfiguration: proxy,
@@ -812,6 +823,7 @@ const {
         state.vtkViews = [];
       }
 
+      // sourceProxy / source?
       let sourceProxy = state.proxyManager.getActiveSource();
       let needPrep = false;
       if (!sourceProxy) {
@@ -822,18 +834,21 @@ const {
         needPrep = true;
       }
 
-      // This try catch and within logic are mainly for handling data doesn't exist issue
+      // This try catch and logic within it are mainly for handling data doesn't exist issue
       try {
         let frameData = null;
+        // load from cache if possible
         if (frameCache.has(frame.id)) {
           frameData = frameCache.get(frame.id).frameData;
         } else {
+          // download from server if not cached
           const result = await loadFileAndGetData(
             frame, { onDownloadProgress },
           );
           frameData = result.frameData;
         }
         sourceProxy.setInputData(frameData);
+        // If sourceProxy doesn't have valid config or proxyManager has no views
         if (needPrep || !state.proxyManager.getViews().length) {
           prepareProxyManager(state.proxyManager);
           state.vtkViews = state.proxyManager.getViews();

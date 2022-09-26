@@ -196,7 +196,7 @@ const djangoClient = {
     const { results } = data;
     return results;
   },
-  async frame(frameId: string): Promise<Frame> {
+  async frame(frameId: string): Promise<Frame> { // TODO: This is hit repeatedly when changing frames within MIQA, frameId is the same, perhaps dozens of times?
     const { data } = await apiClient.get(`/frames/${frameId}`);
     return data;
   },

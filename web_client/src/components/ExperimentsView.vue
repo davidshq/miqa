@@ -75,6 +75,7 @@ export default {
       'loadProject',
     ]),
     scansForExperiment(expId) {
+      // expId looks like: c06a53c8-3d1e-479e-9c13-731886a69b47
       const expScanIds = this.experimentScans[expId];
       return expScanIds.filter(
         (scanId) => Object.keys(this.scans).includes(scanId),
@@ -99,6 +100,7 @@ export default {
       return `/${this.currentProject.id}/${this.scanFrames[scanId][0]}`;
     },
     decisionToRating(decisions) {
+      // decisions are an array of objects
       if (decisions.length === 0) return {};
       const rating = _.first(_.sortBy(decisions, (dec) => dec.created)).decision;
       let color = 'grey--text';
