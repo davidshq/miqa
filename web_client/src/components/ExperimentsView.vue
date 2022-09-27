@@ -74,12 +74,16 @@ export default {
     ...mapActions([
       'loadProject',
     ]),
+    // TODO: For unknown reason we seem to be running this function 3x(numOfScans)
+    // and this occurs over the same scans
     scansForExperiment(expId) {
+      // Get the ids of all scans in specified experiment
       // expId looks like: c06a53c8-3d1e-479e-9c13-731886a69b47
       const expScanIds = this.experimentScans[expId];
       return expScanIds.filter(
         (scanId) => Object.keys(this.scans).includes(scanId),
       ).map((scanId) => {
+        // scanId looks like: 1ec0847e-b324-4bf4-9b42-bf11215fdea4
         const scan = this.scans[scanId];
         return {
           ...scan,
@@ -87,6 +91,15 @@ export default {
         };
       });
     },
+    /**
+     * Receives a string like "NCANDA_E08710" (name of an image file),
+     * this is used as the experiment name
+     *
+     * TODO: This function is called ~4x times the number of experiments + scans in the project.
+     *
+     * @param str
+     * @returns {string|*}
+     */
     ellipsisText(str) {
       if (!this.minimal) return str;
       if (str.length > 25) {
@@ -96,9 +109,22 @@ export default {
       }
       return str;
     },
+    /**
+     * Get the URL of the first frame in the current scan
+     *
+     * @param scanId
+     * @returns {string}
+     */
     getURLForFirstFrameInScan(scanId) {
+
       return `/${this.currentProject.id}/${this.scanFrames[scanId][0]}`;
     },
+    /**
+     * Assigns a color and character if a decision has been rendered on a given scan
+     *
+     * @param decisions
+     * @returns {{decision: (*|string), color: string}|{}}
+     */
     decisionToRating(decisions) {
       // decisions are an array of objects
       if (decisions.length === 0) return {};
@@ -115,6 +141,11 @@ export default {
         color,
       };
     },
+    /**
+     * ?
+     * @param scan
+     * @returns {string}
+     */
     scanState(scan) {
       let state;
       if (this.currentTaskOverview) {
@@ -129,9 +160,11 @@ export default {
       }
       return classes;
     },
+    // Delays for .5 seconds
     delayPrepareDropZone() {
       setTimeout(this.prepareDropZone, 500);
     },
+    // Listens for images being dragged into the dropzone
     prepareDropZone() {
       const dropZone = document.getElementById('dropZone');
       if (dropZone) {
@@ -145,9 +178,15 @@ export default {
         });
       }
     },
+    // Gets files that are dropped
     addDropFiles(e) {
       this.fileSetForUpload = [...e.dataTransfer.files];
     },
+    /**
+     * Uploads images to experiment
+     *
+     * @returns {Promise<void>}
+     */
     async uploadToExperiment() {
       let experimentId;
       this.uploading = true;

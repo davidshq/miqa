@@ -34,7 +34,11 @@ const poolSize = Math.floor(navigator.hardwareConcurrency / 2) || 2;
 let taskRunId = -1;
 let savedWorker = null;
 
-// Delete existing proxyManager views
+/**
+ * Delete existing VTK.js proxyManager views
+ *
+ * @param proxyManager
+ */
 function shrinkProxyManager(proxyManager) {
   proxyManager.getViews().forEach((view) => {
     view.setContainer(null);
@@ -42,8 +46,12 @@ function shrinkProxyManager(proxyManager) {
   });
 }
 
-// Disable Axes visibility, set InterpolationType to nearest and render
-// each view
+/**
+ * Disable Axes visibility, set InterpolationType to nearest and render
+ * each view
+ *
+ * @param proxyManager
+ */
 function prepareProxyManager(proxyManager) {
   if (!proxyManager.getViews().length) {
     ['View2D_Z:z', 'View2D_X:x', 'View2D_Y:y'].forEach((type) => {
@@ -59,14 +67,32 @@ function prepareProxyManager(proxyManager) {
   }
 }
 
-// Array name is file name minus last extension, e.g. image.nii.gz => image.nii
+/**
+ * Array name is file name minus last extension
+ *
+ * e.g. image.nii.gz => image.nii
+ *
+ * @param filename
+ */
 function getArrayName(filename) {
   const idx = filename.lastIndexOf('.');
   const name = idx > -1 ? filename.substring(0, idx) : filename;
   return `Scalars ${name}`;
 }
 
-// Load image data from cache or file
+/**
+ * Load image data from cache or file
+ *
+ * 1. Checks cache for copy
+ * 2. Loads from cache or server
+ * 3. Reads image using ITK
+ * 4. Converts image from ITK to VTK
+ * 5. ...
+ *
+ * @param id
+ * @param file
+ * @param webWorker
+ */
 function getData(id, file, webWorker = null) {
   return new Promise((resolve, reject) => {
     // Load image from frame cache if available
@@ -81,7 +107,8 @@ function getData(id, file, webWorker = null) {
         // Read image with ITK
         readImageArrayBuffer(webWorker, io.result, fileName)
           .then(({ webWorker, image }) => { // eslint-disable-line no-shadow
-            // Convert ITK to VTK image
+            // Convert ITK to VTK image uses below from vtk.js:
+            // https://github.com/Kitware/vtk-js/blob/master/Sources/Common/DataModel/ITKHelper/index.js
             const frameData = convertItkToVtkImage(image, {
               scalarArrayName: getArrayName(fileName),
             });
@@ -104,11 +131,20 @@ function getData(id, file, webWorker = null) {
   });
 }
 
-// Load file from cache if possible
+/**
+ * Load file from cache if possible
+ *
+ * Only called by loadFileAndGetData
+ *
+ * @param frame
+ * @param onDownloadProgress
+ */
 function loadFile(frame, { onDownloadProgress = null } = {}) {
+  // If frame is cached, return it
   if (fileCache.has(frame.id)) {
     return { frameId: frame.id, fileP: fileCache.get(frame.id) };
   }
+  // Otherwise download the frame
   let client = apiClient;
   let downloadURL = `/frames/${frame.id}/download`;
   if (frame.download_url) {
@@ -126,6 +162,14 @@ function loadFile(frame, { onDownloadProgress = null } = {}) {
   return { frameId: frame.id, fileP: promise };
 }
 
+/**
+ * Gets the data from the selected image file using a webWorker.
+ *
+ * Only called by swapToFrame
+ *
+ * @param frame
+ * @param onDownloadProgress
+ */
 function loadFileAndGetData(frame, { onDownloadProgress = null } = {}) {
   const loadResult = loadFile(frame, { onDownloadProgress });
   return loadResult.fileP.then((file) => getData(frame.id, file, savedWorker)
@@ -145,7 +189,12 @@ function loadFileAndGetData(frame, { onDownloadProgress = null } = {}) {
     }));
 }
 
-// Use a worker to download image files
+/**
+ * Use a worker to download image files
+ *
+ * @param webWorker
+ * @param taskInfo
+ */
 function poolFunction(webWorker, taskInfo) {
   return new Promise((resolve, reject) => {
     const { frame } = taskInfo;
@@ -188,13 +237,22 @@ function poolFunction(webWorker, taskInfo) {
   });
 }
 
+/**
+ * Calculates the percent downloaded of currently loading frames
+ *
+ * @param completed
+ * @param total
+ */
 function progressHandler(completed, total) {
   const percentComplete = completed / total;
   store.commit.setScanCachedPercentage(percentComplete);
 }
 
-// Creates array of tasks to run then runs tasks
-// in parallel
+/**
+ * Creates array of tasks to run then runs tasks in parallel
+ *
+ * Only called by checkLoadExperiment
+ */
 function startReaderWorkerPool() {
   const taskArgsArray = readDataQueue.map((taskInfo) => [taskInfo]);
   readDataQueue = [];
@@ -217,7 +275,14 @@ function startReaderWorkerPool() {
     });
 }
 
-// Cache frames associated with scans of current experiment
+/**
+ * Cache frames associated with scans of current experiment
+ *
+ * Only called by swapToFrame
+ *
+ * @param oldValue
+ * @param newValue
+ */
 function checkLoadExperiment(oldValue, newValue) {
   if (
     !newValue
@@ -227,6 +292,7 @@ function checkLoadExperiment(oldValue, newValue) {
   }
 
   readDataQueue = [];
+  // Get scans associated with `newValue` (a selected experiment)
   const newExperimentScans = store.state.experimentScans[newValue.id];
   newExperimentScans.forEach((scanId) => {
     const scanFrames = store.state.scanFrames[scanId].map(
@@ -245,7 +311,13 @@ function checkLoadExperiment(oldValue, newValue) {
   startReaderWorkerPool();
 }
 
-// get next frame (across experiments and scans)
+/**
+ * Get next frame (across experiments and scans)
+ *
+ * @param experiments
+ * @param i
+ * @param j
+ */
 function getNextFrame(experiments, i, j) {
   const experiment = experiments[i];
   const { scans } = experiment;
@@ -266,9 +338,20 @@ function getNextFrame(experiments, i, j) {
   return nextScan.frames[0];
 }
 
+/**
+ * ?
+ *
+ * Only called by `getData`
+ *
+ * @param frameId
+ * @param dataRange
+ */
 function expandScanRange(frameId, dataRange) {
+  // If we have a frame
   if (frameId in store.state.frames) {
+    // Get the scanId from the frame.
     const scanId = store.state.frames[frameId].scan;
+    // Get the scan of specified scanId
     const scan = store.state.scans[scanId];
     if (scan && dataRange[0] < scan.cumulativeRange[0]) {
       [scan.cumulativeRange[0]] = dataRange;
@@ -335,9 +418,22 @@ const {
     lastApiRequestTime: Date.now(),
   },
   getters: {
+    /**
+     * Return all the state
+     *
+     * Never called
+     *
+     * @param state
+     */
     wholeState(state) {
       return state;
     },
+    /**
+     * Runs for each VTKView?
+     *
+     * @param state
+     * @returns Object
+     */
     currentViewData(state) {
       // Get the current frame
       const currentFrame = state.currentFrameId ? state.frames[state.currentFrameId] : null;
@@ -388,17 +484,40 @@ const {
         currentAutoEvaluation: currentFrame.frame_evaluation,
       };
     },
+    /**
+     * Gets the current frame when given a frameId
+     *
+     * @param state
+     */
     currentFrame(state) {
       return state.currentFrameId ? state.frames[state.currentFrameId] : null;
     },
+    /**
+     * Gets the previous frame based on the currentFrame
+     *
+     * @param state
+     * @param getters
+     */
     previousFrame(state, getters) {
       return getters.currentFrame
         ? getters.currentFrame.previousFrame
         : null;
     },
+    /**
+     * Gets the next frame based on the currentFrame
+     *
+     * @param state
+     * @param getters
+     */
     nextFrame(state, getters) {
       return getters.currentFrame ? getters.currentFrame.nextFrame : null;
     },
+    /**
+     * Gets the current scan via the currentFrame
+     *
+     * @param state
+     * @param getters
+     */
     currentScan(state, getters) {
       if (getters.currentFrame) {
         const curScanId = getters.currentFrame.scan;
@@ -406,6 +525,12 @@ const {
       }
       return null;
     },
+    /**
+     * Gets the currentExperiment via the currentScan
+     *
+     * @param state
+     * @param getters
+     */
     currentExperiment(state, getters) {
       if (getters.currentScan) {
         const curExperimentId = getters.currentScan.experiment;
@@ -413,6 +538,11 @@ const {
       }
       return null;
     },
+    /**
+     * Enumerates permissions of logged in user
+     *
+     * @param state
+     */
     myCurrentProjectRoles(state) {
       const projectPerms = Object.entries(state.currentProjectPermissions)
         .filter((entry: [string, Array<User>]): Boolean => entry[1].map(
@@ -424,23 +554,58 @@ const {
       }
       return projectPerms;
     },
+    /**
+     * Returns true if no project has been selected
+     *
+     * @param state
+     */
     isGlobal(state) {
       return state.currentProject === null;
     },
   },
   mutations: {
+    /**
+     * ?
+     *
+     * @param state
+     */
     reset(state) {
       Object.assign(state, { ...state, ...initState });
     },
+    /**
+     * Sets MIQAConfig equal to configuration
+     *
+     * @param state
+     * @param configuration
+     */
     setMIQAConfig(state, configuration) {
       state.MIQAConfig = configuration;
     },
+    /**
+     * Sets me to me
+     *
+     * @param state
+     * @param me
+     */
     setMe(state, me) {
       state.me = me;
     },
+    /**
+     * Sets allUsers to allUsers
+     *
+     * @param state
+     * @param allUsers
+     */
     setAllUsers(state, allUsers) {
       state.allUsers = allUsers;
     },
+    /**
+     * Resets project state when loading a new project
+     *
+     * Only called by loadProject
+     *
+     * @param state
+     */
     resetProject(state) {
       state.experimentIds = [];
       state.experiments = {};
@@ -449,23 +614,59 @@ const {
       state.scanFrames = {};
       state.frames = {};
     },
+    /**
+     * Sets the currentFrameId to frameId
+     *
+     * @param state
+     * @param frameId
+     */
     setCurrentFrameId(state, frameId) {
       state.currentFrameId = frameId;
     },
+    /**
+     * What?
+     *
+     * @param state
+     * @param frameId
+     * @param frame
+     */
     setFrame(state, { frameId, frame }) {
       // Replace with a new object to trigger a Vuex update
       state.frames = { ...state.frames };
       state.frames[frameId] = frame;
     },
+    /**
+     * What?
+     *
+     * @param state
+     * @param scanId
+     * @param scan
+     */
     setScan(state, { scanId, scan }) {
       // Replace with a new object to trigger a Vuex update
       state.scans = { ...state.scans };
       state.scans[scanId] = scan;
       state.allScans = Object.assign(state.allScans, state.scans);
     },
+    /**
+     * Set the renderOrientation
+     *
+     * Only called by `ProjectSettings.vue` when saving a project's settings.
+     *
+     * @param state
+     * @param anatomy
+     */
     setRenderOrientation(state, anatomy) {
       state.renderOrientation = anatomy;
     },
+    /**
+     * Sets the Vuex currentProject
+     *
+     * Also sets renderOrientation and currentProjectPermissions
+     *
+     * @param state
+     * @param project
+     */
     setCurrentProject(state, project: Project | null) {
       state.currentProject = project;
       if (project) {
@@ -473,9 +674,20 @@ const {
         state.currentProjectPermissions = project.settings.permissions;
       }
     },
+    /**
+     * Named the same as django.ts function?
+     *
+     * @param state
+     * @param settings
+     */
     setGlobalSettings(state, settings) {
       state.globalSettings = settings;
     },
+    /**
+     *
+     * @param state
+     * @param taskOverview
+     */
     setTaskOverview(state, taskOverview: ProjectTaskOverview) {
       if (!taskOverview) return;
       if (taskOverview.scan_states) {
@@ -497,43 +709,115 @@ const {
         });
       }
     },
+    /**
+     * Gets a list of projects
+     *
+     * @param state
+     * @param projects
+     */
     setProjects(state, projects: Project[]) {
       state.projects = projects;
     },
+    /**
+     * Adds a scanDecision to a scan
+     *
+     * @param state
+     * @param currentScan
+     * @param newDecision
+     */
     addScanDecision(state, { currentScan, newDecision }) {
       state.scans[currentScan].decisions.push(newDecision);
     },
+    /**
+     * ?
+     *
+     * @param state
+     * @param evaluation
+     */
     setFrameEvaluation(state, evaluation) {
       const currentFrame = state.currentFrameId ? state.frames[state.currentFrameId] : null;
       if (currentFrame) {
         currentFrame.frame_evaluation = evaluation;
       }
     },
+    /**
+     * Used by both `ScreenshotDialog.vue` and `VtkViewer.vue`
+     *
+     * @param state
+     * @param screenshot
+     */
     setCurrentScreenshot(state, screenshot) {
       state.currentScreenshot = screenshot;
     },
+    /**
+     * Create a screenshot
+     *
+     * Only called by `ScreenshotDialog.vue`
+     *
+     * @param state
+     * @param screenshot
+     */
     addScreenshot(state, screenshot) {
       state.screenshots.push(screenshot);
     },
+    /**
+     * Removes a screenshot
+     *
+     * @param state
+     * @param screenshot
+     */
     removeScreenshot(state, screenshot) {
       state.screenshots.splice(state.screenshots.indexOf(screenshot), 1);
     },
+    /**
+     * Updates the last time the API was requested to now
+     *
+     * @param state
+     */
     updateLastApiRequestTime(state) {
       state.lastApiRequestTime = Date.now();
     },
+    /**
+     *
+     * @param state
+     * @param value
+     */
     setLoadingFrame(state, value) {
       state.loadingFrame = value;
     },
+    /**
+     *
+     * @param state
+     * @param value
+     */
     setErrorLoadingFrame(state, value) {
       state.errorLoadingFrame = value;
     },
+    /**
+     *
+     * @param state
+     * @param sid
+     * @param id
+     */
     addScanFrames(state, { sid, id }) {
       state.scanFrames[sid].push(id);
     },
+    /**
+     *
+     * @param state
+     * @param eid
+     * @param sid
+     */
     addExperimentScans(state, { eid, sid }) {
       state.scanFrames[sid] = [];
       state.experimentScans[eid].push(sid);
     },
+    /**
+     *
+     * @param state
+     * @param id
+     * @param value
+     */
     addExperiment(state, { id, value }) {
       state.experimentScans[id] = [];
       if (!state.experimentIds.includes(id)) {
@@ -541,17 +825,37 @@ const {
       }
       state.experiments[id] = value;
     },
+    /**
+     *
+     * @param state
+     * @param experiment
+     */
     updateExperiment(state, experiment) {
       // Necessary for reactivity
       state.experiments = { ...state.experiments };
       state.experiments[experiment.id] = experiment;
     },
+    /**
+     *
+     * @param state
+     * @param lockState
+     */
     setWindowLocked(state, lockState) {
       state.windowLocked = lockState;
     },
+    /**
+     *
+     * @param state
+     * @param percentComplete
+     */
     setScanCachedPercentage(state, percentComplete) {
       state.scanCachedPercentage = percentComplete;
     },
+    /**
+     *
+     * @param state
+     * @param ijkLocation
+     */
     setSliceLocation(state, ijkLocation) {
       if (Object.values(ijkLocation).every((value) => value !== undefined)) {
         state.vtkViews.forEach(
@@ -563,22 +867,53 @@ const {
         );
       }
     },
+    /**
+     *
+     * @param state
+     * @param indexAxis
+     * @param value
+     */
     setCurrentVtkIndexSlices(state, { indexAxis, value }) {
       state[`${indexAxis}IndexSlice`] = value;
       state.sliceLocation = undefined;
     },
+    /**
+     *
+     * @param state
+     * @param value
+     */
     setCurrentWindowWidth(state, value) {
       state.currentWindowWidth = value;
     },
+    /**
+     *
+     * @param state
+     * @param value
+     */
     setCurrentWindowLevel(state, value) {
       state.currentWindowLevel = value;
     },
+    /**
+     *
+     * @param state
+     * @param show
+     */
     setShowCrosshairs(state, show) {
       state.showCrosshairs = show;
     },
+    /**
+     *
+     * @param state
+     * @param value
+     */
     setStoreCrosshairs(state, value) {
       state.storeCrosshairs = value;
     },
+    /**
+     *
+     * @param state
+     * @param mode
+     */
     switchReviewMode(state, mode) {
       state.reviewMode = mode || false;
       if (mode) {
@@ -604,6 +939,11 @@ const {
     },
   },
   actions: {
+    /**
+     *
+     * @param state
+     * @param commit
+     */
     reset({ state, commit }) {
       if (taskRunId >= 0) {
         state.workerPool.cancel(taskRunId);
@@ -613,18 +953,34 @@ const {
       fileCache.clear();
       frameCache.clear();
     },
+    /**
+     *
+     * @param commit
+     */
     async loadConfiguration({ commit }) {
       const configuration = await djangoRest.MIQAConfig();
       commit('setMIQAConfig', configuration);
     },
+    /**
+     *
+     * @param commit
+     */
     async loadMe({ commit }) {
       const me = await djangoRest.me();
       commit('setMe', me);
     },
+    /**
+     *
+     * @param commit
+     */
     async loadAllUsers({ commit }) {
       const allUsers = await djangoRest.allUsers();
       commit('setAllUsers', allUsers.results);
     },
+    /**
+     *
+     * @param commit
+     */
     async loadGlobal({ commit }) {
       const globalSettings = await djangoRest.globalSettings();
       commit('setCurrentProject', null);
@@ -634,10 +990,19 @@ const {
       });
       commit('setTaskOverview', {});
     },
+    /**
+     *
+     * @param commit
+     */
     async loadProjects({ commit }) {
       const projects = await djangoRest.projects();
       commit('setProjects', projects);
     },
+    /**
+     *
+     * @param commit
+     * @param project
+     */
     async loadProject({ commit }, project: Project) {
       commit('resetProject');
 
@@ -725,6 +1090,12 @@ const {
       const taskOverview = await djangoRest.projectTaskOverview(project.id);
       commit('setTaskOverview', taskOverview);
     },
+    /**
+     *
+     * @param commit
+     * @param getters
+     * @param scanId
+     */
     async reloadScan({ commit, getters }, scanId) {
       const { currentFrame } = getters;
       scanId = scanId || currentFrame.scan;
@@ -765,10 +1136,23 @@ const {
       }
       return state.frames[frameId];
     },
+    /**
+     *
+     * @param commit
+     * @param frameId
+     */
     async setCurrentFrame({ commit }, frameId) {
       commit('setCurrentFrameId', frameId);
     },
-    // This is a key function
+    /**
+     * This is a key function
+     * @param state
+     * @param dispatch
+     * @param getters
+     * @param commit
+     * @param frame
+     * @param onDownloadProgress
+     */
     async swapToFrame({
       state, dispatch, getters, commit,
     }, { frame, onDownloadProgress = null }) {
@@ -782,7 +1166,7 @@ const {
       commit('setErrorLoadingFrame', false);
       const oldScan = getters.currentScan;
       const newScan = state.scans[frame.scan];
-      const oldExperiment = getters.currentExperiment ?? null;
+      const oldExperiment = getters.currentExperiment ? getters.currentExperiment : null;
       const newExperimentId = state.scans[frame.scan].experiment;
       const newExperiment = state.experiments[newExperimentId];
 
@@ -895,6 +1279,14 @@ const {
         }
       }
     },
+    /**
+     * Sets a lock on the current experiment
+     *
+     * @param commit
+     * @param experimentId
+     * @param lock
+     * @param force
+     */
     async setLock({ commit }, { experimentId, lock, force }) {
       if (lock) {
         commit(

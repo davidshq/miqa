@@ -129,6 +129,7 @@ export default {
     },
   },
   watch: {
+    // Resets currentViewData for present/absent whenever image changes
     currentViewData() {
       this.confirmedPresent = [];
       this.confirmedAbsent = [];
