@@ -90,8 +90,8 @@ function getArrayName(filename) {
  * 4. Converts image from ITK to VTK
  * 5. ...
  *
- * @param id          Frame ID
- * @param file
+ * @param id          Frame ID to load
+ * @param file        File to load
  * @param webWorker
  */
 function getData(id, file, webWorker = null) {
@@ -119,7 +119,7 @@ function getData(id, file, webWorker = null) {
               .getRange();
             frameCache.set(id, { frameData });
             // eslint-disable-next-line no-use-before-define
-            expandScanRange(id, dataRange);
+            expandScanRange(id, dataRange); // Example dataRange: [0, 3819]
             resolve({ frameData, webWorker });
           })
           .catch((error) => {
@@ -277,6 +277,7 @@ function startReaderWorkerPool() {
 }
 
 /**
+ * Queues scans for download
  *
  * @param scan
  * @param loadNext  Boolean
@@ -324,7 +325,7 @@ function queueLoadScan(scan, loadNext = false) {
 }
 
 /**
- * Get next frame (across experiments and scans)
+ * Get next frame in specific experiment/scan
  *
  * @param experiments         Pass in all the experiments associated with the project
  * @param experimentIndex     The specific index of the experiment we are looking for
@@ -351,12 +352,15 @@ function getNextFrame(experiments, experimentIndex, scanIndex) {
 }
 
 /**
- * ?
+ * Expands individual scan range
+ *
+ * If the range (e.g. [0, 3819] in a scan is <> the range read from data,
+ * ensure that the ranges match
  *
  * Only called by `getData`
  *
  * @param frameId
- * @param dataRange
+ * @param dataRange Array
  */
 function expandScanRange(frameId, dataRange) {
   // If we have a frame
@@ -443,7 +447,7 @@ const {
     /**
      * Runs for each VTKView?
      *
-     * @param state
+     * @param state   All Vuex state in MIQA app
      * @returns Object
      */
     currentViewData(state) {
@@ -499,7 +503,7 @@ const {
     /**
      * Gets the current frame when given a frameId
      *
-     * @param state
+     * @param state All state in MIQA Vuex store
      */
     currentFrame(state) {
       return state.currentFrameId ? state.frames[state.currentFrameId] : null;
@@ -577,9 +581,10 @@ const {
   },
   mutations: {
     /**
-     * ?
+     * Resets all state to that set in initState
      *
      * @param state
+     * @returns state Object
      */
     reset(state) {
       Object.assign(state, { ...state, ...initState });
@@ -587,17 +592,17 @@ const {
     /**
      * Sets MIQAConfig equal to configuration
      *
-     * @param state
-     * @param configuration
+     * @param state         The whole state for the MIQA Vuex store
+     * @param configuration The configuration object as received from Django API
      */
     setMIQAConfig(state, configuration) {
       state.MIQAConfig = configuration;
     },
     /**
-     * Sets me to me
+     * Sets me to me received from API
      *
-     * @param state
-     * @param me
+     * @param state Whole state associated with MIQA Vuex Store
+     * @param me    Me object received from Django API
      */
     setMe(state, me) {
       state.me = me;
@@ -636,7 +641,7 @@ const {
       state.currentFrameId = frameId;
     },
     /**
-     * What?
+     * Sets a specific index within the frames array to a specified frame
      *
      * @param state
      * @param frameId Id of passed in frame
@@ -648,7 +653,7 @@ const {
       state.frames[frameId] = frame;
     },
     /**
-     * What?
+     * Adds a scan to state.scans, then adds state.scans to allScans
      *
      * @param state
      * @param scanId  The scan's Id
@@ -672,9 +677,9 @@ const {
       state.renderOrientation = anatomy;
     },
     /**
-     * Sets the Vuex currentProject
+     * Sets state.currentProject
      *
-     * Also sets renderOrientation and currentProjectPermissions
+     * Also sets state.renderOrientation and state.currentProjectPermissions
      *
      * @param state
      * @param project
@@ -687,21 +692,24 @@ const {
       }
     },
     /**
-     * Named the same as django.ts function?
+     * Sets state.globalSettings to settings passed by Django API
+     *
+     * TODO: Named the same as django.ts function?
      *
      * @param state
-     * @param settings
+     * @param settings  Settings from Django API
      */
     setGlobalSettings(state, settings) {
       state.globalSettings = settings;
     },
     /**
-     *
+     * TODO
      * @param state
      * @param taskOverview
      */
     setTaskOverview(state, taskOverview: ProjectTaskOverview) {
       if (!taskOverview) return;
+      // Calculates total scans and scans that have been marked completre
       if (taskOverview.scan_states) {
         state.projects.find(
           (project) => project.id === taskOverview.project_id,
@@ -712,6 +720,7 @@ const {
           ).length,
         };
       }
+      // If we have a value in state.currentProject and it's id is equal to taskOverview's project_id then:
       if (state.currentProject && taskOverview.project_id === state.currentProject.id) {
         state.currentTaskOverview = taskOverview;
         Object.values(store.state.allScans).forEach((scan: Scan) => {
@@ -741,7 +750,7 @@ const {
       state.scans[currentScan].decisions.push(newDecision);
     },
     /**
-     * ?
+     * Adds an evaluate to the current frame
      *
      * @param state
      * @param evaluation
@@ -790,20 +799,22 @@ const {
       state.lastApiRequestTime = Date.now();
     },
     /**
+     * Sets whether state.loadingFrame is true or false
      *
      * @param state
-     * @param value
+     * @param isLoading Boolean
      */
-    setLoadingFrame(state, value) {
-      state.loadingFrame = value;
+    setLoadingFrame(state, isLoading) {
+      state.loadingFrame = isLoading;
     },
     /**
+     * Sets where state.errorLoadingFrame is true or false
      *
      * @param state
-     * @param value
+     * @param isErrorLoading Boolean
      */
-    setErrorLoadingFrame(state, value) {
-      state.errorLoadingFrame = value;
+    setErrorLoadingFrame(state, isErrorLoading) {
+      state.errorLoadingFrame = isErrorLoading;
     },
     /**
      * Adds a scan ID and it's corresponding Frame ID to state.scanFrames
