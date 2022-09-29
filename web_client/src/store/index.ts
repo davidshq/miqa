@@ -193,6 +193,8 @@ function loadFileAndGetData(frame, { onDownloadProgress = null } = {}) {
 /**
  * Use a worker to download image files
  *
+ * Only used by WorkerPool
+ *
  * @param webWorker
  * @param taskInfo
  */
@@ -731,7 +733,7 @@ const {
       }
     },
     /**
-     * Gets a list of projects
+     * Pulls a list of projects and loads into state.projects
      *
      * @param state
      * @param projects
@@ -750,7 +752,7 @@ const {
       state.scans[currentScan].decisions.push(newDecision);
     },
     /**
-     * Adds an evaluate to the current frame
+     * Adds an evaluation to the current frame
      *
      * @param state
      * @param evaluation
@@ -762,6 +764,8 @@ const {
       }
     },
     /**
+     * Sets state.currentScreenshot to the passed in screenshot
+     *
      * Used by both `ScreenshotDialog.vue` and `VtkViewer.vue`
      *
      * @param state
@@ -771,7 +775,7 @@ const {
       state.currentScreenshot = screenshot;
     },
     /**
-     * Create a screenshot
+     * Adds a screenshot to state.screenshots
      *
      * Only called by `ScreenshotDialog.vue`
      *
@@ -782,7 +786,7 @@ const {
       state.screenshots.push(screenshot);
     },
     /**
-     * Removes a screenshot
+     * Removes a screenshot from state.screenshots
      *
      * @param state
      * @param screenshot
@@ -808,7 +812,7 @@ const {
       state.loadingFrame = isLoading;
     },
     /**
-     * Sets where state.errorLoadingFrame is true or false
+     * Sets whether state.errorLoadingFrame is true or false
      *
      * @param state
      * @param isErrorLoading Boolean
@@ -817,7 +821,7 @@ const {
       state.errorLoadingFrame = isErrorLoading;
     },
     /**
-     * Adds a scan ID and it's corresponding Frame ID to state.scanFrames
+     * Adds a scan ID, and it's corresponding Frame ID to state.scanFrames
      *
      * @param state
      * @param sid Scan ID
@@ -828,15 +832,17 @@ const {
     },
     /**
      * For each scan in Experiment, add it to state.experimentScans
+     *
      * @param state
-     * @param eid   Experiment ID
-     * @param sid   Scan ID
+     * @param experimentId   Experiment ID
+     * @param scanId         Scan ID
      */
-    addExperimentScans(state, { eid, sid }) {
-      state.scanFrames[sid] = []; // Why?
-      state.experimentScans[eid].push(sid);
+    addExperimentScans(state, { experimentId, scanId }) {
+      state.scanFrames[scanId] = []; // Why?
+      state.experimentScans[experimentId].push(scanId);
     },
     /**
+     * TODO?
      *
      * @param state
      * @param id    The experiment's ID?
@@ -850,6 +856,7 @@ const {
       state.experiments[id] = value; // Value looks to be the experiment data
     },
     /**
+     * Update state.experiments
      *
      * @param state
      * @param experiment
@@ -918,25 +925,28 @@ const {
       state.currentWindowLevel = value;
     },
     /**
+     * Toggle true/false for state.showCrosshairs
      *
      * @param state
-     * @param show
+     * @param show  Boolean
      */
     setShowCrosshairs(state, show) {
       state.showCrosshairs = show;
     },
     /**
+     * Toggle true/false for state.storeCrosshairs
      *
      * @param state
-     * @param value
+     * @param value Boolean
      */
     setStoreCrosshairs(state, value) {
       state.storeCrosshairs = value;
     },
     /**
+     * Toggles whether all scans or only unreviewed scans are shown
      *
      * @param state
-     * @param mode
+     * @param mode  Boolean
      */
     switchReviewMode(state, mode) {
       state.reviewMode = mode || false;
@@ -978,6 +988,7 @@ const {
       frameCache.clear();
     },
     /**
+     * Pulls configuration from Django and loads it into state
      *
      * @param commit
      */
@@ -986,6 +997,7 @@ const {
       commit('setMIQAConfig', configuration);
     },
     /**
+     * Pulls user from Django and loads it into state
      *
      * @param commit
      */
@@ -994,6 +1006,7 @@ const {
       commit('setMe', me);
     },
     /**
+     * Pulls all users from Django and loads into state
      *
      * @param commit
      */
@@ -1002,6 +1015,7 @@ const {
       commit('setAllUsers', allUsers.results);
     },
     /**
+     * Pulls global settings from Django and updates currentProject and globalSettings in state
      *
      * @param commit
      */
@@ -1015,6 +1029,7 @@ const {
       commit('setTaskOverview', {});
     },
     /**
+     * Pulls all projects from Django and loads into state
      *
      * @param commit
      */
@@ -1023,7 +1038,7 @@ const {
       commit('setProjects', projects);
     },
     /**
-     * Loads an individual project into Vue
+     * Pulls an individual project from Django and loads into state
      *
      * @param commit
      * @param project
@@ -1064,7 +1079,7 @@ const {
         const { scans } = experiment;
         for (let j = 0; j < scans.length; j += 1) {
           const scan = scans[j];
-          commit('addExperimentScans', { eid: experiment.id, sid: scan.id });
+          commit('addExperimentScans', { experimentId: experiment.id, scanId: scan.id });
 
           // TODO these requests *can* be run in parallel, or collapsed into one XHR
           // eslint-disable-next-line no-await-in-loop
@@ -1118,6 +1133,7 @@ const {
       commit('setTaskOverview', taskOverview);
     },
     /**
+     * TODO
      *
      * @param commit
      * @param getters
@@ -1164,6 +1180,7 @@ const {
       return state.frames[frameId];
     },
     /**
+     * Sets state.currentFrameId
      *
      * @param commit
      * @param frameId
