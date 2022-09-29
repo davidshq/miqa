@@ -116,7 +116,6 @@ export default {
      * @returns {string}
      */
     getURLForFirstFrameInScan(scanId) {
-
       return `/${this.currentProject.id}/${this.scanFrames[scanId][0]}`;
     },
     /**

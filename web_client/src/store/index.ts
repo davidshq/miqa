@@ -29,6 +29,7 @@ Vue.use(Vuex);
 const fileCache = new Map();
 const frameCache = new Map();
 let readDataQueue = [];
+const loadedData = [];
 const pendingFrameDownloads = new Set<any>();
 const poolSize = Math.floor(navigator.hardwareConcurrency / 2) || 2;
 let taskRunId = -1;
@@ -275,40 +276,46 @@ function startReaderWorkerPool() {
     });
 }
 
-/**
- * Cache frames associated with scans of current experiment
- *
- * Only called by swapToFrame
- *
- * @param oldValue
- * @param newValue
- */
-function checkLoadExperiment(oldValue, newValue) {
-  if (
-    !newValue
-    || newValue === oldValue
-  ) {
-    return;
+function queueLoadScan(scan, loadNext = false) {
+  // load all frames in target scan
+  if (!loadedData.includes(scan.id)) {
+    store.state.scanFrames[scan.id].forEach(
+      (frameId) => {
+        readDataQueue.push({
+          experimentId: scan.experiment,
+          scanId: scan.id,
+          frame: store.state.frames[frameId],
+        });
+      },
+    );
+    loadedData.push(scan.id);
   }
 
-  readDataQueue = [];
-  // Get scans associated with `newValue` (a selected experiment)
-  const newExperimentScans = store.state.experimentScans[newValue.id];
-  newExperimentScans.forEach((scanId) => {
-    const scanFrames = store.state.scanFrames[scanId].map(
-      (frameId) => store.state.frames[frameId],
-    );
-    scanFrames.forEach((frame) => {
-      readDataQueue.push({
-        // TODO don't hardcode projectId
-        projectId: 1,
-        experimentId: newValue.id,
-        scanId,
-        frame,
-      });
-    });
-  });
-  startReaderWorkerPool();
+  // semi-recursive; we only recurse on the first call
+  // to queue up the next scan as well
+  // to prefetch further ahead, modify the recursion
+  if (loadNext) {
+    const scansInSameExperiment = store.state.experimentScans[scan.experiment];
+    let nextScan;
+    if (scan.id === scansInSameExperiment[scansInSameExperiment.length - 1]) {
+      // load first scan in next experiment
+      const experimentIds = Object.keys(store.state.experimentScans);
+      const nextExperimentId = experimentIds[experimentIds.indexOf(scan.experiment) + 1];
+      const nextExperimentScans = store.state.experimentScans[nextExperimentId];
+      if (nextExperimentScans && nextExperimentScans.length > 0) {
+        nextScan = store.state.allScans[
+          nextExperimentScans[0]
+        ];
+      }
+    } else {
+      // load next scan in same experiment
+      nextScan = store.state.allScans[scansInSameExperiment[
+        scansInSameExperiment.indexOf(scan.id) + 1
+      ]];
+    }
+    if (nextScan) queueLoadScan(nextScan);
+    startReaderWorkerPool();
+  }
 }
 
 /**
@@ -1170,24 +1177,11 @@ const {
       commit('setErrorLoadingFrame', false);
       const oldScan = getters.currentScan;
       const newScan = state.scans[frame.scan];
-      const oldExperiment = getters.currentExperiment ? getters.currentExperiment : null;
-      const newExperimentId = state.scans[frame.scan].experiment;
-      const newExperiment = state.experiments[newExperimentId];
 
-      // Check if we should cancel the currently loading experiment
-      // e.g., if user is attempting to load a new experiment that is different from the current experiment
-      if (
-        newExperiment
-        && oldExperiment
-        && newExperiment.id !== oldExperiment.id
-        && taskRunId >= 0
-      ) {
-        state.workerPool.cancel(taskRunId);
-        pendingFrameDownloads.forEach(({ abortController }) => {
-          abortController.abort();
-        });
-        pendingFrameDownloads.clear();
-        taskRunId = -1;
+      if (newScan !== oldScan && newScan) {
+        queueLoadScan(
+          newScan, true,
+        );
       }
 
       let newProxyManager = false;
@@ -1253,9 +1247,6 @@ const {
         dispatch('setCurrentFrame', frame.id);
         commit('setLoadingFrame', false);
       }
-
-      // If necessary, queue loading scans of new experiment
-      checkLoadExperiment(oldExperiment, newExperiment);
 
       // check for window lock expiry
       if (state.windowLocked.lock) {
