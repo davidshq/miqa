@@ -314,15 +314,15 @@ function checkLoadExperiment(oldValue, newValue) {
 /**
  * Get next frame (across experiments and scans)
  *
- * @param experiments
- * @param i
- * @param j
+ * @param experiments Pass in all the experiments associated with the project
+ * @param i           The specific experiment we are looking for
+ * @param j           The scans from the specified experiment
  */
 function getNextFrame(experiments, i, j) {
   const experiment = experiments[i];
   const { scans } = experiment;
 
-  if (j === scans.length - 1) {
+  if (j === scans.length - 1) { // If the scan number is less than the total number of scans -1 do this:
     // last scan, go to next experiment
     if (i === experiments.length - 1) {
       // last experiment, nowhere to go
@@ -330,8 +330,8 @@ function getNextFrame(experiments, i, j) {
     }
     // get first scan in next experiment
     const nextExperiment = experiments[i + 1];
-    const nextScan = nextExperiment.scans[0];
-    return nextScan.frames[0];
+    const nextScan = nextExperiment.scans[0]; // Get the first scan in the nextExperiment
+    return nextScan.frames[0]; // Get the first frame in the nextScan
   }
   // get next scan in current experiment
   const nextScan = scans[j + 1];
@@ -627,20 +627,20 @@ const {
      * What?
      *
      * @param state
-     * @param frameId
-     * @param frame
+     * @param frameId Id of passed in frame
+     * @param frame   Frame object
      */
     setFrame(state, { frameId, frame }) {
       // Replace with a new object to trigger a Vuex update
-      state.frames = { ...state.frames };
+      state.frames = { ...state.frames }; // Why do we pass in the frameId when we can access it from frame.id?
       state.frames[frameId] = frame;
     },
     /**
      * What?
      *
      * @param state
-     * @param scanId
-     * @param scan
+     * @param scanId  The scan's Id
+     * @param scan    The scan object
      */
     setScan(state, { scanId, scan }) {
       // Replace with a new object to trigger a Vuex update
@@ -668,7 +668,7 @@ const {
      * @param project
      */
     setCurrentProject(state, project: Project | null) {
-      state.currentProject = project;
+      state.currentProject = project; // We pass the entire Project Object here, not just its Id?
       if (project) {
         state.renderOrientation = project.settings.anatomy_orientation;
         state.currentProjectPermissions = project.settings.permissions;
@@ -794,36 +794,37 @@ const {
       state.errorLoadingFrame = value;
     },
     /**
+     * Adds a scan ID and it's corresponding Frame ID to state.scanFrames
      *
      * @param state
-     * @param sid
-     * @param id
+     * @param sid Scan ID
+     * @param id Frame ID
      */
-    addScanFrames(state, { sid, id }) {
+    addScanFrames(state, { sid, id }) { // Should this be addScanFrame?
       state.scanFrames[sid].push(id);
     },
     /**
-     *
+     * For each scan in Experiment, add it to state.experimentScans
      * @param state
-     * @param eid
-     * @param sid
+     * @param eid   Experiment ID
+     * @param sid   Scan ID
      */
     addExperimentScans(state, { eid, sid }) {
-      state.scanFrames[sid] = [];
+      state.scanFrames[sid] = []; // Why?
       state.experimentScans[eid].push(sid);
     },
     /**
      *
      * @param state
-     * @param id
-     * @param value
+     * @param id    The experiment's ID?
+     * @param value The experiment object?
      */
     addExperiment(state, { id, value }) {
-      state.experimentScans[id] = [];
+      state.experimentScans[id] = []; // We set the scans for this experiment (scan?) to empty
       if (!state.experimentIds.includes(id)) {
-        state.experimentIds.push(id);
+        state.experimentIds.push(id); // We add the experiment's id to state.experimentIds
       }
-      state.experiments[id] = value;
+      state.experiments[id] = value; // Value looks to be the experiment data
     },
     /**
      *
@@ -999,6 +1000,7 @@ const {
       commit('setProjects', projects);
     },
     /**
+     * Loads an individual project into Vue
      *
      * @param commit
      * @param project
@@ -1013,10 +1015,11 @@ const {
       project = await djangoRest.project(project.id);
       commit('setCurrentProject', project);
 
-      // place data in state
+      // place data in state, adds each experiment to experiments
       const { experiments } = project;
 
       for (let i = 0; i < experiments.length; i += 1) {
+        // Get a specific experiment from the project
         const experiment = experiments[i];
         // set experimentScans[experiment.id] before registering the experiment.id
         // so ExperimentsView doesn't update prematurely
@@ -1032,6 +1035,7 @@ const {
           },
         });
 
+        // Get the associated scans from the experiment
         // TODO these requests *can* be run in parallel, or collapsed into one XHR
         // eslint-disable-next-line no-await-in-loop
         const { scans } = experiment;
@@ -1041,7 +1045,7 @@ const {
 
           // TODO these requests *can* be run in parallel, or collapsed into one XHR
           // eslint-disable-next-line no-await-in-loop
-          const { frames } = scan;
+          const { frames } = scan; // Get the frames associated with a specific scan
 
           commit('setScan', {
             scanId: scan.id,
@@ -1057,9 +1061,9 @@ const {
             },
           });
 
-          const nextScan = getNextFrame(experiments, i, j);
+          const nextScan = getNextFrame(experiments, i, j); // Check where i j come from above, is this getting the current scan?
 
-          for (let k = 0; k < frames.length; k += 1) {
+          for (let k = 0; k < frames.length; k += 1) { // then this is getting each frame associated with the scan
             const frame = frames[k];
             commit('addScanFrames', { sid: scan.id, id: frame.id });
             commit('setFrame', {
@@ -1077,7 +1081,7 @@ const {
             });
           }
 
-          if (frames.length > 0) {
+          if (frames.length > 0) { // If a frame exists
             firstInPrev = frames[0].id;
           } else {
             console.error(
