@@ -48,7 +48,7 @@ function shrinkProxyManager(proxyManager) {
 }
 
 /**
- * Disable Axes visibility, set InterpolationType to nearest and render
+ * Disable Axes visibility, sets InterpolationType to nearest and renders
  * each view
  *
  * @param proxyManager
@@ -90,7 +90,7 @@ function getArrayName(filename) {
  * 4. Converts image from ITK to VTK
  * 5. ...
  *
- * @param id
+ * @param id          Frame ID
  * @param file
  * @param webWorker
  */
@@ -252,7 +252,7 @@ function progressHandler(completed, total) {
 /**
  * Creates array of tasks to run then runs tasks in parallel
  *
- * Only called by checkLoadExperiment
+ * Only called by queueLoadScan
  */
 function startReaderWorkerPool() {
   const taskArgsArray = readDataQueue.map((taskInfo) => [taskInfo]);
@@ -276,6 +276,11 @@ function startReaderWorkerPool() {
     });
 }
 
+/**
+ *
+ * @param scan
+ * @param loadNext  Boolean
+ */
 function queueLoadScan(scan, loadNext = false) {
   // load all frames in target scan
   if (!loadedData.includes(scan.id)) {
@@ -321,27 +326,27 @@ function queueLoadScan(scan, loadNext = false) {
 /**
  * Get next frame (across experiments and scans)
  *
- * @param experiments Pass in all the experiments associated with the project
- * @param i           The specific experiment we are looking for
- * @param j           The scans from the specified experiment
+ * @param experiments         Pass in all the experiments associated with the project
+ * @param experimentIndex     The specific index of the experiment we are looking for
+ * @param scanIndex           The specific index of the scan from the specified experiment
  */
-function getNextFrame(experiments, i, j) {
-  const experiment = experiments[i];
+function getNextFrame(experiments, experimentIndex, scanIndex) {
+  const experiment = experiments[experimentIndex];
   const { scans } = experiment;
 
-  if (j === scans.length - 1) { // If the scan number is less than the total number of scans -1 do this:
+  if (scanIndex === scans.length - 1) {
     // last scan, go to next experiment
-    if (i === experiments.length - 1) {
+    if (experimentIndex === experiments.length - 1) {
       // last experiment, nowhere to go
       return null;
     }
     // get first scan in next experiment
-    const nextExperiment = experiments[i + 1];
+    const nextExperiment = experiments[experimentIndex + 1];
     const nextScan = nextExperiment.scans[0]; // Get the first scan in the nextExperiment
     return nextScan.frames[0]; // Get the first frame in the nextScan
   }
   // get next scan in current experiment
-  const nextScan = scans[j + 1];
+  const nextScan = scans[scanIndex + 1];
   return nextScan.frames[0];
 }
 
