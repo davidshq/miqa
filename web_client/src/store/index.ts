@@ -833,7 +833,7 @@ const {
      * @param scanId Scan ID
      * @param frameId Frame ID
      */
-    addScanFrames(state, { scanId, frameId }) { // Should this be addScanFrame?
+    addScanFrames(state, { scanId, frameId }) { // TODO: Should this be addScanFrame or addScanToScanFrames?
       state.scanFrames[scanId].push(frameId);
     },
     /**
@@ -848,18 +848,19 @@ const {
       state.experimentScans[experimentId].push(scanId);
     },
     /**
-     * TODO?
+     * Add an experiment to state.experiments, it's id to state.experimentIds, and set
+     * state.experimentScans to an empty array
      *
      * @param state
-     * @param id    The experiment's ID?
-     * @param value The experiment object?
+     * @param experimentId
+     * @param experiment    Object  Instance of experiment
      */
-    addExperiment(state, { id, value }) {
-      state.experimentScans[id] = []; // We set the scans for this experiment (scan?) to empty
-      if (!state.experimentIds.includes(id)) {
-        state.experimentIds.push(id); // We add the experiment's id to state.experimentIds
+    addExperiment(state, { experimentId, experiment }) {
+      state.experimentScans[experimentId] = [];
+      if (!state.experimentIds.includes(experimentId)) {
+        state.experimentIds.push(experimentId);
       }
-      state.experiments[id] = value; // Value looks to be the experiment data
+      state.experiments[experimentId] = experiment;
     },
     /**
      * Update state.experiments
@@ -873,25 +874,28 @@ const {
       state.experiments[experiment.id] = experiment;
     },
     /**
+     * Ensures that a specific image is being reviewed by a single individual
      *
      * @param state
-     * @param lockState
+     * @param lockState Object  Instance of lockState object
      */
     setWindowLocked(state, lockState) {
       state.windowLocked = lockState;
     },
     /**
+     * Set state.scanCachedPercentage equal to passed in percentage
      *
      * @param state
-     * @param percentComplete
+     * @param percentComplete Number A number representing the percentage of images that have been downloaded
      */
     setScanCachedPercentage(state, percentComplete) {
       state.scanCachedPercentage = percentComplete;
     },
     /**
+     * Saves the location of a click related to a specific scan and decision
      *
      * @param state
-     * @param ijkLocation
+     * @param ijkLocation Location of cursor click for a decision
      */
     setSliceLocation(state, ijkLocation) {
       if (Object.values(ijkLocation).every((value) => value !== undefined)) {
@@ -980,6 +984,7 @@ const {
   },
   actions: {
     /**
+     * Resets the Vuex state associated with MIQA
      *
      * @param state
      * @param commit
@@ -1044,10 +1049,10 @@ const {
       commit('setProjects', projects);
     },
     /**
-     * Pulls an individual project from Django and loads into state
+     * Pulls an individual project from API and loads into state
      *
      * @param commit
-     * @param project
+     * @param project Object Instance of Project
      */
     async loadProject({ commit }, project: Project) {
       commit('resetProject');
@@ -1068,8 +1073,8 @@ const {
         // set experimentScans[experiment.id] before registering the experiment.id
         // so ExperimentsView doesn't update prematurely
         commit('addExperiment', {
-          id: experiment.id,
-          value: {
+          experimentId: experiment.id,
+          experiment: {
             id: experiment.id,
             name: experiment.name,
             note: experiment.note,
@@ -1139,7 +1144,7 @@ const {
       commit('setTaskOverview', taskOverview);
     },
     /**
-     * TODO
+     * Add a scan to scans
      *
      * @param commit
      * @param getters
@@ -1200,8 +1205,8 @@ const {
      * @param dispatch
      * @param getters
      * @param commit
-     * @param frame
-     * @param onDownloadProgress
+     * @param frame Frame Instance of Frame
+     * @param onDownloadProgress Passes local download state from Frame view
      */
     async swapToFrame({
       state, dispatch, getters, commit,
