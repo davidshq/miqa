@@ -90,20 +90,20 @@ function getArrayName(filename) {
  * 4. Converts image from ITK to VTK
  * 5. ...
  *
- * @param frameId     Frame ID to load
- * @param file        File to load
+ * @param frameId     String  Frame ID to load
+ * @param file        Object  File to load
  * @param webWorker
  */
 function getData(frameId, file, webWorker = null) {
   return new Promise((resolve, reject) => {
-    // Load image from frame cache if available
+    // Load image from frame cache if available, this resolves promise
     if (frameCache.has(frameId)) {
       resolve({ frameData: frameCache.get(frameId), webWorker });
     } else {
       const fileName = file.name;
       const io = new FileReader();
 
-      // Once image is loaded
+      // This won't run until io indicates it has loaded the file.
       io.onload = function onLoad() {
         // Read image with ITK
         readImageArrayBuffer(webWorker, io.result, fileName)
@@ -144,7 +144,7 @@ function getData(frameId, file, webWorker = null) {
 function loadFile(frame, { onDownloadProgress = null } = {}) {
   // If frame is cached, return it
   if (fileCache.has(frame.id)) {
-    return { frameId: frame.id, fileP: fileCache.get(frame.id) };
+    return { frameId: frame.id, cachedFile: fileCache.get(frame.id) };
   }
   // Otherwise download the frame
   let client = apiClient;
@@ -161,7 +161,7 @@ function loadFile(frame, { onDownloadProgress = null } = {}) {
     { onDownloadProgress },
   );
   fileCache.set(frame.id, promise);
-  return { frameId: frame.id, fileP: promise };
+  return { frameId: frame.id, cachedFile: promise };
 }
 
 /**
@@ -174,7 +174,9 @@ function loadFile(frame, { onDownloadProgress = null } = {}) {
  */
 function loadFileAndGetData(frame, { onDownloadProgress = null } = {}) {
   const loadResult = loadFile(frame, { onDownloadProgress });
-  return loadResult.fileP.then((file) => getData(frame.id, file, savedWorker)
+  // Once the file has been cached and is available, call getData
+  // Who is `savedWorker`?
+  return loadResult.cachedFile.then((file) => getData(frame.id, file, savedWorker)
     .then(({ webWorker, frameData }) => {
       savedWorker = webWorker;
       return Promise.resolve({ frameData });
@@ -197,8 +199,9 @@ function loadFileAndGetData(frame, { onDownloadProgress = null } = {}) {
  * Only used by WorkerPool
  *
  * @param webWorker
- * @param taskInfo
+ * @param taskInfo  Object  Contains experimentId, scanId, and a frame object
  */
+// Where is poolFunction ever called with parameters?
 function poolFunction(webWorker, taskInfo) {
   return new Promise((resolve, reject) => {
     const { frame } = taskInfo;
