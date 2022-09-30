@@ -115,8 +115,8 @@ function getData(frameId, file, webWorker = null) {
             });
             const dataRange = frameData
               .getPointData() // From the image file
-              .getArray(0)
-              .getRange();
+              .getArray(0) // Values in the file
+              .getRange(); // Range of values in the file, e.g. [0, 3819]
             // Add frame to frameCache
             frameCache.set(frameId, { frameData });
             // eslint-disable-next-line no-use-before-define
@@ -134,7 +134,7 @@ function getData(frameId, file, webWorker = null) {
 }
 
 /**
- * Load file from cache if possible
+ * Load file, from cache if possible
  *
  * Only called by loadFileAndGetData
  *
@@ -176,7 +176,8 @@ function loadFileAndGetData(frame, { onDownloadProgress = null } = {}) {
   const loadResult = loadFile(frame, { onDownloadProgress });
   // Once the file has been cached and is available, call getData
   // Who is `savedWorker`?
-  return loadResult.cachedFile.then((file) => getData(frame.id, file, savedWorker)
+  return loadResult.cachedFile
+    .then((file) => getData(frame.id, file, savedWorker))
     .then(({ webWorker, frameData }) => {
       savedWorker = webWorker;
       return Promise.resolve({ frameData });
@@ -190,7 +191,7 @@ function loadFileAndGetData(frame, { onDownloadProgress = null } = {}) {
         savedWorker.terminate();
         savedWorker = null;
       }
-    }));
+    });
 }
 
 /**
