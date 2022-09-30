@@ -138,7 +138,7 @@ function getData(frameId, file, webWorker = null) {
  *
  * Only called by loadFileAndGetData
  *
- * @param frame
+ * @param frame Frame object
  * @param onDownloadProgress
  */
 function loadFile(frame, { onDownloadProgress = null } = {}) {
@@ -282,7 +282,7 @@ function startReaderWorkerPool() {
 /**
  * Queues scans for download
  *
- * @param scan
+ * @param scan      Scan
  * @param loadNext  Boolean
  */
 function queueLoadScan(scan, loadNext = false) {
@@ -437,6 +437,8 @@ const {
     workerPool: new WorkerPool(poolSize, poolFunction),
     lastApiRequestTime: Date.now(),
   },
+
+  // Getters in Vuex always take in all the state as their first parameter.
   getters: {
     /**
      * Return all the state
@@ -451,7 +453,7 @@ const {
     /**
      * Runs for each VTKView?
      *
-     * @param state   All Vuex state in MIQA app
+     * @param state
      * @returns Object
      */
     currentViewData(state) {
@@ -507,7 +509,7 @@ const {
     /**
      * Gets the current frame when given a frameId
      *
-     * @param state All state in MIQA Vuex store
+     * @param state
      */
     currentFrame(state) {
       return state.currentFrameId ? state.frames[state.currentFrameId] : null;
@@ -587,14 +589,14 @@ const {
     /**
      * Resets all state to that set in initState
      *
-     * @param state
-     * @returns state Object
+     * @param   state   Object
+     * @returns state   Object
      */
     reset(state) {
       Object.assign(state, { ...state, ...initState });
     },
     /**
-     * Sets MIQAConfig equal to configuration
+     * Sets state.MIQAConfig equal to configuration pulled from API
      *
      * @param state         The whole state for the MIQA Vuex store
      * @param configuration The configuration object as received from Django API
@@ -603,7 +605,7 @@ const {
       state.MIQAConfig = configuration;
     },
     /**
-     * Sets me to me received from API
+     * Sets state.me to me received from API
      *
      * @param state Whole state associated with MIQA Vuex Store
      * @param me    Me object received from Django API
@@ -612,7 +614,7 @@ const {
       state.me = me;
     },
     /**
-     * Sets allUsers to allUsers
+     * Sets state.allUsers to allUsers pulled from API
      *
      * @param state
      * @param allUsers
@@ -636,7 +638,7 @@ const {
       state.frames = {};
     },
     /**
-     * Sets the currentFrameId to frameId
+     * Sets state.currentFrameId to a passed in frameId
      *
      * @param state
      * @param frameId
@@ -660,8 +662,8 @@ const {
      * Adds a scan to state.scans, then adds state.scans to allScans
      *
      * @param state
-     * @param scanId  The scan's Id
-     * @param scan    The scan object
+     * @param scanId  Id of a specific scan
+     * @param scan    Scan
      */
     setScan(state, { scanId, scan }) {
       // Replace with a new object to trigger a Vuex update
@@ -686,7 +688,7 @@ const {
      * Also sets state.renderOrientation and state.currentProjectPermissions
      *
      * @param state
-     * @param project
+     * @param project Project A specific Project instance
      */
     setCurrentProject(state, project: Project | null) {
       state.currentProject = project; // We pass the entire Project Object here, not just its Id?
@@ -696,9 +698,7 @@ const {
       }
     },
     /**
-     * Sets state.globalSettings to settings passed by Django API
-     *
-     * TODO: Named the same as django.ts function?
+     * Sets state.globalSettings to settings pulled from API
      *
      * @param state
      * @param settings  Settings from Django API
@@ -709,11 +709,11 @@ const {
     /**
      * TODO
      * @param state
-     * @param taskOverview
+     * @param taskOverview  ProjectTaskOverview Instance of ProjectTaskOverview object
      */
     setTaskOverview(state, taskOverview: ProjectTaskOverview) {
       if (!taskOverview) return;
-      // Calculates total scans and scans that have been marked completre
+      // Calculates total scans and scans that have been marked complete
       if (taskOverview.scan_states) {
         state.projects.find(
           (project) => project.id === taskOverview.project_id,
@@ -724,7 +724,7 @@ const {
           ).length,
         };
       }
-      // If we have a value in state.currentProject and it's id is equal to taskOverview's project_id then:
+      // If we have a value in state.currentProject, and it's id is equal to taskOverview's project_id then:
       if (state.currentProject && taskOverview.project_id === state.currentProject.id) {
         state.currentTaskOverview = taskOverview;
         Object.values(store.state.allScans).forEach((scan: Scan) => {
@@ -735,7 +735,7 @@ const {
       }
     },
     /**
-     * Pulls a list of projects and loads into state.projects
+     * Sets state.projects to projects pulled from API
      *
      * @param state
      * @param projects
@@ -747,11 +747,11 @@ const {
      * Adds a scanDecision to a scan
      *
      * @param state
-     * @param currentScan
-     * @param newDecision
+     * @param currentScanId Id of the current scan
+     * @param newDecision   A scan decision object
      */
-    addScanDecision(state, { currentScan, newDecision }) {
-      state.scans[currentScan].decisions.push(newDecision);
+    addScanDecision(state, { currentScanId, newDecision }) {
+      state.scans[currentScanId].decisions.push(newDecision);
     },
     /**
      * Adds an evaluation to the current frame

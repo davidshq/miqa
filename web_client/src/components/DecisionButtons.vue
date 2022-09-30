@@ -270,7 +270,7 @@ export default {
             } : {}),
           );
           addScanDecision({
-            currentScan: this.currentViewData.scanId,
+            currentScanId: this.currentViewData.scanId,
             newDecision: savedObj,
           });
           this.refreshTaskOverview();
