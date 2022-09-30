@@ -9,6 +9,7 @@ import { InterpolationType } from 'vtk.js/Sources/Rendering/Core/ImageProperty/C
 import '../utils/registerReaders';
 
 import readImageArrayBuffer from 'itk/readImageArrayBuffer';
+// https://github.com/InsightSoftwareConsortium/itk-wasm/blob/master/src/core/WorkerPool.ts
 import WorkerPool from 'itk/WorkerPool';
 import ITKHelper from 'vtk.js/Sources/Common/DataModel/ITKHelper';
 import djangoRest, { apiClient } from '@/django';
@@ -212,8 +213,7 @@ function poolFunction(webWorker, taskInfo) {
     // Load file from cache if available
     if (fileCache.has(frame.id)) {
       filePromise = fileCache.get(frame.id);
-    } else {
-      // Download image file
+    } else { // Download image file
       let client = apiClient;
       let downloadURL = `/frames/${frame.id}/download`;
       if (frame.download_url) {
@@ -989,7 +989,8 @@ const {
   },
   actions: {
     /**
-     * Resets the Vuex state associated with MIQA
+     * Resets the Vuex state associated with MIQA, cancel any existing tasks in the workerPool, clear file and frame
+     * caches
      *
      * @param state
      * @param commit
@@ -1004,7 +1005,7 @@ const {
       frameCache.clear();
     },
     /**
-     * Pulls configuration from Django and loads it into state
+     * Pulls configuration from API and loads it into state
      *
      * @param commit
      */
@@ -1013,7 +1014,7 @@ const {
       commit('setMIQAConfig', configuration);
     },
     /**
-     * Pulls user from Django and loads it into state
+     * Pulls user from API and loads it into state
      *
      * @param commit
      */
@@ -1022,7 +1023,7 @@ const {
       commit('setMe', me);
     },
     /**
-     * Pulls all users from Django and loads into state
+     * Pulls all users from API and loads into state
      *
      * @param commit
      */
@@ -1031,7 +1032,7 @@ const {
       commit('setAllUsers', allUsers.results);
     },
     /**
-     * Pulls global settings from Django and updates currentProject and globalSettings in state
+     * Pulls global settings from API and updates currentProject and globalSettings in state
      *
      * @param commit
      */
@@ -1045,7 +1046,7 @@ const {
       commit('setTaskOverview', {});
     },
     /**
-     * Pulls all projects from Django and loads into state
+     * Pulls all projects from API and loads into state
      *
      * @param commit
      */

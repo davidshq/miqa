@@ -34,18 +34,33 @@ function registerReader({
   };
 }
 
-function getReader({ name }) {
-  const lowerCaseName = name.toLowerCase();
+/**
+ * Gets the correct reader for the given file name
+ *
+ * @param fileName
+ * @returns {*}
+ */
+function getReader({ fileName }) {
+  const lowerCaseName = fileName.toLowerCase();
   const extToUse = Object.keys(READER_MAPPING).find((ext) => lowerCaseName.endsWith(ext));
   return READER_MAPPING[extToUse];
 }
 
+/**
+ * Download Frame
+ *
+ * @param axios               The client
+ * @param fileName            File to be downloaded
+ * @param url                 The URL to download the file
+ * @param onDownloadProgress  downloadLoaded and downloadTotal, see Frame.vue
+ * @returns {{promise: Promise<unknown>, abortController: AbortController}}
+ */
 function downloadFrame(axios, fileName, url, { onDownloadProgress } = {}) {
   const abortController = new AbortController();
 
   return {
     promise: new Promise((resolve, reject) => {
-      const readerMapping = getReader({ name: fileName });
+      const readerMapping = getReader({ fileName });
       if (readerMapping) {
         const { readMethod } = readerMapping;
         FETCH_DATA[readMethod](axios, url, abortController.signal, { onDownloadProgress })
