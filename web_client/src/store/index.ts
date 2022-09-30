@@ -228,11 +228,12 @@ function poolFunction(webWorker, taskInfo) {
       filePromise = download.promise;
       fileCache.set(frame.id, filePromise);
       pendingFrameDownloads.add(download);
-      filePromise.then(() => {
-        pendingFrameDownloads.delete(download);
-      }).catch(() => {
-        pendingFrameDownloads.delete(download);
-      });
+      filePromise
+        .then(() => {
+          pendingFrameDownloads.delete(download);
+        }).catch(() => {
+          pendingFrameDownloads.delete(download);
+        });
     }
 
     filePromise
