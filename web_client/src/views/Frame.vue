@@ -195,6 +195,7 @@ export default {
             <VtkViewer :view="vtkView" />
           </div>
         </div>
+        <!-- Error Loading Frame -->
         <v-layout
           v-if="errorLoadingFrame"
           align-center
@@ -205,6 +206,7 @@ export default {
             Error loading this frame
           </div>
         </v-layout>
+        <!-- End Error Loading Frame -->
       </v-flex>
       <!-- End Show VTK Viewers -->
       <ControlPanel />

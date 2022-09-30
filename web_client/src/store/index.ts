@@ -38,7 +38,7 @@ let savedWorker = null;
 /**
  * Delete existing VTK.js proxyManager views
  *
- * @param proxyManager
+ * @param proxyManager Instance of vtkProxyManager
  */
 function shrinkProxyManager(proxyManager) {
   proxyManager.getViews().forEach((view) => {
@@ -51,7 +51,7 @@ function shrinkProxyManager(proxyManager) {
  * Disable Axes visibility, sets InterpolationType to nearest and renders
  * each view
  *
- * @param proxyManager
+ * @param proxyManager Instance of vtkProxyManager
  */
 function prepareProxyManager(proxyManager) {
   if (!proxyManager.getViews().length) {
@@ -90,15 +90,15 @@ function getArrayName(filename) {
  * 4. Converts image from ITK to VTK
  * 5. ...
  *
- * @param id          Frame ID to load
+ * @param frameId     Frame ID to load
  * @param file        File to load
  * @param webWorker
  */
-function getData(id, file, webWorker = null) {
+function getData(frameId, file, webWorker = null) {
   return new Promise((resolve, reject) => {
     // Load image from frame cache if available
-    if (frameCache.has(id)) {
-      resolve({ frameData: frameCache.get(id), webWorker });
+    if (frameCache.has(frameId)) {
+      resolve({ frameData: frameCache.get(frameId), webWorker });
     } else {
       const fileName = file.name;
       const io = new FileReader();
@@ -114,12 +114,13 @@ function getData(id, file, webWorker = null) {
               scalarArrayName: getArrayName(fileName),
             });
             const dataRange = frameData
-              .getPointData()
+              .getPointData() // From the image file
               .getArray(0)
               .getRange();
-            frameCache.set(id, { frameData });
+            // Add frame to frameCache
+            frameCache.set(frameId, { frameData });
             // eslint-disable-next-line no-use-before-define
-            expandScanRange(id, dataRange); // Example dataRange: [0, 3819]
+            expandScanRange(frameId, dataRange); // Example dataRange: [0, 3819]
             resolve({ frameData, webWorker });
           })
           .catch((error) => {
@@ -168,7 +169,7 @@ function loadFile(frame, { onDownloadProgress = null } = {}) {
  *
  * Only called by swapToFrame
  *
- * @param frame
+ * @param frame Frame Object
  * @param onDownloadProgress
  */
 function loadFileAndGetData(frame, { onDownloadProgress = null } = {}) {
@@ -430,6 +431,7 @@ const {
   rootGetterContext,
   moduleGetterContext,
 } = createDirectStore({
+  strict: true,
   state: {
     ...initState,
     workerPool: new WorkerPool(poolSize, poolFunction),
