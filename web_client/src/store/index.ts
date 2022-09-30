@@ -756,6 +756,8 @@ const {
     /**
      * Adds an evaluation to the current frame
      *
+     * Note: We don't pass the frame, only the evaluation, we then append the value to `currentFrame`
+     *
      * @param state
      * @param evaluation
      */
@@ -797,7 +799,9 @@ const {
       state.screenshots.splice(state.screenshots.indexOf(screenshot), 1);
     },
     /**
-     * Updates the last time the API was requested to now
+     * Updates state.lastApiRequestTime to the current moment
+     *
+     * This is called by `django.ts` after an API called is made.
      *
      * @param state
      */
@@ -826,11 +830,11 @@ const {
      * Adds a scan ID, and it's corresponding Frame ID to state.scanFrames
      *
      * @param state
-     * @param sid Scan ID
-     * @param id Frame ID
+     * @param scanId Scan ID
+     * @param frameId Frame ID
      */
-    addScanFrames(state, { sid, id }) { // Should this be addScanFrame?
-      state.scanFrames[sid].push(id);
+    addScanFrames(state, { scanId, frameId }) { // Should this be addScanFrame?
+      state.scanFrames[scanId].push(frameId);
     },
     /**
      * For each scan in Experiment, add it to state.experimentScans
@@ -1105,7 +1109,7 @@ const {
 
           for (let k = 0; k < frames.length; k += 1) { // then this is getting each frame associated with the scan
             const frame = frames[k];
-            commit('addScanFrames', { sid: scan.id, id: frame.id });
+            commit('addScanFrames', { scanId: scan.id, frameId: frame.id });
             commit('setFrame', {
               frameId: frame.id,
               frame: {
