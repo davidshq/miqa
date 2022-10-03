@@ -438,7 +438,7 @@ const {
   rootGetterContext,
   moduleGetterContext,
 } = createDirectStore({
-  strict: true,
+  strict: true, // TODO: turn off for production
   state: {
     ...initState,
     // WorkerPool creates a pool of poolSize that utilizes poolFunction to process
