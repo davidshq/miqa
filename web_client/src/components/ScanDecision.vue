@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 import { mapMutations } from 'vuex';
 import UserAvatar from './UserAvatar.vue';
 import { decisionOptions } from '../constants';
