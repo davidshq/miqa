@@ -36,25 +36,16 @@ const poolSize = Math.floor(navigator.hardwareConcurrency / 2) || 2;
 let taskRunId = -1;
 let savedWorker = null;
 
-/**
- * Delete existing VTK.js proxyManager views
- *
- * @param proxyManager Instance of vtkProxyManager
- */
-function shrinkProxyManager(proxyManager) {
+/** Delete existing VTK.js proxyManager views */
+function shrinkProxyManager(proxyManager: vtkProxyManager) {
   proxyManager.getViews().forEach((view) => {
     view.setContainer(null);
     proxyManager.deleteProxy(view);
   });
 }
 
-/**
- * Disable Axes visibility, sets InterpolationType to nearest and renders
- * each view
- *
- * @param proxyManager Instance of vtkProxyManager
- */
-function prepareProxyManager(proxyManager) {
+/** Disable Axes visibility, sets InterpolationType to nearest and renders each view */
+function prepareProxyManager(proxyManager: vtkProxyManager) {
   if (!proxyManager.getViews().length) {
     ['View2D_Z:z', 'View2D_X:x', 'View2D_Y:y'].forEach((type) => {
       const view = getView(proxyManager, type);
@@ -459,19 +450,9 @@ const {
   // Getters in Vuex always take in all the state as their first parameter.
   getters: {
     /**
-     * Return all the state
+     * Returns data related to the current view's project, experiments, scans,
+     * frames, and auto-evaluation.
      *
-     * Never called
-     *
-     * @param state
-     */
-    wholeState(state) {
-      return state;
-    },
-    /**
-     * Runs for each VTKView?
-     *
-     * @param state
      * @returns Object
      */
     currentViewData(state) {
@@ -524,40 +505,21 @@ const {
         currentAutoEvaluation: currentFrame.frame_evaluation,
       };
     },
-    /**
-     * Gets the current frame when given a frameId
-     *
-     * @param state
-     */
+    /** Gets the current frame when given a frameId */
     currentFrame(state) {
       return state.currentFrameId ? state.frames[state.currentFrameId] : null;
     },
-    /**
-     * Gets the previous frame based on the currentFrame
-     *
-     * @param state
-     * @param getters
-     */
+    /** Gets the previous frame based on the currentFrame */
     previousFrame(state, getters) {
       return getters.currentFrame
         ? getters.currentFrame.previousFrame
         : null;
     },
-    /**
-     * Gets the next frame based on the currentFrame
-     *
-     * @param state
-     * @param getters
-     */
+    /** Gets the next frame based on the currentFrame */
     nextFrame(state, getters) {
       return getters.currentFrame ? getters.currentFrame.nextFrame : null;
     },
-    /**
-     * Gets the current scan via the currentFrame
-     *
-     * @param state
-     * @param getters
-     */
+    /** Gets the current scan via the currentFrame */
     currentScan(state, getters) {
       if (getters.currentFrame) {
         const curScanId = getters.currentFrame.scan;
@@ -565,12 +527,7 @@ const {
       }
       return null;
     },
-    /**
-     * Gets the currentExperiment via the currentScan
-     *
-     * @param state
-     * @param getters
-     */
+    /** Gets the currentExperiment via the currentScan */
     currentExperiment(state, getters) {
       if (getters.currentScan) {
         const curExperimentId = getters.currentScan.experiment;
@@ -578,11 +535,7 @@ const {
       }
       return null;
     },
-    /**
-     * Enumerates permissions of logged in user
-     *
-     * @param state
-     */
+    /** Enumerates permissions of logged-in user */
     myCurrentProjectRoles(state) {
       const projectPerms = Object.entries(state.currentProjectPermissions)
         .filter((entry: [string, Array<User>]): Boolean => entry[1].map(
@@ -594,22 +547,13 @@ const {
       }
       return projectPerms;
     },
-    /**
-     * Returns true if no project has been selected
-     *
-     * @param state
-     */
+    /** Returns true if no project has been selected */
     isGlobal(state) {
       return state.currentProject === null;
     },
   },
   mutations: {
-    /**
-     * Resets all state to that set in initState
-     *
-     * @param   state   Object
-     * @returns state   Object
-     */
+    /** Resets all state to that set in initState */
     reset(state) {
       Object.assign(state, { ...state, ...initState });
     },
@@ -745,8 +689,11 @@ const {
       // If we have a value in state.currentProject, and it's id is equal to taskOverview's project_id then:
       if (state.currentProject && taskOverview.project_id === state.currentProject.id) {
         state.currentTaskOverview = taskOverview;
+        // Iterate over allScans
         Object.values(store.state.allScans).forEach((scan: Scan) => {
+          // If the scan exists and has been reviewed
           if (taskOverview.scan_states[scan.id] && taskOverview.scan_states[scan.id] !== 'unreviewed') {
+            // Reload the scan
             store.dispatch.reloadScan(scan.id);
           }
         });
@@ -937,22 +884,6 @@ const {
       state.sliceLocation = undefined;
     },
     /**
-     *
-     * @param state
-     * @param value
-     */
-    setCurrentWindowWidth(state, value) {
-      state.currentWindowWidth = value;
-    },
-    /**
-     *
-     * @param state
-     * @param value
-     */
-    setCurrentWindowLevel(state, value) {
-      state.currentWindowLevel = value;
-    },
-    /**
      * Toggle true/false for state.showCrosshairs
      *
      * @param state
@@ -1017,38 +948,22 @@ const {
       fileCache.clear();
       frameCache.clear();
     },
-    /**
-     * Pulls configuration from API and loads it into state
-     *
-     * @param commit
-     */
+    /** Pulls configuration from API and loads it into state */
     async loadConfiguration({ commit }) {
       const configuration = await djangoRest.MIQAConfig();
       commit('setMIQAConfig', configuration);
     },
-    /**
-     * Pulls user from API and loads it into state
-     *
-     * @param commit
-     */
+    /** Pulls user from API and loads it into state */
     async loadMe({ commit }) {
       const me = await djangoRest.me();
       commit('setMe', me);
     },
-    /**
-     * Pulls all users from API and loads into state
-     *
-     * @param commit
-     */
+    /** Pulls all users from API and loads into state */
     async loadAllUsers({ commit }) {
       const allUsers = await djangoRest.allUsers();
       commit('setAllUsers', allUsers.results);
     },
-    /**
-     * Pulls global settings from API and updates currentProject and globalSettings in state
-     *
-     * @param commit
-     */
+    /** Pulls global settings from API and updates currentProject and globalSettings in state */
     async loadGlobal({ commit }) {
       const globalSettings = await djangoRest.globalSettings();
       commit('setCurrentProject', null);
@@ -1058,11 +973,7 @@ const {
       });
       commit('setTaskOverview', {});
     },
-    /**
-     * Pulls all projects from API and loads into state
-     *
-     * @param commit
-     */
+    /** Pulls all projects from API and loads into state */
     async loadProjects({ commit }) {
       const projects = await djangoRest.projects();
       commit('setProjects', projects);

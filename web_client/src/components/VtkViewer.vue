@@ -47,7 +47,8 @@ export default {
       return (
         // force add dependency on currentFrame
         this.currentFrame
-        && this.proxyManager.getRepresentation(null, this.view) // View is a prop we are passed from where?
+        && this.proxyManager.getRepresentation(null, this.view)
+        // View is a prop we are passed from where?
       );
     },
     sliceDomain() {
