@@ -5,7 +5,7 @@ import {
 } from 'vuex';
 import UserAvatar from '@/components/UserAvatar.vue';
 import djangoRest from '@/django';
-import { API_URL, decisionOptions } from '../constants';
+import { API_URL, decisionOptions } from '@/constants';
 
 export default {
   name: 'ExperimentsView',

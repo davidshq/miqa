@@ -26,31 +26,42 @@ export default defineComponent({
   },
   inject: ['user', 'MIQAConfig'],
   setup() {
+    // We are loading projects
     const loadingProjects = ref(true);
     store.dispatch.loadProjects().then(() => {
+      // Project loading complete
       loadingProjects.value = false;
     });
     const currentProject = computed(() => store.state.currentProject);
     const currentTaskOverview = computed(() => store.state.currentTaskOverview);
     const projects = computed(() => store.state.projects);
     const isGlobal = computed(() => store.getters.isGlobal);
+    // TODO: Shouldn't we be able to get this from currentProject above?
+    // Get index of current project (is this different from id?)
     const selectedProjectIndex = ref(projects.value.findIndex(
       (project) => project.id === currentProject.value?.id,
     ));
+    // Loads a specific project
     const selectProject = (project: Project) => {
       store.dispatch.loadProject(project);
     };
+    // Loads global settings
     const selectGlobal = () => {
       store.dispatch.loadGlobal();
     };
 
+    // Starts as an empty array
     const overviewSections = ref([]);
+    // e.g., unreviewed, needs_2_tier_review, complete
     const scanStates = Object.keys(ScanState);
     const setOverviewSections = () => {
+      // If we have projects and a currentTaskOverview
       if (projects.value && currentTaskOverview.value) {
-        const scanStateCounts = ref(reactive(
+        const scanStateCounts = ref(reactive( // TODO: Why ref and reactive?
           scanStates.map(
             (stateString) => {
+              // Replaces _ with a space, e.g. needs_2_tier_review becomes needs 2 tier review
+              // TODO: Understand better
               const stateCount = Object.entries(currentTaskOverview.value.scan_states).filter(
                 ([, scanState]) => scanState === stateString.replace(/_/g, ' '),
               ).length;
@@ -58,6 +69,7 @@ export default defineComponent({
             },
           ),
         ));
+        // TODO: Understand better
         overviewSections.value = scanStateCounts.value.map(
           ([stateString, scanCount]: [string, number]) => ({
             value: scanCount,
@@ -71,8 +83,11 @@ export default defineComponent({
     };
 
     async function refreshTaskOverview() {
+      // If there is a currentProject
       if (currentProject.value) {
+        // Pulls from API
         const taskOverview = await djangoRest.projectTaskOverview(currentProject.value.id);
+        // If the store / API values differ, update store to API
         if (JSON.stringify(store.state.currentTaskOverview) !== JSON.stringify(taskOverview)) {
           store.commit.setTaskOverview(taskOverview);
         }
@@ -80,15 +95,20 @@ export default defineComponent({
     }
 
     async function refreshAllTaskOverviews() {
+      // For each project
       projects.value.forEach(
         async (project: Project) => {
+          // Get the latest projectTaskOverview for each project from the API
           const taskOverview = await djangoRest.projectTaskOverview(project.id);
+          // Update store with API values, this occurs even if same
           store.commit.setTaskOverview(taskOverview);
         },
       );
     }
 
-    const overviewPoll = setInterval(refreshTaskOverview, 10000);
+    // TODO: Make this timeout customizable
+    const overviewPoll = setInterval(refreshTaskOverview, 10000); // 10 secs
+    // Triggers functions when specified state changes
     watch(currentTaskOverview, setOverviewSections);
     watch(currentProject, refreshTaskOverview);
 
@@ -129,12 +149,15 @@ export default defineComponent({
     clearInterval(this.overviewPoll);
   },
   methods: {
+    // TODO: Is below using both Options API and above Composition API?
     ...mapMutations(['setProjects', 'setCurrentProject']),
     async createProject() {
       if (this.creating && this.newName.length > 0) {
         try {
+          // Create project
           const newProject = await djangoRest.createProject(this.newName);
           this.setProjects(this.projects.concat([newProject]));
+          // Load project
           store.dispatch.loadProject(newProject);
           this.creating = false;
           this.newName = '';
