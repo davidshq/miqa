@@ -47,7 +47,7 @@ function getReader({ fileName }) {
 }
 
 /**
- * Download Frame
+ * Downloads file represent Frame.
  *
  * @param axios               The client
  * @param fileName            File to be downloaded
@@ -66,6 +66,7 @@ function downloadFrame(axios, fileName, url, { onDownloadProgress } = {}) {
         FETCH_DATA[readMethod](axios, url, abortController.signal, { onDownloadProgress })
           .then((rawData) => {
             if (rawData) {
+              // Return the file
               resolve(new File([rawData], fileName));
             } else {
               throw new Error(`No data for ${fileName}`);

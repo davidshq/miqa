@@ -154,7 +154,9 @@ function loadFile(frame, { onDownloadProgress = null } = {}) {
     client = axios.create();
     downloadURL = frame.download_url;
   }
-  // ReaderFactory is from utils/ReaderFactory
+  // ReaderFactory is from utils/ReaderFactory, it returns a promise which resolves to a downloaded file
+  // TODO: Why are we adding the promise to fileCache and returning it before it has resolved?
+  // TODO: Couldn't we use `.then` on promise so that these are only triggered once the file is resolved?
   const { promise } = ReaderFactory.downloadFrame(
     client,
     `image${frame.extension}`,
@@ -225,10 +227,10 @@ function poolFunction(webWorker, taskInfo) {
         `image${frame.extension}`,
         downloadURL,
       );
-      filePromise = download.promise;
-      fileCache.set(frame.id, filePromise);
-      pendingFrameDownloads.add(download);
-      filePromise
+      filePromise = download.promise; // Initial this will be a promise
+      fileCache.set(frame.id, filePromise); // So we are setting fileCache to contain a promise?
+      pendingFrameDownloads.add(download); // Adds to Set of all pending downloads
+      filePromise // Delete from pending downloads once resolved/rejected
         .then(() => {
           pendingFrameDownloads.delete(download);
         }).catch(() => {
@@ -236,6 +238,7 @@ function poolFunction(webWorker, taskInfo) {
         });
     }
 
+    // TODO: Could me moved into filePromise above or no?
     filePromise
       .then((file) => {
         resolve(getData(frame.id, file, webWorker));
@@ -248,6 +251,8 @@ function poolFunction(webWorker, taskInfo) {
 
 /**
  * Calculates the percent downloaded of currently loading frames
+ *
+ * TODO: Should this be a mutation?
  *
  * @param completed
  * @param total
@@ -263,17 +268,23 @@ function progressHandler(completed, total) {
  * Only called by queueLoadScan
  */
 function startReaderWorkerPool() {
+  // Get the current array of tasks
   const taskArgsArray = readDataQueue.map((taskInfo) => [taskInfo]);
+  // Reset the current array of tasks in readDataQueue
   readDataQueue = [];
 
+  // https://github.com/InsightSoftwareConsortium/itk-wasm/blob/master/src/core/WorkerPool.ts
+  // `runId` is WorkerPool.runInfo.length -1.
   const { runId, promise } = store.state.workerPool.runTasks(
     taskArgsArray,
     progressHandler,
   );
+  // The number of tasks still running
   taskRunId = runId;
 
   promise
     .then(() => {
+      // Indicates no tasks are running
       taskRunId = -1;
     })
     .catch((err) => {
@@ -439,6 +450,8 @@ const {
   strict: true,
   state: {
     ...initState,
+    // WorkerPool creates a pool of poolSize that utilizes poolFunction to process
+    // See: https://github.com/InsightSoftwareConsortium/itk-wasm/blob/master/src/core/WorkerPoolFunction.ts
     workerPool: new WorkerPool(poolSize, poolFunction),
     lastApiRequestTime: Date.now(),
   },
