@@ -21,8 +21,10 @@ export default {
   inject: ['user'],
   // This is triggered by Vue Router every time we move between frames
   async beforeRouteUpdate(to, from, next) {
+    // Returns a frame with the given id
     const toFrame = await this.getFrame({ frameId: to.params.frameId, projectId: undefined });
     next(true);
+    // If the frame retrieval was successful
     if (toFrame) {
       this.swapToFrame({
         frame: toFrame,

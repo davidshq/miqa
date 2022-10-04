@@ -294,9 +294,12 @@ function startReaderWorkerPool() {
  */
 function queueLoadScan(scan, loadNext = false) {
   // load all frames in target scan
+  // If the scan has not already been loaded
   if (!loadedData.includes(scan.id)) {
+    // For each  scan in scanFrames
     store.state.scanFrames[scan.id].forEach(
       (frameId) => {
+        // Add to readDataQueue a request to get the frames associated with that scan
         readDataQueue.push({
           experimentId: scan.experiment,
           scanId: scan.id,
@@ -1144,12 +1147,14 @@ const {
       if (!frame) {
         throw new Error("frame id doesn't exist");
       }
+      // If we already have the desired frame
       if (getters.currentFrame === frame) {
         return;
       }
       commit('setLoadingFrame', true);
       commit('setErrorLoadingFrame', false);
       const oldScan = getters.currentScan;
+      // frame.scan returns the scan id
       const newScan = state.scans[frame.scan];
 
       if (newScan !== oldScan && newScan) {
