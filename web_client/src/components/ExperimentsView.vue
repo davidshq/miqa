@@ -1,4 +1,8 @@
 <script lang="ts">
+/**
+ * The ExperimentsView appears on the Projects View once a project has been selected. It also appears on Frame.vue
+ * inside a collapsible sidebar.
+ */
 import _ from 'lodash';
 import {
   mapState, mapGetters, mapMutations, mapActions,
@@ -41,6 +45,8 @@ export default {
       'currentProject',
     ]),
     ...mapGetters(['currentScan', 'currentExperiment']),
+    // Gets the experiments based on the experiment ids
+    // TODO: Why do we need this rather than directly accessing experiments?
     orderedExperiments() {
       return this.experimentIds.map((expId) => this.experiments[expId]);
     },
@@ -56,9 +62,11 @@ export default {
     },
   },
   watch: {
+    // Begins loading upload modal
     showUploadModal() {
       this.delayPrepareDropZone();
     },
+    // When the project changes, reset the local state for the project.
     currentProject() {
       this.showUploadModal = false;
       this.uploadToExisting = false;
@@ -74,8 +82,13 @@ export default {
     ...mapActions([
       'loadProject',
     ]),
-    // TODO: For unknown reason we seem to be running this function 3x(numOfScans)
-    // and this occurs over the same scans
+    /**
+     * Gets all scans associated with the provided experiment id
+     *
+     * TODO: For unknown reason we seem to be running this function 3x+ (numOfScans)
+     *
+     * @param expId String  Experiment id
+     */
     scansForExperiment(expId) {
       // Get the ids of all scans in specified experiment
       // expId looks like: c06a53c8-3d1e-479e-9c13-731886a69b47
@@ -141,17 +154,25 @@ export default {
       };
     },
     /**
-     * ?
+     * Returns the task status for the specified scan
+     *
      * @param scan
      * @returns {string}
      */
     scanState(scan) {
-      let state;
+      let scanTaskState;
       if (this.currentTaskOverview) {
-        state = this.currentTaskOverview.scan_states[scan.id];
+        scanTaskState = this.currentTaskOverview.scan_states[scan.id];
       }
-      return state || 'unreviewed';
+      return scanTaskState || 'unreviewed';
     },
+    /**
+     * Adds a class to a scan representative of the scans task state.
+     *
+     * TODO: Could add typing to parameters, e.g. scan could be changed to scan: Scan
+     *
+     * @param scan
+     */
     scanStateClass(scan) {
       let classes = `body-1 state-${this.scanState(scan).replace(/ /g, '-')}`;
       if (scan === this.currentScan) {
@@ -190,10 +211,13 @@ export default {
       let experimentId;
       this.uploading = true;
       try {
+        // Whether we are uploading to an existing experiment
         if (!this.uploadToExisting) {
+          // Create a new experiment
           const newExperiment = await djangoRest.createExperiment(
             this.currentProject.id, this.experimentNameForUpload,
           );
+          // Get the experiments' new id
           experimentId = newExperiment.id;
         } else {
           experimentId = Object.values(this.experiments).find(
