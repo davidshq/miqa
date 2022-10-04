@@ -211,15 +211,16 @@ export default {
       let experimentId;
       this.uploading = true;
       try {
-        // Whether we are uploading to an existing experiment
+        // If we are uploading to a new experiment
         if (!this.uploadToExisting) {
-          // Create a new experiment
+          // Create a new experiment, below returns instance of ResponseData
           const newExperiment = await djangoRest.createExperiment(
             this.currentProject.id, this.experimentNameForUpload,
           );
-          // Get the experiments' new id
+          // Get the experiments' new id, can't find id b/c ResponseData doesn't have it
           experimentId = newExperiment.id;
-        } else {
+        } else { // If uploading to existing experiment
+          // Find the experiment's id that matches the experiment selected
           experimentId = Object.values(this.experiments).find(
             (experiment) => experiment.name === this.experimentNameForUpload,
           ).id;
