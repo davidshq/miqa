@@ -72,7 +72,9 @@ export default {
   watch: {
     currentScan(scan) {
       if (scan) {
+        // Gets the most recent scan decision
         const last = _.head(scan.decisions);
+        // Returns null if no scan decision exists
         this.decision = last ? last.decision : null;
         this.decisionChanged = false;
         this.newNote = '';
@@ -80,11 +82,8 @@ export default {
     },
   },
   async created() {
-    this.debouncedFrameSliderChange = _.debounce(
-      this.debouncedFrameSliderChange,
-      30,
-    );
     // The desired project/frame id's are passed in via the route
+    // TODO: Doesn't this duplicate beforeRouteUpdate?
     const { projectId, frameId } = this.$route.params;
     const frame = await this.getFrame({ frameId, projectId });
     if (frame) {
@@ -111,10 +110,6 @@ export default {
       'swapToFrame',
       'getFrame',
     ]),
-    debouncedFrameSliderChange(index) {
-      const frameId = this.currentScanFrames[index];
-      this.$router.push(frameId).catch(this.handleNavigationError);
-    },
     // Update download percents for loading bar
     onFrameDownloadProgress(e) {
       this.downloadLoaded = e.loaded;

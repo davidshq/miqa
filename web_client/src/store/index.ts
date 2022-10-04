@@ -314,6 +314,7 @@ function queueLoadScan(scan, loadNext = false) {
   // to queue up the next scan as well
   // to prefetch further ahead, modify the recursion
   if (loadNext) {
+    // Get the other scans in the experiment.
     const scansInSameExperiment = store.state.experimentScans[scan.experiment];
     let nextScan;
     if (scan.id === scansInSameExperiment[scansInSameExperiment.length - 1]) {
@@ -1133,12 +1134,10 @@ const {
       commit('setCurrentFrameId', frameId);
     },
     /**
-     * This is a key function
-     * @param state
-     * @param dispatch
-     * @param getters
-     * @param commit
-     * @param frame Frame Instance of Frame
+     * Handles the process of changing frames in Frame.vue
+     *
+     * @param state, dispatch, getters, commit
+     * @param frame Frame Object
      * @param onDownloadProgress Passes local download state from Frame view
      */
     async swapToFrame({
@@ -1157,6 +1156,7 @@ const {
       // frame.scan returns the scan id
       const newScan = state.scans[frame.scan];
 
+      // Queue the new scan to be loaded
       if (newScan !== oldScan && newScan) {
         queueLoadScan(
           newScan, true,
@@ -1170,7 +1170,7 @@ const {
         // slices displayed, even though we have the data and attempted
         // to render it.  This may be due to frame extents changing between
         // scans, which is not the case from one timestep of a single scan
-        // to tne next.
+        // to the next.
         shrinkProxyManager(state.proxyManager);
         newProxyManager = true;
       }
@@ -1181,12 +1181,15 @@ const {
         state.proxyManager = vtkProxyManager.newInstance({
           proxyConfiguration: proxy,
         });
+        // vtkViews are set to empty
         state.vtkViews = [];
       }
 
-      // sourceProxy / source?
+      // get the source from which we are loading the images
       let sourceProxy = state.proxyManager.getActiveSource();
       let needPrep = false;
+      // Provides default source
+      // TODO: What is?
       if (!sourceProxy) {
         sourceProxy = state.proxyManager.createProxy(
           'Sources',
@@ -1195,7 +1198,7 @@ const {
         needPrep = true;
       }
 
-      // This try catch and logic within it are mainly for handling data doesn't exist issue
+      // This try catch and the logic within it are mainly for handling a data doesn't exist issue
       try {
         let frameData = null;
         // load from cache if possible
@@ -1212,8 +1215,10 @@ const {
         // If sourceProxy doesn't have valid config or proxyManager has no views
         if (needPrep || !state.proxyManager.getViews().length) {
           prepareProxyManager(state.proxyManager);
-          state.vtkViews = state.proxyManager.getViews();
+          // Add views to vtkViews
+          state.vtkViews = state.proxyManager.getViews(); // TODO: Can eliminate this, won't it catch on next?
         }
+        // If no vtkViews, get them from proxyManager
         if (!state.vtkViews.length) {
           state.vtkViews = state.proxyManager.getViews();
         }
