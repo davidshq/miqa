@@ -20,11 +20,14 @@ export default {
   },
   inject: ['user'],
   // This is triggered by Vue Router every time we move between frames
+  // But it is not triggered the first time we load the component, so similar code runs
+  // within created()
   async beforeRouteUpdate(to, from, next) {
     // Returns a frame with the given id
     const toFrame = await this.getFrame({ frameId: to.params.frameId, projectId: undefined });
     next(true);
     // If the frame retrieval was successful
+    // TODO: Extract as separate function, call here and in created, avoid code dupe
     if (toFrame) {
       this.swapToFrame({
         frame: toFrame,
@@ -33,6 +36,7 @@ export default {
     }
   },
   // triggered moving between projects and frames
+  // TODO: Not sure this is needed?
   async beforeRouteLeave(to, from, next) {
     next(true);
   },
@@ -83,7 +87,8 @@ export default {
   },
   async created() {
     // The desired project/frame id's are passed in via the route
-    // TODO: Doesn't this duplicate beforeRouteUpdate?
+    // This only kicks off when the component is created, when navigating between frames the same
+    // component is used, so it doesn't kick off
     const { projectId, frameId } = this.$route.params;
     const frame = await this.getFrame({ frameId, projectId });
     if (frame) {
@@ -126,6 +131,7 @@ export default {
     column
   >
     <Navbar frame-view />
+    <!-- Navigation Drawer -->
     <v-navigation-drawer
       expand-on-hover
       permanent
@@ -148,8 +154,8 @@ export default {
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
-    <!-- Show Loading Message -->
-    <!-- TODO: Extract Loading Message into separate component -->
+    <!-- End Navigation Drawer -->
+    <!-- Show Loading Message // TODO: Extract Loading Message into separate component -->
     <v-layout
       v-if="loadingFrame"
       class="loading-indicator-container"
@@ -193,7 +199,7 @@ export default {
             <VtkViewer :view="vtkView" />
           </div>
         </div>
-        <!-- Error Loading Frame -->
+        <!-- Show Error Loading Frame -->
         <v-layout
           v-if="errorLoadingFrame"
           align-center
