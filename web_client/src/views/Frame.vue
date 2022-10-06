@@ -19,11 +19,6 @@ export default {
     ControlPanel,
   },
   inject: ['user'],
-  // triggered moving between projects and frames
-  // TODO: This can probably be removed
-  async beforeRouteLeave(to, from, next) {
-    next(true);
-  },
   data() {
     return {
       downloadLoaded: 0,
