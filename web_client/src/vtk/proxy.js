@@ -20,6 +20,14 @@ import proxyViewRepresentationMapping from './proxyViewRepresentationMapping';
 
 const { createProxyDefinition, activateOnCreate } = ConfigUtils;
 
+/**
+ *
+ * @param classFactory  e.g., vtkView, vtk2DView
+ * @param ui            e.g., proxyUI.View3D, proxyUI.View2D
+ * @param options       e.g., { axis: 0 }, { axis: 1 }, ...
+ * @param props         Never passed
+ * @returns {*}
+ */
 function createDefaultView(classFactory, ui, options, props) {
   return activateOnCreate(
     createProxyDefinition(

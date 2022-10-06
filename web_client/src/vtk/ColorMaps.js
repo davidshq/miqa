@@ -6,14 +6,24 @@ const DEFAULT_PRESET = {
   Name: 'Default (Cool to Warm)',
 };
 
-// sorts case insensitively
+/**
+ * Sorts case insensitively
+ *
+ * @param a
+ * @param b
+ * @returns {number|number}
+ */
 function comparator(a, b) {
   const s1 = a.Name.toLowerCase();
   const s2 = b.Name.toLowerCase();
   return s1 > s2 ? 1 : -(s1 < s2);
 }
 
-// register medical colormaps
+/**
+ * Register medical colormaps
+ *
+ * @param presets
+ */
 function registerPresets(presets) {
   presets.forEach((preset) => {
     if (preset.Children) {
@@ -24,6 +34,12 @@ function registerPresets(presets) {
   });
 }
 
+/**
+ *
+ * @param name
+ * @param childrenNames
+ * @returns {{Children: *, Name}}
+ */
 function createGroup(name, childrenNames) {
   const children = childrenNames.map((n) => vtkColorMaps.getPresetByName(n));
   children.sort(comparator);

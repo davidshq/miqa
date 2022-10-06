@@ -1,7 +1,7 @@
 import { VIEW_ORIENTATIONS, ANNOTATIONS } from './constants';
 
 // ----------------------------------------------------------------------------
-
+// Never used?
 function getNumberOfVisibleViews(proxyManager) {
   let nbViews = 0;
   proxyManager.getViews().forEach((v) => {
@@ -11,7 +11,7 @@ function getNumberOfVisibleViews(proxyManager) {
 }
 
 // ----------------------------------------------------------------------------
-
+// Never used?
 function getViewActions(proxyManager) {
   const possibleActions = {
     crop: false,
@@ -29,13 +29,19 @@ function getViewActions(proxyManager) {
 }
 
 // ----------------------------------------------------------------------------
-
+// Never used?
 function getViewType(view) {
   return `${view.getProxyName()}:${view.getName()}`;
 }
 
 // ----------------------------------------------------------------------------
-
+/**
+ * Used in Vuex Store
+ *
+ * @param proxyManager
+ * @param viewType
+ * @returns {null}
+ */
 function getView(proxyManager, viewType) {
   const [type, name] = viewType.split(':');
   let view = null;
@@ -55,7 +61,7 @@ function getView(proxyManager, viewType) {
   if (!view) {
     view = proxyManager.createProxy('Views', type, { name });
 
-    // Make sure represention is created for new view
+    // Make sure representation is created for new view
     proxyManager
       .getSources()
       .forEach((s) => proxyManager.getRepresentation(s, view));
@@ -78,7 +84,7 @@ function getView(proxyManager, viewType) {
 }
 
 // ----------------------------------------------------------------------------
-
+// Never used?
 function updateViewsAnnotation(proxyManager) {
   const hasImageData = proxyManager
     .getSources()
