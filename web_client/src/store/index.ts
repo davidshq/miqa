@@ -27,13 +27,21 @@ const { convertItkToVtkImage } = ITKHelper;
 
 Vue.use(Vuex);
 
+// Cache of downloaded files
 const fileCache = new Map();
+// Unclear how this differs from above
 const frameCache = new Map();
+// Queue of frames to be downloaded
 let readDataQueue = [];
+// List of frames that have been successfully added to readDataQueue
 const loadedData = [];
+// Frames that need to be downloaded
 const pendingFrameDownloads = new Set<any>();
+// Maximum number of workers in WorkerPool
 const poolSize = Math.floor(navigator.hardwareConcurrency / 2) || 2;
+// Defines the task currently running
 let taskRunId = -1;
+// TODO: Unsure?
 let savedWorker = null;
 
 /** Delete existing VTK.js proxyManager views */
@@ -44,10 +52,15 @@ function shrinkProxyManager(proxyManager: vtkProxyManager) {
   });
 }
 
-/** Disable Axes visibility, sets InterpolationType to nearest and renders each view */
+/**
+ * Renders each view
+ *
+ * Also disables Axes visibility and sets InterpolationType to nearest
+ */
 function prepareProxyManager(proxyManager: vtkProxyManager) {
   if (!proxyManager.getViews().length) {
     ['View2D_Z:z', 'View2D_X:x', 'View2D_Y:y'].forEach((type) => {
+      // ViewManager.getView
       const view = getView(proxyManager, type);
       view.setOrientationAxesVisibility(false);
       view.getRepresentations().forEach((representation) => {
@@ -287,16 +300,17 @@ function startReaderWorkerPool() {
 }
 
 /**
- * Queues scans for download
+ * Queues scan for download
+ *
+ * Will load all frames for a target scan if the scan
+ * has not already been loaded.
  *
  * @param scan      Scan
  * @param loadNext  Boolean
  */
 function queueLoadScan(scan, loadNext = false) {
-  // load all frames in target scan
-  // If the scan has not already been loaded
   if (!loadedData.includes(scan.id)) {
-    // For each  scan in scanFrames
+    // For each scan in scanFrames
     store.state.scanFrames[scan.id].forEach(
       (frameId) => {
         // Add to readDataQueue a request to get the frames associated with that scan
@@ -307,6 +321,7 @@ function queueLoadScan(scan, loadNext = false) {
         });
       },
     );
+    // Once frame has been successfully added to queue:
     loadedData.push(scan.id);
   }
 
@@ -1136,8 +1151,11 @@ const {
     /**
      * Handles the process of changing frames in Frame.vue
      *
-     * @param state, dispatch, getters, commit
-     * @param frame Frame Object
+     * @param state
+     * @param dispatch
+     * @param getters
+     * @param commit
+     * @param frame              Frame Object
      * @param onDownloadProgress Passes local download state from Frame view
      */
     async swapToFrame({
@@ -1189,7 +1207,6 @@ const {
       let sourceProxy = state.proxyManager.getActiveSource();
       let needPrep = false;
       // Provides default source
-      // TODO: What is?
       if (!sourceProxy) {
         sourceProxy = state.proxyManager.createProxy(
           'Sources',
@@ -1198,7 +1215,7 @@ const {
         needPrep = true;
       }
 
-      // This try catch and the logic within it are mainly for handling a data doesn't exist issue
+      // Load the frame
       try {
         let frameData = null;
         // load from cache if possible
@@ -1211,6 +1228,7 @@ const {
           );
           frameData = result.frameData;
         }
+        // We set the source equal to the frameData we've loaded
         sourceProxy.setInputData(frameData);
         // If sourceProxy doesn't have valid config or proxyManager has no views
         if (needPrep || !state.proxyManager.getViews().length) {
@@ -1234,7 +1252,9 @@ const {
 
       // check for window lock expiry
       if (state.windowLocked.lock) {
+        // Get the currentViewData
         const { currentViewData } = getters;
+        // Handles unlocking if necessary
         const unlock = () => {
           commit('setWindowLocked', {
             lock: false,
@@ -1243,6 +1263,7 @@ const {
             associatedImage: undefined,
           });
         };
+        // Unlocks window if scan, experiment, or project has changed
         switch (state.windowLocked.duration) {
           case 'scan':
             if (currentViewData.scanId !== state.windowLocked.target) unlock();

@@ -39,7 +39,7 @@ function getViewType(view) {
  * Used in Vuex Store
  *
  * @param proxyManager
- * @param viewType
+ * @param viewType  e.g., View2D_Z:z, View2D_X:x, View2D_Y:y
  * @returns {null}
  */
 function getView(proxyManager, viewType) {
