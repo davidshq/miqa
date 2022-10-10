@@ -17,6 +17,7 @@ export default {
   computed: {
     tooltipText() {
       let name = this.targetUser.username;
+      // If first and last name exist
       if (this.targetUser.first_name && this.targetUser.last_name) {
         name = `${this.targetUser.first_name} ${this.targetUser.last_name}`;
       }
@@ -28,6 +29,7 @@ export default {
     },
   },
   methods: {
+    // TODO: What does this do? Seems a bit intensive?
     hashCode(s) {
       return s.split('').reduce((a, b) => { a = ((a < 5) - a) + b.charCodeAt(0); return a && a; }, 0);
     },

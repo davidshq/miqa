@@ -22,6 +22,8 @@ export default defineComponent({
   setup() {
     const screenshots = computed(() => store.state.screenshots);
     const currentViewData = computed(() => store.getters.currentViewData);
+    // TODO: Shouldn't we be able to get currentProject, currentFrame, and currentScan
+    // from currentViewData?
     const currentProject = computed(() => store.state.currentProject);
     const currentFrame = computed(() => store.getters.currentFrame);
     const currentScan = computed(() => store.getters.currentScan);

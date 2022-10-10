@@ -37,7 +37,7 @@ export default {
     ]),
     // TODO: Couldn't this be added to currentViewData? We already query it there.
     currentScanFrames() {
-      return this.scanFrames[this.currentScan.id];
+      return this.scanFrames[this.currentScan.id]; // TODO: It seems this is used Direct-Vuex
     },
     // Calculate percentage of requested images downloaded
     downloadProgressPercent() {
