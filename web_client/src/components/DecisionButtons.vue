@@ -4,6 +4,7 @@ import { mapGetters, mapMutations, mapState } from 'vuex';
 import djangoRest from '@/django';
 import store from '@/store';
 import EvaluationResults from '@/components/EvaluationResults.vue';
+import { autoAdvance } from '@/constants';
 import UserAvatar from './UserAvatar.vue';
 
 export default {
@@ -77,7 +78,7 @@ export default {
     suggestedArtifacts() {
       if (this.currentViewData.scanDecisions && this.currentViewData.scanDecisions.length > 0) {
         const lastDecision = _.sortBy(
-          this.currentViewData.scanDecisions, (dec) => dec.created,
+          this.currentViewData.scanDecisions, (decision) => decision.created,
         )[0];
         const lastDecisionArtifacts = lastDecision.user_identified_artifacts;
         // Of the artifacts chosen in the last scandecision,
@@ -243,6 +244,7 @@ export default {
       this.newComment = value;
     },
     async handleCommentSave(decision) {
+      // If feedback has been left on the scan
       if (
         this.newComment.trim().length > 0
         || decision === 'U'
@@ -250,14 +252,17 @@ export default {
         || this.confirmedAbsent.length > 0
       ) {
         try {
+          // Object with present/absent artifacts
           const userIdentifiedArtifacts = {
             present: this.confirmedPresent,
             absent: this.confirmedAbsent,
           };
+          // Get the addScanDecision mutator
           const { addScanDecision } = store.commit;
           const zxyLocation = this.vtkViews.map(
             (view) => this.proxyManager.getRepresentation(null, view).getSlice(),
           );
+          // Create new scan decision using API
           const savedObj = await djangoRest.setDecision(
             this.currentViewData.scanId,
             decision,
@@ -269,12 +274,15 @@ export default {
               k: zxyLocation[0],
             } : {}),
           );
+          // Update Vuex store with scan decision
           addScanDecision({
             currentScanId: this.currentViewData.scanId,
             newDecision: savedObj,
           });
-          this.refreshTaskOverview();
-          this.$emit('handleKeyPress', 'next');
+          this.refreshTaskOverview(); // TODO: Should this be await?
+          if (autoAdvance) {
+            this.$emit('handleKeyPress', 'next');
+          }
           this.$snackbar({
             text: 'Saved decision successfully.',
             timeout: 6000,

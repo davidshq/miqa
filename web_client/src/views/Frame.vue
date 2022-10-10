@@ -53,6 +53,7 @@ export default {
     },
   },
   watch: {
+    // TODO: Is this actually ever called?
     currentScan(scan) {
       if (scan) {
         // Gets the most recent scan decision
@@ -109,8 +110,10 @@ export default {
     fill-height
     column
   >
+    <!-- Top Navbar -->
     <Navbar frame-view />
-    <!-- Navigation Drawer -->
+    <!-- End Top Navbar -->
+    <!-- Left Navigation Drawer -->
     <v-navigation-drawer
       expand-on-hover
       permanent
@@ -133,7 +136,7 @@ export default {
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
-    <!-- End Navigation Drawer -->
+    <!-- End Left Navigation Drawer -->
     <!-- Show Loading Message // TODO: Extract Loading Message into separate component -->
     <v-layout
       v-if="loadingFrame"
@@ -192,7 +195,9 @@ export default {
         <!-- End Error Loading Frame -->
       </v-flex>
       <!-- End Show VTK Viewers -->
+      <!-- Show Bottom Control Panel -->
       <ControlPanel />
+      <!-- End Bottom Control Panel -->
     </template>
   </v-layout>
 </template>
