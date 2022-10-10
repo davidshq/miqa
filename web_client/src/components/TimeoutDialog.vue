@@ -5,12 +5,7 @@ import {
 } from '@vue/composition-api';
 import djangoRest from '@/django';
 import store from '@/store';
-
-const warningDuration = 2 * 60 * 1000; // the warning box will pop up for 2 minutes
-// The server-side session token lasts 30 minutes
-const sessionTimeout = 30 * 60 * 1000;
-// Log out after 15 minutes if the user is away from keyboard
-const idleTimeout = 15 * 60 * 1000;
+import { warningDuration, sessionTimeout, idleTimeout } from '@/constants';
 
 export default defineComponent({
   name: 'TimeoutDialog',
