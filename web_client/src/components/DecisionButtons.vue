@@ -58,7 +58,9 @@ export default {
       'currentViewData',
       'myCurrentProjectRoles',
     ]),
+    // The list of artifacts generally should not change unless the project changes
     artifacts() {
+      // TODO: Verify else is properly triggered if no artifacts set for project
       if (this.currentProject.settings.artifacts !== 'undefined') {
         const currentArtifacts = this.currentProject.settings.artifacts;
         return currentArtifacts.map((name) => ({
@@ -72,13 +74,14 @@ export default {
         }));
       }
     },
+    // Returns an array containing the name of an artifact and it's current selection state
     chips() {
       return this.artifacts.map((artifact) => [artifact, this.getCurrentChipState(artifact)]);
     },
     suggestedArtifacts() {
       if (this.currentViewData.scanDecisions && this.currentViewData.scanDecisions.length > 0) {
         const lastDecision = _.sortBy(
-          this.currentViewData.scanDecisions, (decision) => decision.created,
+          this.currentViewData.scanDecisions, (decision) => { Date.parse(decision.created); },
         )[0];
         const lastDecisionArtifacts = lastDecision.user_identified_artifacts;
         // Of the artifacts chosen in the last scandecision,
