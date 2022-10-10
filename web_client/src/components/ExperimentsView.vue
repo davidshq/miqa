@@ -1,7 +1,7 @@
 <script lang="ts">
 /**
- * The ExperimentsView appears on the Projects View once a project has been selected. It also appears on Frame.vue
- * inside a collapsible sidebar.
+ * The ExperimentsView appears on the Projects View once a project has been selected.
+ * It also appears on Frame.vue inside a collapsible sidebar.
  */
 import _ from 'lodash';
 import {
@@ -125,6 +125,8 @@ export default {
     /**
      * Get the URL of the first frame in the current scan
      *
+     * TODO: MIQA-Annotations
+     *
      * @param scanId
      * @returns {string}
      */
@@ -134,13 +136,13 @@ export default {
     /**
      * Assigns a color and character if a decision has been rendered on a given scan
      *
-     * @param decisions
+     * @param decisions Array of objects
      * @returns {{decision: (*|string), color: string}|{}}
      */
     decisionToRating(decisions) {
       // decisions are an array of objects
       if (decisions.length === 0) return {};
-      const rating = _.first(_.sortBy(decisions, (dec) => dec.created)).decision;
+      const rating = _.first(_.sortBy(decisions, (decision) => decision.created)).decision;
       let color = 'grey--text';
       if (rating === 'U') {
         color = 'green--text';

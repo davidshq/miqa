@@ -33,8 +33,8 @@ export default defineComponent({
     const lastApiRequestTime = computed(() => store.state.lastApiRequestTime);
 
     const reset = async () => {
-      await djangoRest.restoreLogin(store);
-      djangoRest.projects();
+      await djangoRest.restoreLogin(store); // TODO: Understand better
+      djangoRest.projects(); // TODO: Why is this called?
 
       // reset dialog
       show.value = false;
@@ -78,6 +78,8 @@ export default defineComponent({
       }
       // Show the warning if the time remaining is getting close to 0
       show.value = timeRemaining.value < warningDuration;
+      // TODO: Could add an algorithm to determine time to timeout and set check x/2 etc.
+      //  from it instead of checking every 1 second, creates lots of unnecessary calls?
       setTimeout(updateCountdown, 1000);
     };
     updateCountdown();
