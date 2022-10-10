@@ -51,6 +51,7 @@ export default {
     lockOwner() {
       return this.currentViewData.lockOwner;
     },
+    // TODO: Understand better
     representation() {
       return this.currentFrame && this.proxyManager.getRepresentations()[0];
     },
@@ -61,10 +62,12 @@ export default {
       clearInterval(this.lockCycle);
     },
     currentViewData() {
+      // TODO: ?
       this.navigateToNextIfCurrentScanNull();
     },
   },
   mounted() {
+    // Handles key presses
     if (!this.navigateToNextIfCurrentScanNull()) {
       this.switchLock(this.experimentId);
       window.addEventListener('keydown', (event) => {
@@ -82,6 +85,7 @@ export default {
     }
   },
   beforeDestroy() {
+    // Remove lock
     this.setLock({ experimentId: this.experimentId, lock: false });
     clearInterval(this.lockCycle);
   },
@@ -93,6 +97,7 @@ export default {
       'setShowCrosshairs',
       'setStoreCrosshairs',
     ]),
+    // TODO: ?
     openScanLink() {
       window.open(this.currentViewData.scanLink, '_blank');
     },
@@ -193,6 +198,8 @@ export default {
       class="pa-0"
     >
       <v-row no-gutters>
+        <!-- Left Pane (Project/Experiment) -->
+        <!-- TODO: Extract into separate component -->
         <v-col
           cols="4"
           class="pa-2 pr-1"
@@ -301,6 +308,8 @@ export default {
             </v-flex>
           </v-card>
         </v-col>
+        <!-- End Left Pane (Project/Experiment) -->
+        <!-- Center/Right Panes (Scan/Frame/Decision) -->
         <v-col
           cols="8"
           class="pa-2 pl-1"
@@ -314,6 +323,8 @@ export default {
               class="pa-0"
             >
               <v-row no-gutters>
+                <!-- Center Pane (Scan/Frame) -->
+                <!-- TODO: Extract as separate component -->
                 <v-col cols="6">
                   <v-container
                     fill-height
@@ -323,6 +334,7 @@ export default {
                       class="d-flex flex-column"
                       style="width: 100%"
                     >
+                      <!-- Scan Navigation -->
                       <div class="d-flex justify-space-between">
                         <div>
                           Scan:
@@ -361,6 +373,8 @@ export default {
                           </v-btn>
                         </div>
                       </div>
+                      <!-- End Scan Navigation -->
+                      <!-- Frame Navigation -->
                       <div class="d-flex justify-space-between">
                         <div>
                           Frame:
@@ -392,13 +406,15 @@ export default {
                           </v-btn>
                         </div>
                       </div>
+                      <!-- End Frame Navigation -->
                     </div>
-
+                    <!-- Window Widget -->
                     <window-widget
                       :representation="representation"
                       :experiment-id="experimentId"
                     />
-
+                    <!-- End Window Widget -->
+                    <!-- ScanDecision -->
                     <v-row class="mx-0">
                       <v-col
                         cols="12"
@@ -418,8 +434,11 @@ export default {
                         </div>
                       </v-col>
                     </v-row>
+                    <!-- ScanDecision -->
                   </v-container>
                 </v-col>
+                <!-- End Center Pane (Scan/Frame) -->
+                <!-- Right Pane (Decision) -->
                 <v-col cols="6">
                   <DecisionButtons
                     :experiment-is-editable="experimentIsEditable"
@@ -430,10 +449,12 @@ export default {
                     @switchLock="switchLock"
                   />
                 </v-col>
+                <!-- End Right Pane (Decision) -->
               </v-row>
             </v-container>
           </v-card>
         </v-col>
+        <!-- End Center/Right Panes (Scan/Frame/Decision) -->
       </v-row>
     </v-container>
   </v-flex>

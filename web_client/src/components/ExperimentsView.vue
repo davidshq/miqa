@@ -163,13 +163,15 @@ export default {
      */
     scanState(scan) {
       let scanTaskState;
+      // If we have a value for currentTaskOverview
       if (this.currentTaskOverview) {
+        // Get the task state for the current scan
         scanTaskState = this.currentTaskOverview.scan_states[scan.id];
       }
       return scanTaskState || 'unreviewed';
     },
     /**
-     * Adds a class to a scan representative of the scans task state.
+     * Adds a class to a scan representative of the scan's task state.
      *
      * TODO: Could add typing to parameters, e.g. scan could be changed to scan: Scan
      *
@@ -182,6 +184,8 @@ export default {
       }
       return classes;
     },
+    // TODO: Would be good to extract this into a separate component,
+    // This is only needed in Project view, not in Frame vue
     // Delays for .5 seconds
     delayPrepareDropZone() {
       setTimeout(this.prepareDropZone, 500);
