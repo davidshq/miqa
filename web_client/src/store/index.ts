@@ -306,9 +306,9 @@ function startReaderWorkerPool() {
  * has not already been loaded.
  *
  * @param scan      Scan
- * @param loadNext  Boolean
+ * @param loadNext  Integer
  */
-function queueLoadScan(scan, loadNext = false) {
+function queueLoadScan(scan, loadNext = 0) {
   if (!loadedData.includes(scan.id)) {
     // For each scan in scanFrames
     store.state.scanFrames[scan.id].forEach(
@@ -325,10 +325,7 @@ function queueLoadScan(scan, loadNext = false) {
     loadedData.push(scan.id);
   }
 
-  // semi-recursive; we only recurse on the first call
-  // to queue up the next scan as well
-  // to prefetch further ahead, modify the recursion
-  if (loadNext) {
+  if (loadNext > 0) {
     // Get the other scans in the experiment.
     const scansInSameExperiment = store.state.experimentScans[scan.experiment];
     let nextScan;
@@ -338,17 +335,21 @@ function queueLoadScan(scan, loadNext = false) {
       const nextExperimentId = experimentIds[experimentIds.indexOf(scan.experiment) + 1];
       const nextExperimentScans = store.state.experimentScans[nextExperimentId];
       if (nextExperimentScans && nextExperimentScans.length > 0) {
-        nextScan = store.state.allScans[
+        nextScan = store.state.scans[
           nextExperimentScans[0]
         ];
       }
     } else {
-      // load next scan in same experiment
-      nextScan = store.state.allScans[scansInSameExperiment[
-        scansInSameExperiment.indexOf(scan.id) + 1
-      ]];
+      let offset = 1;
+      while (!nextScan || !includeScan(nextScan.id)) {
+        // load next scan in same experiment
+        nextScan = store.state.scans[scansInSameExperiment[
+          scansInSameExperiment.indexOf(scan.id) + offset
+        ]];
+        offset += 1;
+      }
     }
-    if (nextScan) queueLoadScan(nextScan);
+    if (nextScan) queueLoadScan(nextScan, loadNext - 1);
     startReaderWorkerPool();
   }
 }
@@ -407,17 +408,32 @@ function expandScanRange(frameId, dataRange) {
   }
 }
 
+export function includeScan(scanId) {
+  if (store.state.reviewMode) {
+    const myRole = store.state.currentTaskOverview?.my_project_role;
+    const scanState = store.state.currentTaskOverview?.scan_states[scanId];
+    switch (scanState) {
+      case 'unreviewed':
+        return true;
+      case 'complete':
+        return false;
+      default:
+        return myRole === 'tier_2_reviewer';
+    }
+  }
+  return true;
+}
+
 const initState = {
   MIQAConfig: {},
   me: null,
   allUsers: [],
-  reviewMode: false,
+  reviewMode: true,
   globalSettings: undefined as ProjectSettings,
   currentProject: undefined as Project | null,
   currentTaskOverview: null as ProjectTaskOverview | null,
   currentProjectPermissions: {},
   projects: [] as Project[],
-  allScans: {},
   experimentIds: [],
   experiments: {},
   experimentScans: {},
@@ -492,15 +508,12 @@ const {
       const experimentScansList = state.experimentScans[experiment.id];
       // Get list of frames associated with current scan
       const scanFramesList = state.scanFrames[scan.id];
+
+      const scanOrder = Object.values(state.experimentScans).flat().filter(includeScan);
+      const currIndexInOrder = scanOrder.indexOf(scan.id);
       // ?
-      let upTo = currentFrame.firstFrameInPreviousScan;
-      let downTo = currentFrame.firstFrameInNextScan;
-      if (upTo && !Object.keys(state.scans).includes(state.frames[upTo].scan)) {
-        upTo = null;
-      }
-      if (downTo && !Object.keys(state.scans).includes(state.frames[downTo].scan)) {
-        downTo = null;
-      }
+      const upTo = scanOrder[currIndexInOrder - 1];
+      const downTo = scanOrder[currIndexInOrder + 1];
       return {
         projectId: project.id,
         projectName: project.name,
@@ -514,12 +527,14 @@ const {
         scanSubject: scan.subjectID,
         scanLink: scan.link,
         scanDecisions: scan.decisions,
-        scanPositionString: `(${experimentScansList.indexOf(scan.id) + 1}/${experimentScansList.length})`,
-        framePositionString: `(${scanFramesList.indexOf(currentFrame.id) + 1}/${scanFramesList.length})`,
+        experimentScansList,
+        scanFramesList,
+        scanPosition: experimentScansList.indexOf(scan.id) + 1,
+        framePosition: scanFramesList.indexOf(currentFrame.id) + 1,
         backTo: currentFrame.previousFrame,
         forwardTo: currentFrame.nextFrame,
-        upTo,
-        downTo,
+        upTo: state.scanFrames[upTo] ? state.scanFrames[upTo][0] : undefined,
+        downTo: state.scanFrames[downTo] ? state.scanFrames[downTo][0] : undefined,
         currentFrame,
         currentAutoEvaluation: currentFrame.frame_evaluation,
       };
@@ -650,7 +665,6 @@ const {
       // Replace with a new object to trigger a Vuex update
       state.scans = { ...state.scans };
       state.scans[scanId] = scan;
-      state.allScans = Object.assign(state.allScans, state.scans);
     },
     /**
      * Set the renderOrientation
@@ -709,7 +723,7 @@ const {
       if (state.currentProject && taskOverview.project_id === state.currentProject.id) {
         state.currentTaskOverview = taskOverview;
         // Iterate over allScans
-        Object.values(store.state.allScans).forEach((scan: Scan) => {
+        Object.values(store.state.scans).forEach((scan: Scan) => {
           // If the scan exists and has been reviewed
           if (taskOverview.scan_states[scan.id] && taskOverview.scan_states[scan.id] !== 'unreviewed') {
             // Reload the scan
@@ -928,26 +942,6 @@ const {
      */
     switchReviewMode(state, mode) {
       state.reviewMode = mode || false;
-      if (mode) {
-        const myRole = state.currentTaskOverview.my_project_role;
-        state.scans = Object.fromEntries(
-          Object.entries(state.allScans).filter(
-            ([scanId]) => {
-              const scanState = state.currentTaskOverview.scan_states[scanId];
-              switch (scanState) {
-                case 'unreviewed':
-                  return true;
-                case 'complete':
-                  return false;
-                default:
-                  return myRole === 'tier_2_reviewer';
-              }
-            },
-          ),
-        );
-      } else {
-        state.scans = state.allScans;
-      }
     },
   },
   actions: {
@@ -1151,6 +1145,8 @@ const {
     /**
      * Handles the process of changing frames in Frame.vue
      *
+     * Only used by Frame.vue
+     *
      * @param state
      * @param dispatch
      * @param getters
@@ -1177,11 +1173,12 @@ const {
       // Queue the new scan to be loaded
       if (newScan !== oldScan && newScan) {
         queueLoadScan(
-          newScan, true,
+          newScan, 3, // TODO: Why?
         );
       }
 
       let newProxyManager = false;
+      // We only create a new proxy manager if the newScan is not the same as oldScan
       if (oldScan !== newScan && state.proxyManager) {
         // If we don't "shrinkProxyManager()" and reinitialize it between
         // scans, then we can end up with no frame
