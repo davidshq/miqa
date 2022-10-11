@@ -166,9 +166,16 @@ export default {
           .catch(this.handleNavigationError);
       }
     },
+    /**
+     * Change current frame view
+     *
+     * @param framePosition
+     */
     slideToFrame(framePosition) {
       this.navigateToFrame(this.currentViewData.scanFramesList[framePosition - 1]);
     },
+    // Change the currently displayed frame
+    // TODO: Would it make sense to rename `updateImage` to `updateFrame`?
     updateImage() {
       if (this.direction === 'back') {
         this.navigateToFrame(this.previousFrame);
@@ -180,17 +187,35 @@ export default {
         this.navigateToFrame(this.currentViewData.downTo);
       }
     },
+    /**
+     * Handles navigation key presses
+     *
+     * TODO: Does it make sense to rename `handleKeyPress` to `handleNavigationKeyPress`?
+     *
+     * @param direction
+     */
     handleKeyPress(direction) {
       this.direction = direction;
       this.updateImage();
     },
+    /**
+     * After every keystroke into experiment notes, this updates the local component state.
+     *
+     * TODO: Why are we keeping both Vuex state and local state, e.g., we update
+     * this.currentViewData.experimentNote and the local this.newExperimentNote.
+     *
+     * @param value
+     */
     handleExperimentNoteChange(value) {
       this.newExperimentNote = value;
     },
+    // Saves the note using to backend and store
     async handleExperimentNoteSave() {
       if (this.newExperimentNote.length > 0) {
         try {
+          // TODO: This shouldn't be necessary?
           const { updateExperiment } = store.commit;
+          // Save note using API
           const newExpData = await djangoRest.setExperimentNote(
             this.currentViewData.experimentId, this.newExperimentNote,
           );
@@ -198,7 +223,10 @@ export default {
             text: 'Saved note successfully.',
             timeout: 6000,
           });
+          // TODO: What happens to the old experiment notes?
           this.newExperimentNote = '';
+          // TODO: This is where we actually commit the data...but this is already
+          //  happening via bind?
           updateExperiment(newExpData);
         } catch (err) {
           this.$snackbar({
