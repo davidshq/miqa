@@ -134,6 +134,7 @@ export default {
   },
   watch: {
     // Resets currentViewData for present/absent whenever image changes
+    // TODO: This causes the decision buttons to get out of sync if we aren't auto advancing scans
     currentViewData() {
       this.confirmedPresent = [];
       this.confirmedAbsent = [];

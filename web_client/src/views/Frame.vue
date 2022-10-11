@@ -91,9 +91,12 @@ export default {
     },
     // Loads a specific frame
     async loadFrame() {
+      // Get the project/frame id's from the URL
       const { projectId, frameId } = this.$route.params;
+      // Get the specified frame
       const frame = await this.getFrame({ frameId, projectId });
       if (frame) {
+        // Swap to the specified frame
         await this.swapToFrame({
           frame,
           onDownloadProgress: this.onFrameDownloadProgress,
