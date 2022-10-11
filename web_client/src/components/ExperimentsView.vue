@@ -9,6 +9,7 @@ import {
 } from 'vuex';
 import UserAvatar from '@/components/UserAvatar.vue';
 import djangoRest from '@/django';
+import { includeScan } from '@/store';
 import { API_URL, decisionOptions } from '@/constants';
 
 export default {
@@ -82,6 +83,7 @@ export default {
     ...mapActions([
       'loadProject',
     ]),
+    includeScan,
     /**
      * Gets all scans associated with the provided experiment id
      *
@@ -246,41 +248,30 @@ export default {
 
 <template>
   <v-card class="flex-card">
-    <v-subheader
-      v-if="!minimal"
+    <div
       class="d-flex"
-      style="justify-content: space-between"
+      style="justify-content: space-between; align-items: baseline"
     >
-      Experiments
-      <div
-        class="d-flex mode-toggle"
+      <v-subheader
+        v-if="!minimal"
+        style="display: inline"
+      >
+        Experiments
+      </v-subheader>
+      <v-subheader
+        class="mode-toggle"
       >
         <span>All scans</span>
         <v-switch
-          :value="reviewMode"
-          inset
+          :input-value="true"
           dense
           style="display: inline-block; max-height: 40px; max-width: 60px;"
           class="px-3 ma-0"
           @change="switchReviewMode"
         />
         <span>Scans for my review</span>
-      </div>
-    </v-subheader>
-    <v-subheader
-      v-if="minimal"
-      class="d-flex mode-toggle"
-    >
-      <span>All scans</span>
-      <v-switch
-        :value="reviewMode"
-        dense
-        style="display: inline-block; max-height: 40px; max-width: 60px;"
-        class="px-3 ma-0"
-        @change="switchReviewMode"
-      />
-      <span>Scans for my review</span>
-    </v-subheader>
+      </v-subheader>
+    </div>
     <div class="scans-view">
       <div v-if="orderedExperiments && orderedExperiments.length">
         <ul class="experiment">
@@ -322,6 +313,7 @@ export default {
                     <v-btn
                       v-bind="attrs"
                       :to="getURLForFirstFrameInScan(scan.id)"
+                      :disabled="!includeScan(scan.id)"
                       class="ml-0 px-1 scan-name"
                       href
                       text
@@ -346,6 +338,13 @@ export default {
             </ul>
           </li>
         </ul>
+      </div>
+      <div
+        v-else-if="currentProject.experiments.length"
+        class="pa-5"
+        style="width: 60%; text-align: center"
+      >
+        <v-progress-circular indeterminate />
       </div>
       <div
         v-else
@@ -526,6 +525,7 @@ ul.scans {
 }
 .mode-toggle {
   align-items: baseline;
+  display: inline-block;
 }
 .add-scans {
   min-width: 150px;
