@@ -1,15 +1,15 @@
-import vtk2DView from 'vtk.js/Sources/Proxy/Core/View2DProxy';
+import vtk2DView from 'vtk.js/Sources/Proxy/Core/View2DProxy'; // Probably used
 import vtkGeometryRepresentationProxy from 'vtk.js/Sources/Proxy/Representations/GeometryRepresentationProxy';
 import vtkSkyboxRepresentationProxy from 'vtk.js/Sources/Proxy/Representations/SkyboxRepresentationProxy';
 import vtkGlyphRepresentationProxy from 'vtk.js/Sources/Proxy/Representations/GlyphRepresentationProxy';
-import vtkLookupTableProxy from 'vtk.js/Sources/Proxy/Core/LookupTableProxy';
+import vtkLookupTableProxy from 'vtk.js/Sources/Proxy/Core/LookupTableProxy'; // Probably used
 import vtkMoleculeRepresentationProxy from 'vtk.js/Sources/Proxy/Representations/MoleculeRepresentationProxy';
-import vtkPiecewiseFunctionProxy from 'vtk.js/Sources/Proxy/Core/PiecewiseFunctionProxy';
-import vtkProxySource from 'vtk.js/Sources/Proxy/Core/SourceProxy';
-import vtkSliceRepresentationProxy from 'vtk.js/Sources/Proxy/Representations/SliceRepresentationProxy';
-import vtkView from 'vtk.js/Sources/Proxy/Core/ViewProxy';
-import vtkVolumeRepresentationProxy from 'vtk.js/Sources/Proxy/Representations/VolumeRepresentationProxy';
-import 'vtk.js/Sources/Rendering/Profiles/All';
+import vtkPiecewiseFunctionProxy from 'vtk.js/Sources/Proxy/Core/PiecewiseFunctionProxy'; // Maybe used
+import vtkProxySource from 'vtk.js/Sources/Proxy/Core/SourceProxy'; // Probably used
+import vtkSliceRepresentationProxy from 'vtk.js/Sources/Proxy/Representations/SliceRepresentationProxy'; // Maybe used
+import vtkView from 'vtk.js/Sources/Proxy/Core/ViewProxy'; // Maybe used
+import vtkVolumeRepresentationProxy from 'vtk.js/Sources/Proxy/Representations/VolumeRepresentationProxy'; // Probably used
+import 'vtk.js/Sources/Rendering/Profiles/All'; // Probably used
 
 import ConfigUtils from './configUtils';
 
@@ -21,6 +21,11 @@ import proxyViewRepresentationMapping from './proxyViewRepresentationMapping';
 const { createProxyDefinition, activateOnCreate } = ConfigUtils;
 
 /**
+ * Sets up the default rendered volume view
+ *
+ * Note: The options set here include annotation opacity,
+ * visibility of orientation axes, orientation axes preset,
+ * and orientation axes type.
  *
  * @param classFactory  e.g., vtkView, vtk2DView
  * @param ui            e.g., proxyUI.View3D, proxyUI.View2D
@@ -72,9 +77,11 @@ export default {
       LookupTable: createProxyDefinition(vtkLookupTableProxy, [], [], {
         presetName: 'Default (Cool to Warm)',
       }),
+      // Controls the appearance of the volume.
       PiecewiseFunction: createProxyDefinition(vtkPiecewiseFunctionProxy),
     },
     Sources: {
+      // For stand-alone data objects
       TrivialProducer: activateOnCreate(createProxyDefinition(vtkProxySource)),
       Contour: proxyFilter.Contour,
     },

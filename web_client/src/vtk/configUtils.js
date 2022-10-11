@@ -1,5 +1,7 @@
-// ----------------------------------------------------------------------------
 /**
+ * Creates a proxy definition
+ *
+ * Called by proxy.
  *
  * @param classFactory
  * @param ui
@@ -22,7 +24,6 @@ function createProxyDefinition(
   };
 }
 
-// ----------------------------------------------------------------------------
 /**
  *
  * @param def
@@ -34,7 +35,6 @@ function activateOnCreate(def) {
   return def;
 }
 
-// ----------------------------------------------------------------------------
 // TODO: Never used?
 function deepCopyPath(rootObj, pathSpec) {
   const path = typeof pathSpec === 'string' ? pathSpec.split('.') : pathSpec;
@@ -60,7 +60,6 @@ function deepCopyPath(rootObj, pathSpec) {
   return newRootObj;
 }
 
-// ----------------------------------------------------------------------------
 // TODO: Never used?
 function objAssignPath(rootObj, pathSpec, value) {
   const path = typeof pathSpec === 'string' ? pathSpec.split('.') : pathSpec;
@@ -83,7 +82,6 @@ function objAssignPath(rootObj, pathSpec, value) {
   }
 }
 
-// ----------------------------------------------------------------------------
 export default {
   createProxyDefinition,
   activateOnCreate,

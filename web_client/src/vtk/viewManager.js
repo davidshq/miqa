@@ -47,12 +47,16 @@ function getView(proxyManager, viewType) {
   let view = null;
   const views = proxyManager.getViews();
   for (let i = 0; i < views.length; i += 1) {
+    // If the view is of the type, e.g. View2D_Z, View2D_X, View2D_Y
     if (views[i].getProxyName() === type) {
+      // If the view has a name, e.g. z, x, y
       if (name) {
+        // If VTK view equals name, get the view
         if (views[i].getName() === name) {
           view = views[i];
         }
       } else {
+        // TODO: This seems redundant?
         view = views[i];
       }
     }
