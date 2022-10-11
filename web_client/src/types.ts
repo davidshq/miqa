@@ -20,6 +20,7 @@ interface Frame {
   name: string,
   scan: string,
   extension: string,
+  // TODO: Add frame_evaluation?
 }
 
 interface ScanDecision {
