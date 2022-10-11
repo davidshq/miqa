@@ -137,6 +137,9 @@ export default {
           .catch(this.handleNavigationError);
       }
     },
+    slideToFrame(framePosition) {
+      this.navigateToFrame(this.currentViewData.scanFramesList[framePosition - 1]);
+    },
     updateImage() {
       if (this.direction === 'back') {
         this.navigateToFrame(this.previousFrame);
@@ -349,7 +352,8 @@ export default {
                             class="grey--text"
                             style="display:inline"
                           >
-                            {{ currentViewData.scanPositionString }}
+                            ({{ currentViewData.scanPosition }} /
+                            {{ currentViewData.experimentScansList.length }})
                           </p>
                         </div>
                         <div>
@@ -382,9 +386,18 @@ export default {
                             class="grey--text"
                             style="display:inline"
                           >
-                            {{ currentViewData.framePositionString }}
+                            ({{ currentViewData.framePosition }} /
+                            {{ currentViewData.scanFramesList.length }})
                           </p>
                         </div>
+                        <v-slider
+                          :value="currentViewData.framePosition"
+                          ticks="always"
+                          tick-size="4"
+                          :min="1"
+                          :max="currentViewData.scanFramesList.length"
+                          @input="slideToFrame"
+                        />
                         <div>
                           <v-btn
                             :disabled="!previousFrame"
@@ -427,7 +440,8 @@ export default {
                           :decision="decision"
                         />
                         <div
-                          v-if="currentViewData.scanDecisions.length === 0"
+                          v-if="!currentViewData.scanDecisions
+                            || currentViewData.scanDecisions.length === 0"
                           class="grey--text"
                         >
                           This scan has no prior comments.
