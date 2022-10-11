@@ -14,6 +14,8 @@ export default {
     UserAvatar,
   },
   inject: ['user', 'MIQAConfig'],
+  // TODO: Could we pass down current scan info via props and use to determine
+  // rather than currentViewData?
   props: {
     experimentIsEditable: {
       type: Boolean,
@@ -48,7 +50,7 @@ export default {
   },
   computed: {
     ...mapState([
-      'currentViewData',
+      'currentViewData', // TODO: Why both as state and getters?
       'currentProject',
       'proxyManager',
       'vtkViews',
@@ -78,17 +80,35 @@ export default {
     chips() {
       return this.artifacts.map((artifact) => [artifact, this.getCurrentChipState(artifact)]);
     },
+    /**
+     * Determines which artifacts are suggested.
+     *
+     * Artifacts are suggested either:
+     *
+     * 1. By a prior user decision
+     * 2. By auto evaluation
+     */
     suggestedArtifacts() {
-      if (this.currentViewData.scanDecisions && this.currentViewData.scanDecisions.length > 0) {
+      // TODO: Should create reusable null check function
+      // See: https://deviq.com/design-patterns/guard-clause
+      if (!this.currentViewData.scanDecisions) {
+        return [];
+      }
+      // TODO: Same here.
+      if (this.currentViewData.scanDecisions.length > 0) {
+        // Get the most recent decision
         const lastDecision = _.sortBy(
           this.currentViewData.scanDecisions, (decision) => { Date.parse(decision.created); },
         )[0];
+        // Gets the artifacts associated with the most recent decision
+        // TODO: Are these actually user identified or are they also auto evaluation?
         const lastDecisionArtifacts = lastDecision.user_identified_artifacts;
-        // Of the artifacts chosen in the last scandecision,
+        // Of the artifacts chosen in the last scanDecision,
         // include only those marked as present.
         return Object.entries(lastDecisionArtifacts).filter(
           ([, present]) => present === this.MIQAConfig.artifact_states.PRESENT,
         ).map(([artifactName]) => artifactName);
+        // If a current auto evaluation exists
       } if (this.currentViewData.currentAutoEvaluation) {
         const predictedArtifacts = this.currentViewData.currentAutoEvaluation.results;
         // Of the results from the NN, filter these to
@@ -103,7 +123,9 @@ export default {
       }
       return [];
     },
+    // Displays the decision buttons based on user's roles
     options() {
+      // Basic option
       const myOptions = [
         {
           label: 'Usable',
@@ -111,6 +133,7 @@ export default {
           color: 'green darken-3 white--text',
         },
       ];
+      // Tier 2 reviewer only
       if (this.myCurrentProjectRoles.includes('tier_2_reviewer')) {
         myOptions.push({
           label: 'Usable-Extra',
@@ -122,6 +145,7 @@ export default {
           code: 'UN',
           color: 'red darken-3 white--text',
         });
+        // Tier 1/superuser only
       } else if (this.myCurrentProjectRoles.includes('tier_1_reviewer') || this.myCurrentProjectRoles.includes('superuser')) {
         myOptions.push({
           label: 'Questionable',
@@ -139,6 +163,7 @@ export default {
       this.confirmedPresent = [];
       this.confirmedAbsent = [];
     },
+    // If a change is made to comment, present, absent, set warnDecision false
     newComment() {
       this.warnDecision = false;
     },
@@ -150,11 +175,13 @@ export default {
     },
   },
   mounted() {
+    // Check every 10 secs for whether an auto evaluation has been completed
     if (!this.currentViewData.currentAutoEvaluation) {
       this.pollInterval = setInterval(this.pollForEvaluation, 1000 * 10);
     }
   },
   beforeUnmount() {
+    // Stop polling for auto evaluations
     clearInterval(this.pollInterval);
   },
   methods: {
@@ -163,12 +190,18 @@ export default {
       'setFrameEvaluation',
     ]),
     async pollForEvaluation() {
+      // Get a frame from API
       const frameData = await djangoRest.frame(this.currentViewData.currentFrame.id);
+      // If there is a frame_evaluation
       if (frameData.frame_evaluation) {
         this.setFrameEvaluation(frameData.frame_evaluation);
         clearInterval(this.pollInterval);
       }
     },
+    /**
+     * Takes an artifact name, e.g. 'something_artifact' and converts to 'Something artifact'
+     * @param artifactName
+     */
     convertValueToLabel(artifactName) {
       return artifactName
         .replace('susceptibility_metal', 'metal_susceptibility')
@@ -182,12 +215,15 @@ export default {
     switchLock() {
       this.$emit('switchLock', this.currentViewData.experimentId, null, true);
     },
+    /**
+     * Determines the styling of the four chip states
+     *
+     * Four possible states are: confirmed present, confirmed absent,
+     * suggested unconfirmed, unsuggested unconfirmed (default)
+     *
+     * @param artifact
+     */
     getCurrentChipState(artifact) {
-      // this function determines the styling of the four chip states.
-      // four states of a chip are:
-      //  confirmed present, confirmed absent, suggested unconfirmed, unsuggested unconfirmed
-
-      // default is unsuggested unconfirmed
       const chipState = {
         state: 0,
         label: artifact.labelText,
@@ -196,6 +232,7 @@ export default {
         textDecoration: 'none',
         textColor: 'default',
       };
+      // TODO: Switch statement?
       if (this.confirmedPresent.includes(artifact.value)) {
         // confirmed present
         chipState.state = 1;
@@ -215,8 +252,13 @@ export default {
       }
       return chipState;
     },
+    /**
+     * Changes the state of a chip when it has been clicked upon
+     *
+     * @param artifact
+     * @param chipState
+     */
     clickChip(artifact, chipState) {
-      // this function determines state cycle of chips
       switch (chipState) {
         case 1:
           // currently confirmed present
@@ -239,6 +281,7 @@ export default {
     async refreshTaskOverview() {
       if (this.currentProject) {
         const taskOverview = await djangoRest.projectTaskOverview(this.currentProject.id);
+        // If API has different data, update taskOverview
         if (JSON.stringify(store.state.currentTaskOverview) !== JSON.stringify(taskOverview)) {
           store.commit.setTaskOverview(taskOverview);
         }
