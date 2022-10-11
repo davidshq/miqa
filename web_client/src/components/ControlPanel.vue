@@ -38,16 +38,21 @@ export default {
       'myCurrentProjectRoles',
     ]),
     experimentId() {
+      // This could be retrieved using `currentExperiment` getter
       return this.currentViewData.experimentId;
     },
+    // Determines whether user can edit
+    // TODO: What does edit mean in this context?
     editRights() {
       return this.myCurrentProjectRoles.includes('tier_1_reviewer')
       || this.myCurrentProjectRoles.includes('tier_2_reviewer')
       || this.myCurrentProjectRoles.includes('superuser');
     },
+    // If there is a lock and the lock holder is the current user
     experimentIsEditable() {
       return this.lockOwner && this.lockOwner.id === this.user.id;
     },
+    // Returns holder of lock on current experiment
     lockOwner() {
       return this.currentViewData.lockOwner;
     },
@@ -57,19 +62,21 @@ export default {
     },
   },
   watch: {
+    // Update the experiment that is locked
     experimentId(newValue, oldValue) {
       this.switchLock(newValue, oldValue);
       clearInterval(this.lockCycle);
     },
     currentViewData() {
-      // TODO: ?
       this.navigateToNextIfCurrentScanNull();
     },
   },
   mounted() {
-    // Handles key presses
+    // If there is a current scan
     if (!this.navigateToNextIfCurrentScanNull()) {
+      // Switch the lock to the current experiment
       this.switchLock(this.experimentId);
+      // Handles key presses
       window.addEventListener('keydown', (event) => {
         if (['textarea', 'input'].includes(document.activeElement.type)) return;
         if (event.key === 'ArrowUp') {
@@ -97,17 +104,30 @@ export default {
       'setShowCrosshairs',
       'setStoreCrosshairs',
     ]),
-    // TODO: ?
+    // Link is name of link file
+    // TODO: This doesn't seem to open the correct link
     openScanLink() {
       window.open(this.currentViewData.scanLink, '_blank');
     },
-    async switchLock(newExp, oldExp = null, force = false) {
+    /**
+     * Release lock on old experiment, set lock on new experiment
+     *
+     * Note: Lock is only set if the user has edit rights
+     *
+     * @param newExperimentId
+     * @param oldExperimentId
+     * @param force
+     */
+    async switchLock(newExperimentId, oldExperimentId = null, force = false) {
+      // If there is a scan
       if (!this.navigateToNextIfCurrentScanNull()) {
+        // And the user has edit rights
         if (this.editRights) {
           this.loadingLock = true;
-          if (oldExp) {
+          // If there is an old experiment
+          if (oldExperimentId) {
             try {
-              await this.setLock({ experimentId: oldExp, lock: false, force });
+              await this.setLock({ experimentId: oldExperimentId, lock: false, force });
             } catch (err) {
               this.$snackbar({
                 text: 'Failed to release edit access on Experiment.',
@@ -115,8 +135,9 @@ export default {
               });
             }
           }
+          // Set the new lock
           try {
-            await this.setLock({ experimentId: newExp, lock: true, force });
+            await this.setLock({ experimentId: newExperimentId, lock: true, force });
             this.lockCycle = setInterval(async (experimentId) => {
               await this.setLock({ experimentId, lock: true });
             }, 1000 * 60 * 5, this.currentViewData.experimentId);
@@ -130,8 +151,16 @@ export default {
         }
       }
     },
+    /**
+     * Navigates to a different frame
+     *
+     * @param frameId
+     */
     navigateToFrame(frameId) {
-      if (frameId && frameId !== this.$route.params.frameId) {
+      if (!frameId) {
+        return;
+      }
+      if (frameId !== this.$route.params.frameId) {
         this.$router
           .push(`/${this.currentViewData.projectId}/${frameId}` || '')
           .catch(this.handleNavigationError);
@@ -179,6 +208,7 @@ export default {
         }
       }
     },
+    // TODO: How does this work? Why < 2?
     navigateToNextIfCurrentScanNull() {
       if (Object.keys(this.currentViewData).length < 2) {
         this.handleKeyPress('next');
