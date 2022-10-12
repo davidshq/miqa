@@ -14,8 +14,6 @@ export default {
     UserAvatar,
   },
   inject: ['user', 'MIQAConfig'],
-  // TODO: Could we pass down current scan info via props and use to determine
-  // rather than currentViewData?
   props: {
     experimentIsEditable: {
       type: Boolean,
@@ -60,6 +58,7 @@ export default {
     ...mapGetters([
       'currentViewData',
       'myCurrentProjectRoles',
+      'currentFrame',
     ]),
     // The list of artifacts generally should not change unless the project changes
     artifacts() {
@@ -160,7 +159,7 @@ export default {
   watch: {
     // Resets currentViewData for present/absent whenever image changes
     // TODO: This causes the decision buttons to get out of sync if we aren't auto advancing scans
-    currentViewData() {
+    currentFrame() {
       this.confirmedPresent = [];
       this.confirmedAbsent = [];
     },
