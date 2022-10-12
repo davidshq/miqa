@@ -25,6 +25,7 @@ export default {
   data: () => ({
     API_URL,
     showUploadModal: false,
+    showDeleteModal: false,
     uploadToExisting: false,
     uploadError: '',
     experimentNameForUpload: '',
@@ -132,8 +133,8 @@ export default {
      * @param scanId
      * @returns {string}
      */
-    getURLForFirstFrameInScan(scanId) {
-      return `/${this.currentProject.id}/${this.scanFrames[scanId][0]}`;
+    getURLForScan(scanId) {
+      return `/${this.currentProject.id}/${scanId}`;
     },
     /**
      * Assigns a color and character if a decision has been rendered on a given scan
@@ -242,6 +243,14 @@ export default {
       }
       this.uploading = false;
     },
+    deleteExperiment(experimentId) {
+      djangoRest.deleteExperiment(experimentId).then(
+        () => {
+          this.loadProject(this.currentProject);
+          this.showDeleteModal = false;
+        },
+      );
+    },
   },
 };
 </script>
@@ -263,7 +272,7 @@ export default {
       >
         <span>All scans</span>
         <v-switch
-          :input-value="true"
+          :input-value="reviewMode"
           dense
           style="display: inline-block; max-height: 40px; max-width: 60px;"
           class="px-3 ma-0"
@@ -291,6 +300,56 @@ export default {
                   :target-user="experiment.lock_owner"
                   as-editor
                 />
+                <v-dialog
+                  v-else-if="!minimal"
+                  :value="showDeleteModal === experiment.id"
+                  width="600px"
+                >
+                  <template #activator="{ attrs }">
+                    <div
+                      v-bind="attrs"
+                      style="display: inline"
+                      @click="showDeleteModal = experiment.id"
+                    >
+                      <v-icon>mdi-delete</v-icon>
+                    </div>
+                  </template>
+
+                  <v-card>
+                    <v-btn
+                      icon
+                      style="float:right"
+                      @click="showDeleteModal=false"
+                    >
+                      <v-icon>mdi-close</v-icon>
+                    </v-btn>
+                    <v-card-title class="text-h6">
+                      Confirmation
+                    </v-card-title>
+                    <v-card-text>
+                      Are you sure you want to delete experiment {{ experiment.name }}?
+                    </v-card-text>
+                    <v-divider />
+                    <v-card-actions>
+                      <v-btn
+                        :loading="uploading"
+                        color="gray"
+                        text
+                        @click="() => showDeleteModal = false"
+                      >
+                        Cancel
+                      </v-btn>
+                      <v-btn
+                        :loading="uploading"
+                        color="red"
+                        text
+                        @click="() => deleteExperiment(experiment.id)"
+                      >
+                        Delete
+                      </v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </v-dialog>
               </v-card>
               <v-card flat>
                 <v-icon
@@ -312,7 +371,7 @@ export default {
                   <template #activator="{ on, attrs }">
                     <v-btn
                       v-bind="attrs"
-                      :to="getURLForFirstFrameInScan(scan.id)"
+                      :to="getURLForScan(scan.id)"
                       :disabled="!includeScan(scan.id)"
                       class="ml-0 px-1 scan-name"
                       href
