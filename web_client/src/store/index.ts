@@ -531,10 +531,8 @@ const {
         scanFramesList,
         scanPosition: experimentScansList.indexOf(scan.id) + 1,
         framePosition: scanFramesList.indexOf(currentFrame.id) + 1,
-        backTo: currentFrame.previousFrame,
-        forwardTo: currentFrame.nextFrame,
-        upTo: state.scanFrames[upTo] ? state.scanFrames[upTo][0] : undefined,
-        downTo: state.scanFrames[downTo] ? state.scanFrames[downTo][0] : undefined,
+        upTo,
+        downTo,
         currentFrame,
         currentAutoEvaluation: currentFrame.frame_evaluation,
       };
@@ -1118,20 +1116,20 @@ const {
      *
      * @param state       Object   Contains the entire Vuex store for MIQA
      * @param dispatch
-     * @param frameId     string   ID of the frame to load, e.g. de0f2e0a-3dfb-47b7-831b-9dd562caa6cf
+     * @param scanId     string   ID of the scan to load, e.g. de0f2e0a-3dfb-47b7-831b-9dd562caa6cf
      * @param projectId   string   ID of the currently loaded project, e.g., 2dd4e46d-0a34-4267-be8c-3ccfbd4e9fcc
      */
-    async getFrame({ state, dispatch }, { frameId, projectId }) {
-      if (!frameId) {
+    async getScan({ state, dispatch }, { scanId, projectId }) {
+      if (!scanId) {
         return undefined;
       }
       // If currently loaded frameId does not match frameId to load
-      if (!state.frames[frameId]) {
+      if (!state.scans[scanId]) {
         await dispatch('loadProjects');
         const targetProject = state.projects.filter((proj) => proj.id === projectId)[0];
         await dispatch('loadProject', targetProject);
       }
-      return state.frames[frameId];
+      return state.scans[scanId];
     },
     /**
      * Sets state.currentFrameId
