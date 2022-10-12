@@ -1008,9 +1008,9 @@ const {
       // place data in state, adds each experiment to experiments
       const { experiments } = project;
 
-      for (let i = 0; i < experiments.length; i += 1) {
+      for (let experimentIndex = 0; experimentIndex < experiments.length; experimentIndex += 1) {
         // Get a specific experiment from the project
-        const experiment = experiments[i];
+        const experiment = experiments[experimentIndex];
         // set experimentScans[experiment.id] before registering the experiment.id
         // so ExperimentsView doesn't update prematurely
         commit('addExperiment', {
@@ -1020,7 +1020,7 @@ const {
             name: experiment.name,
             note: experiment.note,
             project: experiment.project,
-            index: i,
+            index: experimentIndex,
             lockOwner: experiment.lock_owner,
           },
         });
@@ -1029,8 +1029,8 @@ const {
         // TODO these requests *can* be run in parallel, or collapsed into one XHR
         // eslint-disable-next-line no-await-in-loop
         const { scans } = experiment;
-        for (let j = 0; j < scans.length; j += 1) {
-          const scan = scans[j];
+        for (let scanIndex = 0; scanIndex < scans.length; scanIndex += 1) {
+          const scan = scans[scanIndex];
           commit('addExperimentScans', { experimentId: experiment.id, scanId: scan.id });
 
           // TODO these requests *can* be run in parallel, or collapsed into one XHR
@@ -1051,7 +1051,7 @@ const {
             },
           });
 
-          const nextScan = getNextFrame(experiments, i, j); // Check where i j come from above, is this getting the current scan?
+          const nextScan = getNextFrame(experiments, experimentIndex, scanIndex); // Check where i j come from above, is this getting the current scan?
 
           for (let k = 0; k < frames.length; k += 1) { // then this is getting each frame associated with the scan
             const frame = frames[k];
