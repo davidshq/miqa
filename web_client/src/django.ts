@@ -79,6 +79,15 @@ const djangoClient = {
     const response = await apiClient.post('/global/import');
     return response?.data;
   },
+  /**
+   * Import to a specific project
+   *
+   * TODO: Sometimes there seems to be weird import path issues, this happens to me frequently,
+   * still unsure of cause. Interesting to note that moving the csv file out to the root folder
+   * allowed it to be seen, moving it back in and renaming sub-folder allowed import?
+   *
+   * @param projectId
+   */
   async projectImport(projectId: string): Promise<ResponseData> {
     const response = await apiClient.post(`/projects/${projectId}/import`);
     return response?.data;

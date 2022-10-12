@@ -5,11 +5,14 @@ import {
 } from '@vue/composition-api';
 import djangoRest from '@/django';
 import store from '@/store';
-import { warningDuration, sessionTimeout, idleTimeout } from '@/constants';
+import { WARNING_DURATION, SESSION_TIMEOUT, IDLE_TIMEOUT } from '@/constants';
 
 export default defineComponent({
   name: 'TimeoutDialog',
   setup() {
+    const warningDuration = WARNING_DURATION;
+    const sessionTimeout = SESSION_TIMEOUT;
+    const idleTimeout = IDLE_TIMEOUT;
     const show = ref(false);
     const idleWarningTriggered = ref(false);
     const unauthorizedTriggered = ref(false);

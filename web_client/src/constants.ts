@@ -10,10 +10,10 @@ export const decisionOptions = {
   UN: 'Unusable',
 };
 
-export const warningDuration = 2 * 60 * 1000; // the warning box will pop up for 2 minutes
+export const WARNING_DURATION = 2 * 60 * 1000; // the warning box will pop up for 2 minutes
 // The server-side session token lasts 30 minutes
-export const sessionTimeout = 30 * 60 * 1000;
+export const SESSION_TIMEOUT = 30 * 60 * 1000;
 // Log out after 15 minutes if the user is away from keyboard
-export const idleTimeout = 15 * 60 * 1000;
+export const IDLE_TIMEOUT = 15 * 60 * 1000;
 // Controls whether MIQA auto-advances to the next scan when a decision is rendered on the current scan
-export const autoAdvance = false;
+export const AUTO_ADVANCE = false;

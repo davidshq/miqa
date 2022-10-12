@@ -4,7 +4,7 @@ import { mapGetters, mapMutations, mapState } from 'vuex';
 import djangoRest from '@/django';
 import store from '@/store';
 import EvaluationResults from '@/components/EvaluationResults.vue';
-import { autoAdvance } from '@/constants';
+import { AUTO_ADVANCE } from '@/constants';
 import UserAvatar from './UserAvatar.vue';
 
 export default {
@@ -36,6 +36,7 @@ export default {
   },
   data() {
     return {
+      autoAdvance: AUTO_ADVANCE,
       warnDecision: false,
       newComment: '',
       confirmedPresent: [],
@@ -327,7 +328,7 @@ export default {
             newDecision: savedObj,
           });
           this.refreshTaskOverview(); // TODO: Should this be await?
-          if (autoAdvance) {
+          if (AUTO_ADVANCE) {
             this.$emit('handleKeyPress', 'next');
           }
           this.$snackbar({
