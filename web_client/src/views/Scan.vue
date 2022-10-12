@@ -73,8 +73,8 @@ export default {
       });
     },
     // Replaces `beforeRouteUpdate` and code in `created` handling frame load
-    '$route.params.frameId': {
-      handler: 'loadFrame',
+    '$route.params.scanId': {
+      handler: 'loadScan',
       immediate: true,
     },
   },
@@ -98,7 +98,7 @@ export default {
       this.downloadTotal = e.total;
     },
     // Loads a specific frame
-    async loadFrame() {
+    async loadScan() {
       // Get the project/frame id's from the URL
       const { projectId, scanId } = this.$route.params;
       const scan = await this.getScan({ scanId, projectId });
