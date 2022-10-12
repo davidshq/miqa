@@ -103,6 +103,7 @@ export default {
     ...mapMutations([
       'setShowCrosshairs',
       'setStoreCrosshairs',
+      'setCurrentFrameId',
     ]),
     // Link is name of link file
     // TODO: This doesn't seem to open the correct link
@@ -152,17 +153,15 @@ export default {
       }
     },
     /**
-     * Navigates to a different frame
+     * Navigates to a different scan
      *
-     * @param frameId
+     * @param location
      */
-    navigateToFrame(frameId) {
-      if (!frameId) {
-        return;
-      }
-      if (frameId !== this.$route.params.frameId) {
+    navigateToScan(location) {
+      if (!location) location = 'complete';
+      if (location && location !== this.$route.params.scanId) {
         this.$router
-          .push(`/${this.currentViewData.projectId}/${frameId}` || '')
+          .push(`/${this.currentViewData.projectId}/${location}` || '')
           .catch(this.handleNavigationError);
       }
     },
@@ -172,19 +171,19 @@ export default {
      * @param framePosition
      */
     slideToFrame(framePosition) {
-      this.navigateToFrame(this.currentViewData.scanFramesList[framePosition - 1]);
+      this.setCurrentFrameId(this.currentViewData.scanFramesList[framePosition - 1]);
     },
     // Change the currently displayed frame
     // TODO: Would it make sense to rename `updateImage` to `updateFrame`?
     updateImage() {
       if (this.direction === 'back') {
-        this.navigateToFrame(this.previousFrame);
+        this.setCurrentFrameId(this.previousFrame);
       } else if (this.direction === 'forward') {
-        this.navigateToFrame(this.nextFrame);
+        this.setCurrentFrameId(this.nextFrame);
       } else if (this.direction === 'previous') {
-        this.navigateToFrame(this.currentViewData.upTo);
+        this.navigateToScan(this.currentViewData.upTo);
       } else if (this.direction === 'next') {
-        this.navigateToFrame(this.currentViewData.downTo);
+        this.navigateToScan(this.currentViewData.downTo);
       }
     },
     /**
