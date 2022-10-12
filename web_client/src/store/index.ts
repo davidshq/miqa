@@ -1141,9 +1141,9 @@ const {
       commit('setCurrentFrameId', frameId);
     },
     /**
-     * Handles the process of changing frames in Frame.vue
+     * Handles the process of changing frames in Scan.vue
      *
-     * Only used by Frame.vue
+     * Only used by Scan.vue
      *
      * @param state
      * @param dispatch

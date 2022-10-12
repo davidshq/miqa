@@ -1,7 +1,7 @@
 <script lang="ts">
 /**
  * The ExperimentsView appears on the Projects View once a project has been selected.
- * It also appears on Frame.vue inside a collapsible sidebar.
+ * It also appears on Scan.vue inside a collapsible sidebar.
  */
 import _ from 'lodash';
 import {

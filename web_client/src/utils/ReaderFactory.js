@@ -52,7 +52,7 @@ function getReader({ fileName }) {
  * @param axios               The client
  * @param fileName            File to be downloaded
  * @param url                 The URL to download the file
- * @param onDownloadProgress  downloadLoaded and downloadTotal, see Frame.vue
+ * @param onDownloadProgress  downloadLoaded and downloadTotal, see Scan.vue
  * @returns {{promise: Promise<unknown>, abortController: AbortController}}
  */
 function downloadFrame(axios, fileName, url, { onDownloadProgress } = {}) {
