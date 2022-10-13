@@ -1,5 +1,4 @@
 <script lang="ts">
-import _ from 'lodash';
 import {
   mapState, mapActions,
 } from 'vuex';
@@ -34,10 +33,6 @@ export default {
       'loadingFrame',
       'errorLoadingFrame',
     ]),
-    // TODO: Couldn't this be added to currentViewData? We already query it there.
-    currentScanFrames() {
-      return this.scanFrames[this.currentScan.id]; // TODO: It seems this is used Direct-Vuex
-    },
     // Calculate percentage of requested images downloaded
     downloadProgressPercent() {
       return 100 * (this.downloadLoaded / this.downloadTotal);
@@ -55,17 +50,6 @@ export default {
     },
   },
   watch: {
-    // TODO: Is this actually ever called?
-    currentScan(scan) {
-      if (scan) {
-        // Gets the most recent scan decision
-        const last = _.head(scan.decisions);
-        // Returns null if no scan decision exists
-        this.decision = last ? last.decision : null;
-        this.decisionChanged = false;
-        this.newNote = '';
-      }
-    },
     async currentFrameId(frameId) {
       await this.swapToFrame({
         frame: this.frames[frameId],
@@ -227,7 +211,7 @@ export default {
 
   .view {
     position: relative;
-    flex: 1 0 0px;
+    flex: 1 0 0;
 
     border: 1.5px solid white;
     border-top: none;
