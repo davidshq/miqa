@@ -58,7 +58,7 @@ export default {
     },
     // Replaces `beforeRouteUpdate` and code in `created` handling frame load
     '$route.params.scanId': {
-      handler: 'loadScan',
+      handler: 'swapToScan',
       immediate: true,
     },
   },
@@ -74,7 +74,7 @@ export default {
     ...mapActions([
       'loadProject',
       'swapToFrame',
-      'getScan',
+      'loadScan',
     ]),
     // Update download percents for loading bar
     onFrameDownloadProgress(e) {
@@ -82,10 +82,10 @@ export default {
       this.downloadTotal = e.total;
     },
     // Loads a specific frame
-    async loadScan() {
+    async swapToScan() {
       // Get the project/frame id's from the URL
       const { projectId, scanId } = this.$route.params;
-      const scan = await this.getScan({ scanId, projectId });
+      const scan = await this.loadScan({ scanId, projectId });
       const frame = this.frames[this.scanFrames[scan.id][0]];
       if (frame) {
         await this.swapToFrame({

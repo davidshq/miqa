@@ -1112,14 +1112,14 @@ const {
       });
     },
     /**
-     * Get the desired frame
+     * Pulls the requested scan, from the API if necessary.
      *
      * @param state       Object   Contains the entire Vuex store for MIQA
      * @param dispatch
      * @param scanId     string   ID of the scan to load, e.g. de0f2e0a-3dfb-47b7-831b-9dd562caa6cf
      * @param projectId   string   ID of the currently loaded project, e.g., 2dd4e46d-0a34-4267-be8c-3ccfbd4e9fcc
      */
-    async getScan({ state, dispatch }, { scanId, projectId }) {
+    async loadScan({ state, dispatch }, { scanId, projectId }) {
       if (!scanId) {
         return undefined;
       }
