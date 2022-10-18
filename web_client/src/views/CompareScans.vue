@@ -14,11 +14,14 @@ export default {
     selectedProject: '',
     selectExperiments: [],
     selectedExperiment: '',
+    selectScans: [],
+    selectedScan: [],
   }),
   computed: {
     ...mapState([
       'projects',
       'experiments',
+      'scans',
     ]),
   },
   watch: {
@@ -44,6 +47,15 @@ export default {
       console.log('watched experiments');
       this.selectedExperiment = experiment;
       console.log(experiment);
+      console.log('getting current scans');
+      this.selectScans = [];
+      const keys = Object.keys(this.scans);
+      console.log('add scans to selectScans');
+      keys.forEach((key) => {
+        const { name } = this.scans[key];
+        const { id } = this.scans[key];
+        this.selectScans.push({ name, id });
+      });
     },
   },
   mounted() {
@@ -78,9 +90,33 @@ export default {
     />
     <table>
       <tr>
-        <td><v-select label="Select Scan" /></td>
-        <td><v-select label="Select Scan" /></td>
-        <td><v-select label="Select Scan" /></td>
+        <td>
+          <v-select
+            v-model="selectedScan[0]"
+            label="Select Scan"
+            :items="selectScans"
+            item-text="name"
+            item-value="id"
+          />
+        </td>
+        <td>
+          <v-select
+            v-model="selectedScan[1]"
+            label="Select Scan"
+            :items="selectScans"
+            item-text="name"
+            item-value="id"
+          />
+        </td>
+        <td>
+          <v-select
+            v-model="selectedScan[2]"
+            label="Select Scan"
+            :items="selectScans"
+            item-text="name"
+            item-value="id"
+          />
+        </td>
       </tr>
       <tr>
         <td>View 1</td>
