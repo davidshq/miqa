@@ -15,7 +15,8 @@ export default {
     selectExperiments: [],
     selectedExperiment: '',
     selectScans: [],
-    selectedScan: [],
+    selectedScans: [],
+    scanToEdit: '',
   }),
   computed: {
     ...mapState([
@@ -60,7 +61,6 @@ export default {
   },
   mounted() {
     this.loadProjects();
-    console.log('this is CompareScans');
     console.log(this.projects);
   },
   methods: {
@@ -92,29 +92,32 @@ export default {
       <tr>
         <td>
           <v-select
-            v-model="selectedScan[0]"
+            v-model="selectedScans[0]"
             label="Select Scan"
             :items="selectScans"
             item-text="name"
             item-value="id"
+            return-object
           />
         </td>
         <td>
           <v-select
-            v-model="selectedScan[1]"
+            v-model="selectedScans[1]"
             label="Select Scan"
             :items="selectScans"
             item-text="name"
             item-value="id"
+            return-object
           />
         </td>
         <td>
           <v-select
-            v-model="selectedScan[2]"
+            v-model="selectedScans[2]"
             label="Select Scan"
             :items="selectScans"
             item-text="name"
             item-value="id"
+            return-object
           />
         </td>
       </tr>
@@ -124,7 +127,15 @@ export default {
         <td>View 3</td>
       </tr>
       <tr>
-        <td>Select View to Edit</td>
+        <td>
+          <v-select
+            v-model="scanToEdit"
+            label="Select Scan to Edit"
+            :items="selectedScans"
+            item-text="name"
+            item-value="id"
+          />
+        </td>
       </tr>
       <tr>
         <td>Control Panel</td>
