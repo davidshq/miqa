@@ -4,7 +4,7 @@ import {
 } from 'vuex';
 import ControlPanelExperiment from '@/components/ControlPanelExperiment.vue';
 import ControlPanelScan from '@/components/ControlPanelScan.vue';
-import DecisionButtons from './DecisionButtons.vue';
+import DecisionButtons from './ControlPanelDecision.vue';
 
 export default {
   name: 'ControlPanelFrame',
@@ -156,7 +156,10 @@ export default {
       }
     },
 
-    // TODO: How does this work? Why < 2?
+    /**
+     * If there aren't at least two keys in `currentViewData` we know
+     * that we aren't looking at a valid scan, so advance to next.
+     */
     navigateToNextIfCurrentScanNull() {
       if (Object.keys(this.currentViewData).length < 2) {
         this.handleKeyPress('next');
@@ -181,6 +184,8 @@ export default {
       <v-row no-gutters>
         <ControlPanelExperiment />
         <!-- Center/Right Panes (Scan/Frame/Decision) -->
+        <!-- TODO: See if enclosing `v-col`, `v-card`, `v-container` and `v-row` can be removed. -->
+        <!-- Ideally components should plop next to `ControlPanelExperiment` w/out containers -->
         <v-col
           cols="8"
           class="pa-2 pl-1"
@@ -194,22 +199,18 @@ export default {
               class="pa-0"
             >
               <v-row no-gutters>
-                <!-- TODO: Extract as separate component -->
                 <ControlPanelScan
                   :representation="representation"
                   @handleKeyPress="handleKeyPress"
                 />
-                <!-- Right Pane (Decision) -->
-                <v-col cols="6">
-                  <DecisionButtons
-                    :experiment-is-editable="experimentIsEditable"
-                    :edit-rights="editRights"
-                    :lock-owner="currentViewData.lockOwner"
-                    :loading-lock="loadingLock"
-                    @handleKeyPress="handleKeyPress"
-                    @switchLock="switchLock"
-                  />
-                </v-col>
+                <DecisionButtons
+                  :experiment-is-editable="experimentIsEditable"
+                  :edit-rights="editRights"
+                  :lock-owner="currentViewData.lockOwner"
+                  :loading-lock="loadingLock"
+                  @handleKeyPress="handleKeyPress"
+                  @switchLock="switchLock"
+                />
               </v-row>
             </v-container>
           </v-card>
