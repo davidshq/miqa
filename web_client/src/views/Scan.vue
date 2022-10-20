@@ -1,17 +1,16 @@
 <script lang="ts">
-import {
-  mapState, mapActions,
-} from 'vuex';
+import { mapActions, mapState } from 'vuex';
 
 import Navbar from '@/components/Navbar.vue';
 import ControlPanel from '@/components/ControlPanel.vue';
 import ExperimentsView from '@/components/ExperimentsView.vue';
 import VtkViewer from '@/components/VtkViewer.vue';
-import formatSize from '@/utils/helper';
+import LoadingMessage from '@/components/LoadingMessage.vue';
 
 export default {
   name: 'Scan',
   components: {
+    LoadingMessage,
     Navbar,
     ExperimentsView,
     VtkViewer,
@@ -30,21 +29,8 @@ export default {
       'vtkViews',
       'frames',
       'scanFrames',
-      'loadingFrame',
       'errorLoadingFrame',
     ]),
-    // Calculate percentage of requested images downloaded
-    downloadProgressPercent() {
-      return 100 * (this.downloadLoaded / this.downloadTotal);
-    },
-    // Show downloading message with percent complete, once downloaded,
-    // show loading image viewer message
-    loadProgressMessage() {
-      if (this.downloadTotal && this.downloadLoaded === this.downloadTotal) {
-        return 'Loading image viewer...';
-      }
-      return `Downloading image ${formatSize(this.downloadLoaded)} / ${formatSize(this.downloadTotal)}`;
-    },
     currentFrame() {
       return this.frames[this.currentFrameId];
     },
@@ -108,7 +94,6 @@ export default {
   >
     <!-- Top Navbar -->
     <Navbar frame-view />
-    <!-- End Top Navbar -->
     <!-- Left Navigation Drawer -->
     <v-navigation-drawer
       expand-on-hover
@@ -132,41 +117,13 @@ export default {
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
-    <!-- End Left Navigation Drawer -->
-    <!-- Show Loading Message // TODO: Extract Loading Message into separate component -->
-    <v-layout
-      v-if="loadingFrame"
-      class="loading-indicator-container"
-      align-center
-      justify-center
-      fill-height
-    >
-      <v-col>
-        <v-row justify="center">
-          <v-progress-circular
-            :width="4"
-            :size="56"
-            :rotate="-90"
-            :value="downloadProgressPercent"
-            :indeterminate="downloadTotal === 0 || downloadTotal === downloadLoaded"
-            color="primary"
-          >
-            {{ Math.round(downloadProgressPercent || 0) }}%
-          </v-progress-circular>
-        </v-row>
-        <v-row
-          justify="center"
-          class="mt-2"
-        >
-          <div class="text-center">
-            {{ loadProgressMessage }}
-          </div>
-        </v-row>
-      </v-col>
-    </v-layout>
-    <!-- End Loading Message -->
+    <!-- Show Loading Message -->
+    <LoadingMessage
+      :download-loaded="downloadLoaded"
+      :download-total="downloadTotal"
+    />
+    <!-- Show VTK Viewers -->
     <template v-if="currentFrame">
-      <!-- Show VTK Viewers -->
       <v-flex
         class="layout-container"
       >
@@ -195,7 +152,6 @@ export default {
       <!-- End Show VTK Viewers -->
       <!-- Show Bottom Control Panel -->
       <ControlPanel />
-      <!-- End Bottom Control Panel -->
     </template>
   </v-layout>
 </template>
@@ -245,16 +201,6 @@ export default {
     text-overflow: ellipsis;
   }
 
-  .loading-indicator-container {
-    background: #ffffffcc;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 1;
-  }
-
   .layout-container {
     position: relative;
   }
@@ -292,7 +238,6 @@ export default {
 <style lang="scss">
 .load-completion {
   font-size: 1.1em;
-  /*font-weight: bold;*/
 }
 
 .justifyRight {
