@@ -3,17 +3,15 @@ import {
   mapActions, mapGetters, mapMutations, mapState,
 } from 'vuex';
 import ControlPanelExperiment from '@/components/ControlPanelExperiment.vue';
-import ScanDecision from './ScanDecision.vue';
+import ControlPanelScan from '@/components/ControlPanelScan.vue';
 import DecisionButtons from './DecisionButtons.vue';
-import WindowWidget from './WindowWidget.vue';
 
 export default {
   name: 'ControlPanelFrame',
   components: {
+    ControlPanelScan,
     ControlPanelExperiment,
-    ScanDecision,
     DecisionButtons,
-    WindowWidget,
   },
   inject: ['user'],
   data: () => ({
@@ -83,11 +81,6 @@ export default {
     ...mapMutations([
       'setCurrentFrameId',
     ]),
-    // Link is name of link file
-    // TODO: This doesn't seem to open the correct link
-    openScanLink() {
-      window.open(this.currentViewData.scanLink, '_blank');
-    },
     /**
      * Release lock on old experiment, set lock on new experiment
      *
@@ -142,14 +135,6 @@ export default {
           .push(`/${this.currentViewData.projectId}/${location}` || '')
           .catch(this.handleNavigationError);
       }
-    },
-    /**
-     * Change current frame view
-     *
-     * @param framePosition
-     */
-    slideToFrame(framePosition) {
-      this.setCurrentFrameId(this.currentViewData.scanFramesList[framePosition - 1]);
     },
     /**
      * Handles navigation key presses
@@ -209,132 +194,11 @@ export default {
               class="pa-0"
             >
               <v-row no-gutters>
-                <!-- Center Pane (Scan/Frame) -->
                 <!-- TODO: Extract as separate component -->
-                <v-col cols="6">
-                  <v-container
-                    fill-height
-                    fluid
-                  >
-                    <div
-                      class="d-flex flex-column"
-                      style="width: 100%"
-                    >
-                      <!-- Scan Navigation -->
-                      <div class="d-flex justify-space-between">
-                        <div>
-                          Scan:
-                          <p
-                            :class="currentViewData.scanLink ? 'link' : 'grey--text'"
-                            style="display:inline"
-                            @click="openScanLink"
-                          >
-                            <b>{{ currentViewData.scanName }}</b>
-                          </p>
-                          <p
-                            class="grey--text"
-                            style="display:inline"
-                          >
-                            ({{ currentViewData.scanPosition }} /
-                            {{ currentViewData.experimentScansList.length }})
-                          </p>
-                        </div>
-                        <div>
-                          <v-btn
-                            :disabled="!currentViewData.upTo"
-                            small
-                            depressed
-                            class="transparent-btn"
-                            @mousedown="handleKeyPress('previous')"
-                          >
-                            <v-icon>fa-caret-up</v-icon>
-                          </v-btn>
-                          <v-btn
-                            :disabled="!currentViewData.downTo"
-                            small
-                            depressed
-                            class="transparent-btn"
-                            @mousedown="handleKeyPress('next')"
-                          >
-                            <v-icon>fa-caret-down</v-icon>
-                          </v-btn>
-                        </div>
-                      </div>
-                      <!-- End Scan Navigation -->
-                      <!-- Frame Navigation -->
-                      <div class="d-flex justify-space-between">
-                        <div>
-                          Frame:
-                          <p
-                            class="grey--text"
-                            style="display:inline"
-                          >
-                            ({{ currentViewData.framePosition }} /
-                            {{ currentViewData.scanFramesList.length }})
-                          </p>
-                        </div>
-                        <v-slider
-                          :value="currentViewData.framePosition"
-                          ticks="always"
-                          tick-size="4"
-                          :min="1"
-                          :max="currentViewData.scanFramesList.length"
-                          @input="slideToFrame"
-                        />
-                        <div>
-                          <v-btn
-                            :disabled="!previousFrame"
-                            small
-                            depressed
-                            class="transparent-btn"
-                            @mousedown="handleKeyPress('back')"
-                          >
-                            <v-icon>fa-caret-left</v-icon>
-                          </v-btn>
-                          <v-btn
-                            :disabled="!nextFrame"
-                            small
-                            depressed
-                            class="transparent-btn"
-                            @mousedown="handleKeyPress('forward')"
-                          >
-                            <v-icon>fa-caret-right</v-icon>
-                          </v-btn>
-                        </div>
-                      </div>
-                      <!-- End Frame Navigation -->
-                    </div>
-                    <!-- Window Widget -->
-                    <window-widget
-                      :representation="representation"
-                      :experiment-id="currentViewData.experimentId"
-                    />
-                    <!-- End Window Widget -->
-                    <!-- ScanDecision -->
-                    <v-row class="mx-0">
-                      <v-col
-                        cols="12"
-                        class="grey lighten-4"
-                        style="height: 100px; overflow:auto; margin: 15px 0"
-                      >
-                        <ScanDecision
-                          v-for="decision in currentViewData.scanDecisions"
-                          :key="decision.id"
-                          :decision="decision"
-                        />
-                        <div
-                          v-if="!currentViewData.scanDecisions
-                            || currentViewData.scanDecisions.length === 0"
-                          class="grey--text"
-                        >
-                          This scan has no prior comments.
-                        </div>
-                      </v-col>
-                    </v-row>
-                    <!-- ScanDecision -->
-                  </v-container>
-                </v-col>
-                <!-- End Center Pane (Scan/Frame) -->
+                <ControlPanelScan
+                  :representation="representation"
+                  @handleKeyPress="handleKeyPress"
+                />
                 <!-- Right Pane (Decision) -->
                 <v-col cols="6">
                   <DecisionButtons
@@ -346,7 +210,6 @@ export default {
                     @switchLock="switchLock"
                   />
                 </v-col>
-                <!-- End Right Pane (Decision) -->
               </v-row>
             </v-container>
           </v-card>
@@ -358,11 +221,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-.transparent-btn.v-btn--disabled, .transparent-btn.v-btn--disabled::before,
-.transparent-btn, .transparent-btn::before,
-.theme--light.v-btn.v-btn--disabled:not(.v-btn--flat):not(.v-btn--text):not(.v-btn-outlined) {
-  background-color: transparent !important;
-}
 
 .bounce-enter-active {
   animation: bounce-in .5s;
@@ -380,12 +238,6 @@ export default {
   100% {
     transform: scale(1);
   }
-}
-
-.link {
-  color: #1976d2;
-  text-decoration: underline;
-  cursor: pointer;
 }
 
 </style>
