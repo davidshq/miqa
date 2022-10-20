@@ -58,7 +58,6 @@ export default {
   },
   methods: {
     ...mapActions([
-      'loadProject',
       'swapToFrame',
       'loadScan',
     ]),
