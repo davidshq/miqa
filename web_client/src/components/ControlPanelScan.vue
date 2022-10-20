@@ -35,8 +35,15 @@ export default {
 </script>
 
 <template>
-  <v-col cols="6">
-    <v-container
+  <v-col
+    cols="4"
+    class="pa-2 pl-1"
+  >
+    <v-card
+      height="100%"
+      elevation="3"
+    >
+      <v-container
       fill-height
       fluid
     >
@@ -157,6 +164,7 @@ export default {
       </v-row>
       <!-- ScanDecision -->
     </v-container>
+    </v-card>
   </v-col>
 </template>
 

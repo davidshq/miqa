@@ -348,213 +348,221 @@ export default {
 </script>
 
 <template>
-  <v-col cols="6">
-    <v-container
-      fluid
-      class="px-5"
+  <v-col
+    cols="4"
+    class="pl-0 pr-2 pa-2"
+  >
+    <v-card
+      height="100%"
+      elevation="3"
     >
-      <v-flex
-        class="d-flex pb-3"
-        style="justify-content: space-between; column-gap: 20px"
+      <v-container
+        fluid
+        class="px-5"
       >
-        <v-subheader
-          v-if="experimentIsEditable"
-          class="pa-0 ma-0"
-        >
-          Indicate artifacts in this scan
-          <v-tooltip bottom>
-            <template #activator="{ on, attrs }">
-              <v-icon
-                v-bind="attrs"
-                small
-                class="pl-2"
-                v-on="on"
-              >
-                info
-              </v-icon>
-            </template>
-            <span>
-              Toggle each tag below.
-              Fill red to confirm an artifact is present.
-              Crossthrough to confirm an artifact is absent.
-            </span>
-          </v-tooltip>
-        </v-subheader>
         <v-flex
-          v-if="currentViewData.currentAutoEvaluation"
-          style="display: flex; align-items: flex-start; justify-content: flex-end"
+          class="d-flex pb-3"
+          style="justify-content: space-between; column-gap: 20px"
         >
           <v-subheader
+            v-if="experimentIsEditable"
             class="pa-0 ma-0"
-            style="text-align: right"
           >
-            Auto evaluation
+            Indicate artifacts in this scan
+            <v-tooltip bottom>
+              <template #activator="{ on, attrs }">
+                <v-icon
+                  v-bind="attrs"
+                  small
+                  class="pl-2"
+                  v-on="on"
+                >
+                  info
+                </v-icon>
+              </template>
+              <span>
+                Toggle each tag below.
+                Fill red to confirm an artifact is present.
+                Crossthrough to confirm an artifact is absent.
+              </span>
+            </v-tooltip>
           </v-subheader>
-          <v-tooltip bottom>
-            <template #activator="{ on, attrs }">
-              <v-icon
-                v-bind="attrs"
-                small
-                style="height: 25px; padding: 5px"
-                v-on="on"
-              >
-                info
-              </v-icon>
-            </template>
-            <span>
-              An evaluation performed by the MIQA server using artificial intelligence
-            </span>
-          </v-tooltip>
-          <EvaluationResults
-            :results="currentViewData.currentAutoEvaluation.results"
-          />
-        </v-flex>
-        <v-flex
-          v-else
-          cols="5"
-          class="d-flex justify-end align-center"
-        >
-          <v-subheader
-            class="pa-0 ma-0"
-            style="text-align: right"
+          <v-flex
+            v-if="currentViewData.currentAutoEvaluation"
+            style="display: flex; align-items: flex-start; justify-content: flex-end"
           >
-            No Auto evaluation available
-          </v-subheader>
-          <v-tooltip bottom>
-            <template #activator="{ on, attrs }">
-              <v-icon
-                v-bind="attrs"
-                small
-                style="height: 25px; padding: 5px"
-                v-on="on"
-              >
-                info
-              </v-icon>
-            </template>
-            <span>
-              An evaluation performed by the MIQA server using artificial intelligence
-            </span>
-          </v-tooltip>
-        </v-flex>
-      </v-flex>
-      <v-row
-        v-if="experimentIsEditable"
-        no-gutters
-      >
-        <v-col
-          cols="12"
-          class="d-flex justify-space-around flex-wrap"
-        >
-          <v-chip
-            v-for="([artifact, chipState]) in chips"
-            v-bind="artifact"
-            :key="artifact.value"
-            :outlined="chipState.outlined"
-            :color="chipState.color"
-            :text-color="chipState.textColor"
-            :style="'text-decoration: '+chipState.textDecoration +'; margin-bottom: 3px;'"
-            small
-            @click="clickChip(artifact, chipState.state)"
-          >
-            {{ chipState.label }}
-          </v-chip>
-        </v-col>
-      </v-row>
-      <v-row
-        v-if="experimentIsEditable"
-        dense
-      >
-        <v-col
-          cols="12"
-          class="pt-5"
-        >
-          <v-textarea
-            ref="commentInput"
-            v-model="newComment"
-            :counter="!warnDecision"
-            :hide-details="warnDecision"
-            filled
-            no-resize
-            height="80px"
-            name="input-comment"
-            label="Evaluation Comment"
-            placeholder="Write a comment about the scan"
-            @input="handleCommentChange"
-          />
-        </v-col>
-      </v-row>
-      <v-row
-        v-if="warnDecision"
-        dense
-      >
-        <v-col
-          cols="12"
-          class="red--text"
-          style="text-align: center"
-        >
-          Decisions other than "usable" must have a comment or artifact selection.
-        </v-col>
-      </v-row>
-      <v-row
-        v-if="experimentIsEditable"
-        no-gutters
-      >
-        <v-col cols="12">
-          <div class="button-container">
-            <div
-              v-for="option in options"
-              :key="option.code"
-              style="text-align: center"
+            <v-subheader
+              class="pa-0 ma-0"
+              style="text-align: right"
             >
-              <v-btn
-                v-mousetrap="[
-                  { bind: decisionShortcuts[option.code],
-                    handler: () => handleCommentSave(option.code) },
-                ]"
-                :color="option.color"
-                @click="handleCommentSave(option.code)"
+              Auto evaluation
+            </v-subheader>
+            <v-tooltip bottom>
+              <template #activator="{ on, attrs }">
+                <v-icon
+                  v-bind="attrs"
+                  small
+                  style="height: 25px; padding: 5px"
+                  v-on="on"
+                >
+                  info
+                </v-icon>
+              </template>
+              <span>
+                An evaluation performed by the MIQA server using artificial intelligence
+              </span>
+            </v-tooltip>
+            <EvaluationResults
+              :results="currentViewData.currentAutoEvaluation.results"
+            />
+          </v-flex>
+          <v-flex
+            v-else
+            cols="5"
+            class="d-flex justify-end align-center"
+          >
+            <v-subheader
+              class="pa-0 ma-0"
+              style="text-align: right"
+            >
+              No Auto evaluation available
+            </v-subheader>
+            <v-tooltip bottom>
+              <template #activator="{ on, attrs }">
+                <v-icon
+                  v-bind="attrs"
+                  small
+                  style="height: 25px; padding: 5px"
+                  v-on="on"
+                >
+                  info
+                </v-icon>
+              </template>
+              <span>
+                An evaluation performed by the MIQA server using artificial intelligence
+              </span>
+            </v-tooltip>
+          </v-flex>
+        </v-flex>
+        <v-row
+          v-if="experimentIsEditable"
+          no-gutters
+        >
+          <v-col
+            cols="12"
+            class="d-flex justify-space-around flex-wrap"
+          >
+            <v-chip
+              v-for="([artifact, chipState]) in chips"
+              v-bind="artifact"
+              :key="artifact.value"
+              :outlined="chipState.outlined"
+              :color="chipState.color"
+              :text-color="chipState.textColor"
+              :style="'text-decoration: '+chipState.textDecoration +'; margin-bottom: 3px;'"
+              small
+              @click="clickChip(artifact, chipState.state)"
+            >
+              {{ chipState.label }}
+            </v-chip>
+          </v-col>
+        </v-row>
+        <v-row
+          v-if="experimentIsEditable"
+          dense
+        >
+          <v-col
+            cols="12"
+            class="pt-5"
+          >
+            <v-textarea
+              ref="commentInput"
+              v-model="newComment"
+              :counter="!warnDecision"
+              :hide-details="warnDecision"
+              filled
+              no-resize
+              height="80px"
+              name="input-comment"
+              label="Evaluation Comment"
+              placeholder="Write a comment about the scan"
+              @input="handleCommentChange"
+            />
+          </v-col>
+        </v-row>
+        <v-row
+          v-if="warnDecision"
+          dense
+        >
+          <v-col
+            cols="12"
+            class="red--text"
+            style="text-align: center"
+          >
+            Decisions other than "usable" must have a comment or artifact selection.
+          </v-col>
+        </v-row>
+        <v-row
+          v-if="experimentIsEditable"
+          no-gutters
+        >
+          <v-col cols="12">
+            <div class="button-container">
+              <div
+                v-for="option in options"
+                :key="option.code"
+                style="text-align: center"
               >
-                {{ option.label }}
+                <v-btn
+                  v-mousetrap="[
+                    { bind: decisionShortcuts[option.code],
+                      handler: () => handleCommentSave(option.code) },
+                  ]"
+                  :color="option.color"
+                  @click="handleCommentSave(option.code)"
+                >
+                  {{ option.label }}
+                </v-btn>
+              </div>
+            </div>
+          </v-col>
+        </v-row>
+        <v-row v-if="!experimentIsEditable">
+          <v-col cols="12">
+            <div
+              class="uneditable-notice pa-3"
+            >
+              <v-icon>mdi-lock</v-icon>
+              You {{ editRights ?'have not claimed' :'do not have' }}
+              edit access on this Experiment.
+              <div
+                v-if="currentViewData.lockOwner"
+                class="my-3"
+                style="text-align:center"
+              >
+                <UserAvatar
+                  :target-user="currentViewData.lockOwner"
+                  as-editor
+                />
+                <br>
+                {{ currentViewData.lockOwner.username }}
+                <br>
+                currently has edit access.
+              </div>
+              <v-btn
+                v-if="editRights && (user.is_superuser || !currentViewData.lockOwner)"
+                :loading="loadingLock"
+                :disabled="loadingLock"
+                color="primary"
+                @click="switchLock"
+              >
+                {{ currentViewData.lockOwner ?"Steal edit access" :"Claim edit access" }}
               </v-btn>
             </div>
-          </div>
-        </v-col>
-      </v-row>
-      <v-row v-if="!experimentIsEditable">
-        <v-col cols="12">
-          <div
-            class="uneditable-notice pa-3"
-          >
-            <v-icon>mdi-lock</v-icon>
-            You {{ editRights ?'have not claimed' :'do not have' }}
-            edit access on this Experiment.
-            <div
-              v-if="currentViewData.lockOwner"
-              class="my-3"
-              style="text-align:center"
-            >
-              <UserAvatar
-                :target-user="currentViewData.lockOwner"
-                as-editor
-              />
-              <br>
-              {{ currentViewData.lockOwner.username }}
-              <br>
-              currently has edit access.
-            </div>
-            <v-btn
-              v-if="editRights && (user.is_superuser || !currentViewData.lockOwner)"
-              :loading="loadingLock"
-              :disabled="loadingLock"
-              color="primary"
-              @click="switchLock"
-            >
-              {{ currentViewData.lockOwner ?"Steal edit access" :"Claim edit access" }}
-            </v-btn>
-          </div>
-        </v-col>
-      </v-row>
-    </v-container>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-card>
   </v-col>
 </template>
 

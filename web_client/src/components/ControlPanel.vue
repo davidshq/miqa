@@ -180,36 +180,17 @@ export default {
     >
       <v-row no-gutters>
         <ControlPanelExperiment />
-        <!-- Center/Right Panes (Scan/Frame/Decision) -->
-        <!-- TODO: See if enclosing `v-col`, `v-card`, `v-container` and `v-row` can be removed. -->
-        <!-- Ideally components should plop next to `ControlPanelExperiment` w/out containers -->
-        <v-col
-          cols="8"
-          class="pa-2 pl-1"
-        >
-          <v-card
-            height="100%"
-            elevation="3"
-          >
-            <v-container
-              fluid
-              class="pa-0"
-            >
-              <v-row no-gutters>
-                <ControlPanelScan
-                  :representation="representation"
-                  @handleKeyPress="handleKeyPress"
-                />
-                <ControlPanelDecision
-                  :loading-lock="loadingLock"
-                  @handleKeyPress="handleKeyPress"
-                  @switchLock="switchLock"
-                />
-              </v-row>
-            </v-container>
-          </v-card>
-        </v-col>
-        <!-- End Center/Right Panes (Scan/Frame/Decision) -->
+
+        <ControlPanelScan
+          :representation="representation"
+          @handleKeyPress="handleKeyPress"
+        />
+
+        <ControlPanelDecision
+          :loading-lock="loadingLock"
+          @handleKeyPress="handleKeyPress"
+          @switchLock="switchLock"
+        />
       </v-row>
     </v-container>
   </v-flex>
