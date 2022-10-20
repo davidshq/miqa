@@ -4,12 +4,17 @@ import {
   mapState,
 } from 'vuex';
 
+import VtkViewer from '@/components/VtkViewer.vue';
+
 export default {
   name: 'CompareScans',
   components: {
+    VtkViewer,
   },
   inject: ['user'],
   data: () => ({
+    downloadLoaded: 0,
+    downloadTotal: 0,
     allProjects: [],
     selectedProject: '',
     selectExperiments: [],
@@ -23,6 +28,9 @@ export default {
       'projects',
       'experiments',
       'scans',
+      'frames',
+      'scanFrames',
+      'vtkViews',
     ]),
   },
   watch: {
@@ -58,6 +66,9 @@ export default {
         this.selectScans.push({ name, id });
       });
     },
+    async selectedScans() {
+      await this.loadImage();
+    },
   },
   mounted() {
     this.loadProjects();
@@ -67,7 +78,29 @@ export default {
     ...mapActions([
       'loadProjects',
       'loadProject',
+      'swapToFrame',
     ]),
+    async loadImage() {
+      // Attempting to load 1 image to start.
+      const scan = this.selectedScans[0];
+      const frameId = this.scanFrames[scan.id][0];
+      console.log('loadImage: frameId');
+      console.log(frameId);
+      const frame = this.frames[frameId];
+      console.log('loadImage: frame');
+      console.log(frame);
+      if (frame) {
+        await this.swapToFrame({
+          frame,
+          onDownloadProgress: this.onFrameDownloadProgress,
+        });
+        console.log('after swapToFrame');
+      }
+    },
+    onFrameDownloadProgress(e) {
+      this.downloadLoaded = e.loaded;
+      this.downloadTotal = e.total;
+    },
   },
 };
 </script>
@@ -122,7 +155,7 @@ export default {
         </td>
       </tr>
       <tr>
-        <td>View 1</td>
+        <td><VtkViewer view="selectedScans[0]" /></td>
         <td>View 2</td>
         <td>View 3</td>
       </tr>

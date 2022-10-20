@@ -1163,6 +1163,9 @@ const {
     async swapToFrame({
       state, dispatch, getters, commit,
     }, { frame, onDownloadProgress = null }) {
+      console.log('swapToFrame');
+      console.log(frame)
+      console.log(onDownloadProgress)
       if (!frame) {
         throw new Error("frame id doesn't exist");
       }
@@ -1179,7 +1182,7 @@ const {
       // Queue the new scan to be loaded
       if (newScan !== oldScan && newScan) {
         queueLoadScan(
-          newScan, 3, // TODO: Why?
+          newScan, 3, // TODO: Why 3?
         );
       }
 
