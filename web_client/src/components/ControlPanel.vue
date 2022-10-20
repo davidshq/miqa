@@ -160,19 +160,6 @@ export default {
     slideToFrame(framePosition) {
       this.setCurrentFrameId(this.currentViewData.scanFramesList[framePosition - 1]);
     },
-    // Change the currently displayed frame
-    // TODO: Would it make sense to rename `updateImage` to `updateFrame`?
-    updateImage() {
-      if (this.direction === 'back') {
-        this.setCurrentFrameId(this.previousFrame);
-      } else if (this.direction === 'forward') {
-        this.setCurrentFrameId(this.nextFrame);
-      } else if (this.direction === 'previous') {
-        this.navigateToScan(this.currentViewData.upTo);
-      } else if (this.direction === 'next') {
-        this.navigateToScan(this.currentViewData.downTo);
-      }
-    },
     /**
      * Handles navigation key presses
      *
@@ -182,7 +169,15 @@ export default {
      */
     handleKeyPress(direction) {
       this.direction = direction;
-      this.updateImage();
+      if (this.direction === 'back') {
+        this.setCurrentFrameId(this.previousFrame);
+      } else if (this.direction === 'forward') {
+        this.setCurrentFrameId(this.nextFrame);
+      } else if (this.direction === 'previous') {
+        this.navigateToScan(this.currentViewData.upTo);
+      } else if (this.direction === 'next') {
+        this.navigateToScan(this.currentViewData.downTo);
+      }
     },
     /**
      * After every keystroke into experiment notes, this updates the local component state.
