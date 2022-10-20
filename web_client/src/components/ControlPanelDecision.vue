@@ -8,25 +8,13 @@ import { AUTO_ADVANCE } from '@/constants';
 import UserAvatar from './UserAvatar.vue';
 
 export default {
-  name: 'DecisionButtons',
+  name: 'ControlPanelDecision',
   components: {
     EvaluationResults,
     UserAvatar,
   },
   inject: ['user', 'MIQAConfig'],
   props: {
-    experimentIsEditable: {
-      type: Boolean,
-      default: false,
-    },
-    editRights: {
-      type: Boolean,
-      default: false,
-    },
-    lockOwner: {
-      type: Object,
-      default: undefined,
-    },
     loadingLock: {
       type: Boolean,
       default: false,
@@ -59,6 +47,8 @@ export default {
       'currentViewData',
       'myCurrentProjectRoles',
       'currentFrame',
+      'experimentIsEditable',
+      'editRights',
     ]),
     // The list of artifacts generally should not change unless the project changes
     artifacts() {
@@ -539,27 +529,27 @@ export default {
             You {{ editRights ?'have not claimed' :'do not have' }}
             edit access on this Experiment.
             <div
-              v-if="lockOwner"
+              v-if="currentViewData.lockOwner"
               class="my-3"
               style="text-align:center"
             >
               <UserAvatar
-                :target-user="lockOwner"
+                :target-user="currentViewData.lockOwner"
                 as-editor
               />
               <br>
-              {{ lockOwner.username }}
+              {{ currentViewData.lockOwner.username }}
               <br>
               currently has edit access.
             </div>
             <v-btn
-              v-if="editRights && (user.is_superuser || !lockOwner)"
+              v-if="editRights && (user.is_superuser || !currentViewData.lockOwner)"
               :loading="loadingLock"
               :disabled="loadingLock"
               color="primary"
               @click="switchLock"
             >
-              {{ lockOwner ?"Steal edit access" :"Claim edit access" }}
+              {{ currentViewData.lockOwner ?"Steal edit access" :"Claim edit access" }}
             </v-btn>
           </div>
         </v-col>

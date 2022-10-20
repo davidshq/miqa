@@ -4,14 +4,14 @@ import {
 } from 'vuex';
 import ControlPanelExperiment from '@/components/ControlPanelExperiment.vue';
 import ControlPanelScan from '@/components/ControlPanelScan.vue';
-import DecisionButtons from './ControlPanelDecision.vue';
+import ControlPanelDecision from './ControlPanelDecision.vue';
 
 export default {
   name: 'ControlPanelFrame',
   components: {
     ControlPanelScan,
     ControlPanelExperiment,
-    DecisionButtons,
+    ControlPanelDecision,
   },
   inject: ['user'],
   data: () => ({
@@ -26,12 +26,9 @@ export default {
       'nextFrame',
       'previousFrame',
       'currentFrame',
-      'myCurrentProjectRoles',
       'editRights',
-      'experimentIsEditable',
     ]),
     experimentId() {
-      // This could be retrieved using `currentExperiment` getter
       return this.currentViewData.experimentId;
     },
     // TODO: Understand better
@@ -203,10 +200,7 @@ export default {
                   :representation="representation"
                   @handleKeyPress="handleKeyPress"
                 />
-                <DecisionButtons
-                  :experiment-is-editable="experimentIsEditable"
-                  :edit-rights="editRights"
-                  :lock-owner="currentViewData.lockOwner"
+                <ControlPanelDecision
                   :loading-lock="loadingLock"
                   @handleKeyPress="handleKeyPress"
                   @switchLock="switchLock"
