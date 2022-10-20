@@ -36,25 +36,12 @@ export default {
       'previousFrame',
       'currentFrame',
       'myCurrentProjectRoles',
+      'editRights',
+      'experimentIsEditable',
     ]),
     experimentId() {
       // This could be retrieved using `currentExperiment` getter
       return this.currentViewData.experimentId;
-    },
-    // Determines whether user can edit
-    // TODO: What does edit mean in this context?
-    editRights() {
-      return this.myCurrentProjectRoles.includes('tier_1_reviewer')
-      || this.myCurrentProjectRoles.includes('tier_2_reviewer')
-      || this.myCurrentProjectRoles.includes('superuser');
-    },
-    // If there is a lock and the lock holder is the current user
-    experimentIsEditable() {
-      return this.lockOwner && this.lockOwner.id === this.user.id;
-    },
-    // Returns holder of lock on current experiment
-    lockOwner() {
-      return this.currentViewData.lockOwner;
     },
     // TODO: Understand better
     representation() {
@@ -75,7 +62,7 @@ export default {
     // If there is a current scan
     if (!this.navigateToNextIfCurrentScanNull()) {
       // Switch the lock to the current experiment
-      this.switchLock(this.experimentId);
+      this.switchLock(this.currentViewData.experimentId);
       // Handles key presses
       window.addEventListener('keydown', (event) => {
         if (['textarea', 'input'].includes(document.activeElement.type)) return;
@@ -93,7 +80,7 @@ export default {
   },
   beforeDestroy() {
     // Remove lock
-    this.setLock({ experimentId: this.experimentId, lock: false });
+    this.setLock({ experimentId: this.currentViewData.experimentId, lock: false });
     clearInterval(this.lockCycle);
   },
   methods: {
@@ -287,8 +274,8 @@ export default {
                   <div>
                     {{ currentViewData.experimentName }}
                     <UserAvatar
-                      v-if="lockOwner"
-                      :target-user="lockOwner"
+                      v-if="currentViewData.lockOwner"
+                      :target-user="currentViewData.lockOwner"
                       as-editor
                     />
                   </div>
@@ -481,7 +468,7 @@ export default {
                     <!-- Window Widget -->
                     <window-widget
                       :representation="representation"
-                      :experiment-id="experimentId"
+                      :experiment-id="currentViewData.experimentId"
                     />
                     <!-- End Window Widget -->
                     <!-- ScanDecision -->
@@ -514,7 +501,7 @@ export default {
                   <DecisionButtons
                     :experiment-is-editable="experimentIsEditable"
                     :edit-rights="editRights"
-                    :lock-owner="lockOwner"
+                    :lock-owner="currentViewData.lockOwner"
                     :loading-lock="loadingLock"
                     @handleKeyPress="handleKeyPress"
                     @switchLock="switchLock"

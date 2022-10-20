@@ -583,6 +583,14 @@ const {
     isGlobal(state) {
       return state.currentProject === null;
     },
+    editRights(state, getters) {
+      return getters.myCurrentProjectRoles.includes('tier_1_reviewer')
+        || getters.myCurrentProjectRoles.includes('tier_2_reviewer')
+        || getters.myCurrentProjectRoles.includes('superuser');
+    },
+    experimentIsEditable(state, getters) {
+      return getters.currentViewData.lockOwner && getters.currentViewData.lockOwner.id === state.me.id;
+    },
   },
   mutations: {
     /** Resets all state to that set in initState */
