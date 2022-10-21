@@ -25,6 +25,7 @@ export default {
   }),
   computed: {
     ...mapState([
+      'currentFrameId',
       'projects',
       'experiments',
       'scans',
@@ -32,6 +33,9 @@ export default {
       'scanFrames',
       'vtkViews',
     ]),
+    currentFrame() {
+      return this.frames[this.currentFrameId];
+    },
   },
   watch: {
     // Keeps the list of projects updated
@@ -155,9 +159,11 @@ export default {
         </td>
       </tr>
       <tr>
-        <td><VtkViewer view="selectedScans[0]" /></td>
-        <td>View 2</td>
-        <td>View 3</td>
+        <template v-if="currentFrame">
+          <td><div class="view"><VtkViewer :view="vtkViews[0]" /></div></td>
+          <td>View 2</td>
+          <td>View 3</td>
+        </template>
       </tr>
       <tr>
         <td>
@@ -178,4 +184,20 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+.view {
+  position: relative;
+  flex: 1 0 0;
+
+  border: 1.5px solid white;
+  border-top: none;
+  border-bottom: none;
+
+  &:first-child {
+    border-left: none;
+  }
+
+  &:last-child {
+    border-right: none;
+  }
+}
 </style>
