@@ -111,93 +111,178 @@ export default {
 
 <template>
   <div>
-    <v-select
-      v-model="selectedProject"
-      label="Project"
-      :items="allProjects"
-      item-text="name"
-      item-value="id"
-    />
-    <v-select
-      v-model="selectedExperiment"
-      label="Experiment"
-      :items="selectExperiments"
-      item-text="name"
-      item-value="id"
-    />
-    <table>
-      <tr>
-        <td>
-          <v-select
-            v-model="selectedScans[0]"
-            label="Select Scan"
-            :items="selectScans"
-            item-text="name"
-            item-value="id"
-            return-object
-          />
-        </td>
-        <td>
-          <v-select
-            v-model="selectedScans[1]"
-            label="Select Scan"
-            :items="selectScans"
-            item-text="name"
-            item-value="id"
-            return-object
-          />
-        </td>
-        <td>
-          <v-select
-            v-model="selectedScans[2]"
-            label="Select Scan"
-            :items="selectScans"
-            item-text="name"
-            item-value="id"
-            return-object
-          />
-        </td>
-      </tr>
-      <tr>
+    <v-row id="ProjectExperimentSelect">
+      <v-col>
+        <v-select
+          v-model="selectedProject"
+          label="Project"
+          :items="allProjects"
+          item-text="name"
+          item-value="id"
+        />
+      </v-col>
+      <v-col>
+        <v-select
+          v-model="selectedExperiment"
+          label="Experiment"
+          :items="selectExperiments"
+          item-text="name"
+          item-value="id"
+        />
+      </v-col>
+    </v-row>
+    <v-row id="ScansSelects">
+      <v-col>
+        <v-select
+          v-model="selectedScans[0]"
+          label="Select Scan"
+          :items="selectScans"
+          item-text="name"
+          item-value="id"
+          return-object
+        />
+      </v-col>
+      <v-col>
+        <v-select
+          v-model="selectedScans[1]"
+          label="Select Scan"
+          :items="selectScans"
+          item-text="name"
+          item-value="id"
+          return-object
+        />
+      </v-col>
+      <v-col>
+        <v-select
+          v-model="selectedScans[2]"
+          label="Select Scan"
+          :items="selectScans"
+          item-text="name"
+          item-value="id"
+          return-object
+        />
+      </v-col>
+    </v-row>
+    <v-row id="ScanViews"
+      class="frame fill-height"
+    >
+      <v-col class="layout-container">
         <template v-if="currentFrame">
-          <td><div class="view"><VtkViewer :view="vtkViews[0]" /></div></td>
-          <td>View 2</td>
-          <td>View 3</td>
+          <div class="my-layout">
+            <div class="view"><VtkViewer :view="vtkViews[0]" /></div>
+            <div class="view"><VtkViewer :view="vtkViews[1]" /></div>
+            <div class="view"><VtkViewer :view="vtkViews[2]" /></div>
+          </div>
         </template>
-      </tr>
-      <tr>
-        <td>
-          <v-select
-            v-model="scanToEdit"
-            label="Select Scan to Edit"
-            :items="selectedScans"
-            item-text="name"
-            item-value="id"
-          />
-        </td>
-      </tr>
-      <tr>
-        <td>Control Panel</td>
-      </tr>
-    </table>
+      </v-col>
+    </v-row>
+    <v-row id="ControlPanelSelect">
+      <v-col><v-select
+        v-model="scanToEdit"
+        label="Select Scan to Edit"
+        :items="selectedScans"
+        item-text="name"
+        item-value="id"
+      /></v-col>
+    </v-row>
+    <v-row id="ControlPanel">
+      <v-col><p>Control Panel</p></v-col>
+    </v-row>
   </div>
 </template>
 
 <style lang="scss" scoped>
-.view {
-  position: relative;
-  flex: 1 0 0;
+.my-layout {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
 
-  border: 1.5px solid white;
-  border-top: none;
-  border-bottom: none;
+  .view {
+    position: relative;
+    flex: 1 0 0;
 
-  &:first-child {
-    border-left: none;
+    border: 1.5px solid white;
+    border-top: none;
+    border-bottom: none;
+
+    &:first-child {
+      border-left: none;
+    }
+
+    &:last-child {
+      border-right: none;
+    }
+  }
+}
+
+.frame {
+  .scans-bar {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    .scans-view {
+      overflow: auto;
+    }
   }
 
-  &:last-child {
-    border-right: none;
+  .layout-container {
+    position: relative;
+  }
+
+  .v-btn.smaller {
+    height: 35px;
+    width: 35px;
+  }
+
+  .bottom {
+    > .container {
+      position: relative;
+    }
+
+    .buttons {
+      width: 100%;
+
+      .v-btn {
+        height: 36px;
+        opacity: 1;
+        flex: 1;
+      }
+    }
+  }
+}
+
+.theme--light.v-btn.v-btn--disabled:not(.v-btn--flat):not(.v-btn--text):not(.v-btn-outlined),
+.theme--light.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn-outlined),
+.v-btn::before {
+  background-color: transparent !important;
+}
+
+</style>
+
+<style lang="scss">
+.load-completion {
+  font-size: 1.1em;
+}
+
+.justifyRight {
+  text-align: right;
+}
+
+.frame {
+  .v-text-field.small .v-input__control {
+    min-height: 36px !important;
+  }
+
+  .note-field .v-input__control {
+    min-height: 36px !important;
+  }
+
+  .v-input--slider.frame-slider {
+    margin-top: 0;
   }
 }
 </style>
