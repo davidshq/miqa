@@ -86,10 +86,8 @@ export default {
 </script>
 
 <template>
-  <v-layout
-    class="frame"
-    fill-height
-    column
+  <v-row
+    class="frame fill-height flex-column ma-0"
   >
     <!-- Top Navbar -->
     <Navbar frame-view />
@@ -123,7 +121,7 @@ export default {
     />
     <!-- Show VTK Viewers -->
     <template v-if="currentFrame">
-      <v-flex
+      <v-col
         class="layout-container"
       >
         <div class="my-layout">
@@ -136,23 +134,21 @@ export default {
           </div>
         </div>
         <!-- Show Error Loading Frame -->
-        <v-layout
+        <v-row
           v-if="errorLoadingFrame"
-          align-center
-          justify-center
-          fill-height
+          class="align-center justify-center fill-height"
         >
-          <div class="title">
+          <div class="text-h6">
             Error loading this frame
           </div>
-        </v-layout>
+        </v-row>
         <!-- End Error Loading Frame -->
-      </v-flex>
+      </v-col>
       <!-- End Show VTK Viewers -->
       <!-- Show Bottom Control Panel -->
       <ControlPanel />
     </template>
-  </v-layout>
+  </v-row>
 </template>
 
 <style lang="scss" scoped>

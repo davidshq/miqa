@@ -378,7 +378,7 @@ export default {
       :class="name"
       class="header"
     >
-      <v-layout align-center>
+      <v-row class="align-center ma-0">
         <v-slider
           v-mousetrap="[
             { bind: keyboardBindings[1], handler: () => changeSlice(slice + 1)},
@@ -392,10 +392,10 @@ export default {
           hide-details
           @input="changeSlice"
         />
-        <div class="slice caption px-2">
+        <div class="slice text-caption px-2">
           {{ roundSlice(slice) }} mm
         </div>
-      </v-layout>
+      </v-row>
     </div>
     <div
       class="viewer"
@@ -420,7 +420,7 @@ export default {
     >
       <div
         :class="name"
-        class="indicator body-2"
+        class="indicator text-body-2"
       >
         {{ displayName }}
       </div>
