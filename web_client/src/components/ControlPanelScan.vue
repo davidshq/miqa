@@ -44,7 +44,7 @@ export default {
       elevation="3"
     >
       <v-container
-        fill-height
+        class="fill-height"
         fluid
       >
         <div

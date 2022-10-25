@@ -69,8 +69,7 @@ export default {
         >
           <v-col
             cols="5"
-            align="right"
-            class="pr-3 font-weight-bold"
+            class="pr-3 font-weight-bold align"
             style="text-transform: capitalize"
           >
             Overall Quality
@@ -112,8 +111,7 @@ export default {
         >
           <v-col
             cols="5"
-            align="right"
-            class="pr-3"
+            class="pr-3 align"
             style="text-transform: capitalize"
           >
             {{ name.replace(/_/g, " ") }}

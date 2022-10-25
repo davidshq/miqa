@@ -85,11 +85,10 @@ export default {
         Save screenshot
       </v-card-title>
       <v-container
-        grid-list-sm
         class="pb-0"
       >
-        <v-layout>
-          <v-flex>
+        <v-row>
+          <v-col>
             <v-card
               flat
               tile
@@ -99,10 +98,10 @@ export default {
                 :src="currentScreenshot.dataURL"
               />
             </v-card>
-          </v-flex>
-        </v-layout>
-        <v-layout>
-          <v-flex>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col>
             <v-text-field
               v-model="filename"
               label="Filename"
@@ -111,8 +110,8 @@ export default {
                 close();
               "
             />
-          </v-flex>
-          <v-flex xs2>
+          </v-col>
+          <v-col cols="2">
             <v-select
               v-model="fileType"
               :items="['jpg', 'png']"
@@ -120,8 +119,8 @@ export default {
               hide-details
               single-line
             />
-          </v-flex>
-        </v-layout>
+          </v-col>
+        </v-row>
       </v-container>
       <v-card-actions>
         <v-spacer />

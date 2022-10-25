@@ -194,7 +194,7 @@ export default defineComponent({
       :items="[{text: 'Neurology (LPS)', value: 'LPS'}, {text: 'Radiology (RAS)', value: 'RAS'}]"
       @change="changed = true"
     />
-    <v-flex
+    <v-col
       class="d-flex"
       style="flex-direction: row"
     >
@@ -222,7 +222,7 @@ export default defineComponent({
           DELETE PROJECT
         </v-btn>
       </div>
-    </v-flex>
+    </v-col>
     <v-overlay
       v-if="userCanEditProject && !isGlobal"
       :value="showDeleteWarningOverlay"

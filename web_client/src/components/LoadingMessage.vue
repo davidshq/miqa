@@ -30,12 +30,11 @@ export default {
 </script>
 
 <template>
-  <v-layout
+  <v-row
     v-if="loadingFrame"
-    class="loading-indicator-container"
-    align-center
-    justify-center
-    fill-height
+    class="loading-indicator-container fill-height"
+    align="center"
+    justify="center"
   >
     <v-col>
       <v-row justify="center">
@@ -59,5 +58,5 @@ export default {
         </div>
       </v-row>
     </v-col>
-  </v-layout>
+  </v-row>
 </template>

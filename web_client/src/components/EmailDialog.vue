@@ -160,7 +160,7 @@ export default defineComponent({
       @submit.prevent="send"
     >
       <v-card>
-        <v-card-title class="headline grey lighten-4">
+        <v-card-title class="text-h5 grey lighten-4">
           Send email
           <v-spacer />
           <v-btn
@@ -173,19 +173,18 @@ export default defineComponent({
           </v-btn>
         </v-card-title>
         <v-container
-          grid-list-sm
           class="py-0"
         >
-          <v-layout align-center>
-            <v-flex>
+          <v-row align="center">
+            <v-col>
               <EmailRecipientCombobox
                 v-model="to"
                 :candidates="to"
                 :required="true"
                 label="to"
               />
-            </v-flex>
-            <v-flex shrink>
+            </v-col>
+            <v-col class="shrink">
               <a
                 v-if="!showCC"
                 class="px-2"
@@ -196,30 +195,30 @@ export default defineComponent({
                 class="px-2"
                 @click="showBCC = true"
               >bcc</a>
-            </v-flex>
-          </v-layout>
-          <v-layout v-if="showCC">
-            <v-flex>
+            </v-col>
+          </v-row>
+          <v-row v-if="showCC">
+            <v-col>
               <EmailRecipientCombobox
                 v-model="cc"
                 :candidates="cc"
                 :required="false"
                 label="cc"
               />
-            </v-flex>
-          </v-layout>
-          <v-layout v-if="showBCC">
-            <v-flex>
+            </v-col>
+          </v-row>
+          <v-row v-if="showBCC">
+            <v-col>
               <EmailRecipientCombobox
                 v-model="bcc"
                 :candidates="bcc"
                 :required="false"
                 label="bcc"
               />
-            </v-flex>
-          </v-layout>
-          <v-layout>
-            <v-flex>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col>
               <v-text-field
                 v-model="subject"
                 :rules="[v => !!v || 'Subject is required']"
@@ -229,26 +228,26 @@ export default defineComponent({
                 autocomplete="on"
                 required
               />
-            </v-flex>
-          </v-layout>
-          <v-layout>
-            <v-flex>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col>
               <v-textarea
                 v-model="body"
                 label="Body"
                 rows="8"
               />
-            </v-flex>
-          </v-layout>
+            </v-col>
+          </v-row>
           <template v-if="screenshots.length">
-            <div class="caption">
+            <div class="text-caption">
               Include screenshots
             </div>
-            <v-layout class="screenshot-row">
-              <v-flex
+            <v-row class="screenshot-row">
+              <v-col
                 v-for="(screenshot, index) of screenshots"
                 :key="index"
-                shrink
+                class="shrink"
               >
                 <v-hover v-slot="{ hover }">
                   <v-card
@@ -284,8 +283,8 @@ export default defineComponent({
                     </v-fade-transition>
                   </v-card>
                 </v-hover>
-              </v-flex>
-            </v-layout>
+              </v-col>
+            </v-row>
           </template>
         </v-container>
         <v-card-actions>

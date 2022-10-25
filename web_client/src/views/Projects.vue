@@ -259,8 +259,8 @@ export default defineComponent({
                         {{ project.name }}
                       </v-col>
                       <v-col
+                        class="align"
                         cols="4"
-                        align="right"
                       >
                         ({{ project.status.total_complete }}/{{ project.status.total_scans }})
                       </v-col>
@@ -331,11 +331,11 @@ export default defineComponent({
               Settings
             </v-subheader>
 
-            <v-layout class="pa-5">
-              <v-flex>
+            <v-row class="pa-5">
+              <v-col>
                 <ProjectSettings />
-              </v-flex>
-            </v-layout>
+              </v-col>
+            </v-row>
           </v-card>
           <v-card
             v-if="currentTaskOverview && currentTaskOverview.total_scans > 0"
@@ -368,14 +368,14 @@ export default defineComponent({
         v-else
         class="flex-grow-1 ma-3"
       >
-        <v-layout
-          align-center
-          justify-center
-          fill-height
+        <v-row
+          class="fill-height"
+          align="center"
+          justify="center"
         >
           <div
             v-if="complete"
-            class="title text-center"
+            class="text-h6 text-center"
           >
             Viewed all scans in Project {{ currentProject.name }}.
             <div
@@ -409,13 +409,13 @@ export default defineComponent({
           </div>
           <div
             v-else-if="projects.length > 0"
-            class="title"
+            class="text-h6"
           >
             Select a project
           </div>
           <div
             v-else
-            class="title"
+            class="text-h6"
           >
             <v-progress-circular
               v-if="loadingProjects"
@@ -424,7 +424,7 @@ export default defineComponent({
             />
             <span v-else>You have not been added to any projects yet.</span>
           </div>
-        </v-layout>
+        </v-row>
       </v-card>
     </div>
   </div>

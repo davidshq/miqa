@@ -169,10 +169,9 @@ export default {
 </script>
 
 <template>
-  <v-flex
+  <v-col
     v-if="representation"
-    shrink
-    class="bottom"
+    class="bottom shrink"
   >
     <v-container
       fluid
@@ -193,7 +192,7 @@ export default {
         />
       </v-row>
     </v-container>
-  </v-flex>
+  </v-col>
 </template>
 
 <style lang="scss" scoped>

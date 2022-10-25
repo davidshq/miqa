@@ -46,7 +46,7 @@ export default {
 </script>
 
 <template>
-  <v-flex
+  <v-col
     class="d-flex"
     style="flex-direction:row; column-gap: 5px; margin-bottom: 10px;"
   >
@@ -85,15 +85,14 @@ export default {
         <span>View location saved with decision</span>
       </v-tooltip>
     </div>
-    <v-flex
+    <v-col
       :class="decision.note ? 'black--text' : 'grey--text'"
       class="d-flex justify-space-between"
     >
       {{ decision.note ? decision.note : "No comment" }}
-    </v-flex>
-    <v-flex
-      shrink
-      class="d-flex flex-wrap justify-end flex-shrink-1"
+    </v-col>
+    <v-col
+      class="d-flex flex-wrap justify-end flex-shrink-1 shrink"
     >
       <v-tooltip
         v-for="chip in artifactChips"
@@ -112,14 +111,14 @@ export default {
         </template>
         <span>{{ chip.value }}</span>
       </v-tooltip>
-    </v-flex>
+    </v-col>
     <div
       class="grey--text"
       style="text-align: right"
     >
       {{ decision.created }}
     </div>
-  </v-flex>
+  </v-col>
 </template>
 
 <style scoped>

@@ -287,7 +287,7 @@ export default {
           <li
             v-for="experiment of orderedExperiments"
             :key="`e.${experiment.id}`"
-            class="body-2 pb-5"
+            class="text-body-2 pb-5"
           >
             <v-card
               flat

@@ -152,7 +152,7 @@ export default {
           Save Note
         </v-col>
       </v-row>
-      <v-flex
+      <v-col
         class="d-flex ml-5"
         style="flex-direction:row"
       >
@@ -174,7 +174,7 @@ export default {
             @change="setStoreCrosshairs"
           />
         </div>
-      </v-flex>
+      </v-col>
     </v-card>
   </v-col>
 </template>

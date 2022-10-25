@@ -360,7 +360,7 @@ export default {
         fluid
         class="px-5"
       >
-        <v-flex
+        <v-col
           class="d-flex pb-3"
           style="justify-content: space-between; column-gap: 20px"
         >
@@ -387,7 +387,7 @@ export default {
               </span>
             </v-tooltip>
           </v-subheader>
-          <v-flex
+          <v-col
             v-if="currentViewData.currentAutoEvaluation"
             style="display: flex; align-items: flex-start; justify-content: flex-end"
           >
@@ -415,8 +415,8 @@ export default {
             <EvaluationResults
               :results="currentViewData.currentAutoEvaluation.results"
             />
-          </v-flex>
-          <v-flex
+          </v-col>
+          <v-col
             v-else
             cols="5"
             class="d-flex justify-end align-center"
@@ -442,8 +442,8 @@ export default {
                 An evaluation performed by the MIQA server using artificial intelligence
               </span>
             </v-tooltip>
-          </v-flex>
-        </v-flex>
+          </v-col>
+        </v-col>
         <v-row
           v-if="experimentIsEditable"
           no-gutters
