@@ -200,6 +200,15 @@ export default {
         </v-col>
       </v-row>
     </v-col>
+    <v-col id="ControlPanelSelect" class="shrink">
+      <v-select
+        v-model="scanToEdit"
+        label="Select Scan to Edit"
+        :items="selectedScans"
+        item-text="name"
+        item-value="id"
+      />
+    </v-col>
     <v-col id="ScanViews" class="layout-container">
       <template v-if="currentFrame">
         <div class="my-layout">
@@ -215,15 +224,7 @@ export default {
         </div>
       </template>
     </v-col>
-    <v-col id="ControlPanelSelect" class="shrink">
-      <v-select
-        v-model="scanToEdit"
-        label="Select Scan to Edit"
-        :items="selectedScans"
-        item-text="name"
-        item-value="id"
-      />
-    </v-col>
+
     <!-- Control Panel Goes Here -->
   </v-row>
 </template>
