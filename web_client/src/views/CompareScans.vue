@@ -4,11 +4,19 @@ import {
   mapState,
 } from 'vuex';
 
+import Navbar from '@/components/Navbar.vue';
+import ControlPanel from '@/components/ControlPanel.vue';
+import ExperimentsView from '@/components/ExperimentsView.vue';
+import LoadingMessage from '@/components/LoadingMessage.vue';
 import VtkViewer from '@/components/VtkViewer.vue';
 
 export default {
   name: 'CompareScans',
   components: {
+    LoadingMessage,
+    Navbar,
+    ExperimentsView,
+    ControlPanel,
     VtkViewer,
   },
   inject: ['user'],
@@ -110,9 +118,35 @@ export default {
 </script>
 
 <template>
-  <div>
-    <v-row id="ProjectExperimentSelect">
-      <v-col>
+  <v-row
+    class="frame fill-height flex-column ma-0"
+  >
+    <Navbar frame-view />
+    <v-navigation-drawer
+      expand-on-hover
+      permanent
+      app
+      width="350px"
+    >
+      <v-list>
+        <v-list-item>
+          <v-icon>fas fa-list</v-icon>
+          <v-toolbar-title class="pl-5">
+            Experiments
+          </v-toolbar-title>
+        </v-list-item>
+        <v-list-item>
+          <v-icon />
+          <ExperimentsView
+            class="mt-1"
+            minimal
+          />
+        </v-list-item>
+      </v-list>
+    </v-navigation-drawer>
+    <v-col id="ProjectExperimentSelect" class="shrink">
+      <v-row>
+        <v-col>
         <v-select
           v-model="selectedProject"
           label="Project"
@@ -130,65 +164,68 @@ export default {
           item-value="id"
         />
       </v-col>
-    </v-row>
-    <v-row id="ScansSelects">
-      <v-col>
-        <v-select
-          v-model="selectedScans[0]"
-          label="Select Scan"
-          :items="selectScans"
-          item-text="name"
-          item-value="id"
-          return-object
-        />
-      </v-col>
-      <v-col>
-        <v-select
-          v-model="selectedScans[1]"
-          label="Select Scan"
-          :items="selectScans"
-          item-text="name"
-          item-value="id"
-          return-object
-        />
-      </v-col>
-      <v-col>
-        <v-select
-          v-model="selectedScans[2]"
-          label="Select Scan"
-          :items="selectScans"
-          item-text="name"
-          item-value="id"
-          return-object
-        />
-      </v-col>
-    </v-row>
-    <v-row id="ScanViews"
-      class="frame fill-height"
-    >
-      <v-col class="layout-container">
-        <template v-if="currentFrame">
-          <div class="my-layout">
-            <div class="view"><VtkViewer :view="vtkViews[0]" /></div>
-            <div class="view"><VtkViewer :view="vtkViews[1]" /></div>
-            <div class="view"><VtkViewer :view="vtkViews[2]" /></div>
+      </v-row>
+    </v-col>
+    <v-col id="ScansSelects" class="shrink">
+      <v-row>
+        <v-col>
+          <v-select
+            v-model="selectedScans[0]"
+            label="Select Scan"
+            :items="selectScans"
+            item-text="name"
+            item-value="id"
+            return-object
+          />
+        </v-col>
+        <v-col>
+          <v-select
+            v-model="selectedScans[1]"
+            label="Select Scan"
+            :items="selectScans"
+            item-text="name"
+            item-value="id"
+            return-object
+          />
+        </v-col>
+        <v-col>
+          <v-select
+            v-model="selectedScans[2]"
+            label="Select Scan"
+            :items="selectScans"
+            item-text="name"
+            item-value="id"
+            return-object
+          />
+        </v-col>
+      </v-row>
+    </v-col>
+    <v-col id="ScanViews" class="layout-container">
+      <template v-if="currentFrame">
+        <div class="my-layout">
+          <div class="view">
+            <VtkViewer :view="vtkViews[0]" />
           </div>
-        </template>
-      </v-col>
-    </v-row>
-    <v-row id="ControlPanelSelect">
-      <v-col><v-select
+          <div class="view">
+            <VtkViewer :view="vtkViews[1]" />
+          </div>
+          <div class="view">
+            <VtkViewer :view="vtkViews[2]" />
+          </div>
+        </div>
+      </template>
+    </v-col>
+    <v-col id="ControlPanelSelect" class="shrink">
+      <v-select
         v-model="scanToEdit"
         label="Select Scan to Edit"
         :items="selectedScans"
         item-text="name"
         item-value="id"
-      /></v-col>
-    </v-row>
-    <v-row id="ControlPanel">
-      <v-col><p>Control Panel</p></v-col>
-    </v-row>
-  </div>
+      />
+    </v-col>
+    <!-- Control Panel Goes Here -->
+  </v-row>
 </template>
 
 <style lang="scss" scoped>
