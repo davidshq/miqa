@@ -80,7 +80,7 @@ function prepareProxyManager(proxyManager: vtkProxyManager) {
  *
  * @param filename
  */
-function getArrayName(filename) {
+function getArrayNameFromFilename(filename) {
   const idx = filename.lastIndexOf('.');
   const name = idx > -1 ? filename.substring(0, idx) : filename;
   return `Scalars ${name}`;
@@ -99,7 +99,7 @@ function getArrayName(filename) {
  * @param file        Object  File to load
  * @param webWorker
  */
-function getData(frameId, file, webWorker = null) {
+function getImageData(frameId, file, webWorker = null) {
   return new Promise((resolve, reject) => {
     // Load image from frame cache if available, this resolves promise
     if (frameCache.has(frameId)) {
@@ -116,7 +116,7 @@ function getData(frameId, file, webWorker = null) {
             // Convert ITK to VTK image uses below from vtk.js:
             // https://github.com/Kitware/vtk-js/blob/master/Sources/Common/DataModel/ITKHelper/index.js
             const frameData = convertItkToVtkImage(image, {
-              scalarArrayName: getArrayName(fileName),
+              scalarArrayName: getArrayNameFromFilename(fileName),
             });
             const dataRange = frameData
               .getPointData() // From the image file
@@ -181,10 +181,10 @@ function loadFile(frame, { onDownloadProgress = null } = {}) {
  */
 function loadFileAndGetData(frame, { onDownloadProgress = null } = {}) {
   const loadResult = loadFile(frame, { onDownloadProgress });
-  // Once the file has been cached and is available, call getData
+  // Once the file has been cached and is available, call getImageData
   // Who is `savedWorker`?
   return loadResult.cachedFile
-    .then((file) => getData(frame.id, file, savedWorker))
+    .then((file) => getImageData(frame.id, file, savedWorker))
     .then(({ webWorker, frameData }) => {
       savedWorker = webWorker;
       return Promise.resolve({ frameData });
@@ -245,7 +245,7 @@ function poolFunction(webWorker, taskInfo) {
     // TODO: Could me moved into filePromise above or no?
     filePromise
       .then((file) => {
-        resolve(getData(frame.id, file, webWorker));
+        resolve(getImageData(frame.id, file, webWorker));
       })
       .catch((err) => {
         reject(err);
@@ -387,7 +387,7 @@ function getNextFrame(experiments, experimentIndex, scanIndex) {
  * If the range (e.g. [0, 3819] in a scan is <> the range read from data,
  * ensure that the ranges match
  *
- * Only called by `getData`
+ * Only called by `getImageData`
  *
  * @param frameId
  * @param dataRange Array
@@ -1166,10 +1166,11 @@ const {
       console.log('swapToFrame');
       console.log(frame)
       console.log(onDownloadProgress)
+
+      // Guard Clauses
       if (!frame) {
         throw new Error("frame id doesn't exist");
       }
-      // If we already have the desired frame
       if (getters.currentFrame === frame) {
         return;
       }
@@ -1240,11 +1241,15 @@ const {
         if (needPrep || !state.proxyManager.getViews().length) {
           prepareProxyManager(state.proxyManager);
           // Add views to vtkViews
+          console.log('this is the vtkViews you are looking for');
           state.vtkViews = state.proxyManager.getViews(); // TODO: Can eliminate this, won't it catch on next?
+          console.log(state.vtkViews);
         }
         // If no vtkViews, get them from proxyManager
         if (!state.vtkViews.length) {
+          console.log('or are these the vtkViews you are looking for?');
           state.vtkViews = state.proxyManager.getViews();
+          console.log(state.vtkViews);
         }
       } catch (err) {
         console.log('Caught exception loading next frame');
