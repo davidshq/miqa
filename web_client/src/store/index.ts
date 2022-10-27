@@ -21,7 +21,7 @@ import { proxy } from '../vtk';
 import { getView } from '../vtk/viewManager';
 import { ijkMapping } from '../vtk/constants';
 
-import { RESET_STATE, SET_MIQA_CONFIG, SET_ME, SET_ALL_USERS, RESET_PROJECT, SET_CURRENT_FRAME_ID,
+import { RESET_STATE, SET_MIQA_CONFIG, SET_ME, SET_ALL_USERS, RESET_PROJECT_STATE, SET_CURRENT_FRAME_ID,
          SET_FRAME, SET_SCAN, SET_RENDER_ORIENTATION, SET_CURRENT_PROJECT, SET_GLOBAL_SETTINGS,
          SET_TASK_OVERVIEW, SET_PROJECTS, ADD_SCAN_DECISION, SET_FRAME_EVALUATION, SET_CURRENT_SCREENSHOT,
          ADD_SCREENSHOT, REMOVE_SCREENSHOT, UPDATE_LAST_API_REQUEST_TIME, SET_LOADING_FRAME,
@@ -596,7 +596,7 @@ const {
       state.allUsers = allUsers;
     },
     /** Resets project state when loading a new project */
-    [RESET_PROJECT] (state) {
+    [RESET_PROJECT_STATE] (state) {
       state.experimentIds = [];
       state.experiments = {};
       state.experimentScans = {};
@@ -807,7 +807,7 @@ const {
     },
     /** Pulls an individual project from API and loads into state */
     async loadProject({ commit }, project: Project) {
-      commit('RESET_PROJECT');
+      commit('RESET_PROJECT_STATE');
 
       // Build navigation links throughout the frame to improve performance.
       let firstInPrev = null;
