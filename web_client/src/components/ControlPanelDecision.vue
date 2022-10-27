@@ -176,15 +176,15 @@ export default {
   },
   methods: {
     ...mapMutations([
-      'updateExperiment',
-      'setFrameEvaluation',
+      'UPDATE_EXPERIMENT',
+      'SET_FRAME_EVALUATION',
     ]),
     async pollForEvaluation() {
       // Get a frame from API
       const frameData = await djangoRest.frame(this.currentViewData.currentFrame.id);
       // If there is a frame_evaluation
       if (frameData.frame_evaluation) {
-        this.setFrameEvaluation(frameData.frame_evaluation);
+        this.SET_FRAME_EVALUATION(frameData.frame_evaluation);
         clearInterval(this.pollInterval);
       }
     },
@@ -294,8 +294,7 @@ export default {
             present: this.confirmedPresent,
             absent: this.confirmedAbsent,
           };
-          // Get the addScanDecision mutator
-          const { addScanDecision } = store.commit;
+          const { ADD_SCAN_DECISION } = store.commit;
           const zxyLocation = this.vtkViews.map(
             (view) => this.proxyManager.getRepresentation(null, view).getSlice(),
           );
@@ -312,7 +311,7 @@ export default {
             } : {}),
           );
           // Update Vuex store with scan decision
-          addScanDecision({
+          ADD_SCAN_DECISION({
             currentScanId: this.currentViewData.scanId,
             newDecision: savedObj,
           });
@@ -336,7 +335,7 @@ export default {
           //   (else we would already know about the lock owner and not attempt to lock).
           //   Thus, we need to update our experiment's info and check who the lock owner is
           if (err.toString().includes('lock')) {
-            this.updateExperiment(await djangoRest.experiment(this.currentViewData.experimentId));
+            this.UPDATE_EXPERIMENT(await djangoRest.experiment(this.currentViewData.experimentId));
           }
         }
       } else {

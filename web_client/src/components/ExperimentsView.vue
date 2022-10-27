@@ -79,7 +79,7 @@ export default {
   },
   methods: {
     ...mapMutations([
-      'switchReviewMode',
+      'SWITCH_REVIEW_MODE',
     ]),
     ...mapActions([
       'loadProject',
@@ -276,7 +276,7 @@ export default {
           dense
           style="display: inline-block; max-height: 40px; max-width: 60px;"
           class="px-3 ma-0"
-          @change="switchReviewMode"
+          @change="SWITCH_REVIEW_MODE"
         />
         <span>Scans for my review</span>
       </v-subheader>

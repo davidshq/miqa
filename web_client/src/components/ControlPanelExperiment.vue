@@ -23,8 +23,8 @@ export default {
   },
   methods: {
     ...mapMutations([
-      'setShowCrosshairs',
-      'setStoreCrosshairs',
+      'SET_SHOW_CROSSHAIRS',
+      'SET_STORE_CROSSHAIRS',
     ]),
     /**
      * After every keystroke into experiment notes, this updates the local component state.
@@ -42,7 +42,7 @@ export default {
       if (this.newExperimentNote.length > 0) {
         try {
           // TODO: This shouldn't be necessary?
-          const { updateExperiment } = store.commit;
+          const { UPDATE_EXPERIMENT } = store.commit;
           // Save note using API
           const newExpData = await djangoRest.setExperimentNote(
             this.currentViewData.experimentId, this.newExperimentNote,
@@ -55,7 +55,7 @@ export default {
           this.newExperimentNote = '';
           // TODO: This is where we actually commit the data...but this is already
           //  happening via bind?
-          updateExperiment(newExpData);
+          UPDATE_EXPERIMENT(newExpData);
         } catch (err) {
           this.$snackbar({
             text: `Save failed: ${err.response.data.detail || 'Server error'}`,
@@ -162,7 +162,7 @@ export default {
             label="Display crosshairs"
             hide-details
             class="shrink pa-0 ml-n2"
-            @change="setShowCrosshairs"
+            @change="SET_SHOW_CROSSHAIRS"
           />
         </div>
         <div style="flex-grow: 1">
@@ -171,7 +171,7 @@ export default {
             label="Store crosshairs with decision"
             hide-details
             class="shrink pa-0 ml-n2"
-            @change="setStoreCrosshairs"
+            @change="SET_STORE_CROSSHAIRS"
           />
         </div>
       </v-col>

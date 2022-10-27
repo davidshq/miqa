@@ -89,8 +89,8 @@ export default {
   watch: {
     slice(value) {
       this.representation.setSlice(value);
-      if (this.setCurrentVtkIndexSlices) {
-        this.setCurrentVtkIndexSlices({
+      if (this.SET_CURRENT_VTK_INDEX_SLICES) {
+        this.SET_CURRENT_VTK_INDEX_SLICES({
           indexAxis: ijkMapping[this.trueAxis(this.name)],
           value: this.representation.getSliceIndex(),
         });
@@ -132,9 +132,9 @@ export default {
   methods: {
     ...mapMutations([
       'saveSlice',
-      'setCurrentScreenshot',
-      'setCurrentVtkIndexSlices',
-      'setSliceLocation',
+      'SET_CURRENT_SCREENSHOT',
+      'SET_CURRENT_VTK_INDEX_SLICES',
+      'SET_SLICE_LOCATION',
     ]),
     prepareViewer() {
       this.initializeView();
@@ -289,7 +289,7 @@ export default {
         this.drawLine(ctx, displayLine1);
         this.drawLine(ctx, displayLine2);
       }
-      this.setCurrentScreenshot({
+      this.SET_CURRENT_SCREENSHOT({
         name: `${this.currentViewData.experimentName}/${
           this.currentViewData.scanName
         }/${this.currentFrame.frame_number}/${this.displayName}`,
@@ -352,7 +352,7 @@ export default {
         this.iIndexSlice, this.jIndexSlice, this.kIndexSlice,
       );
       const location = crosshairSet.locationOfClick(clickEvent);
-      this.setSliceLocation(location);
+      this.SET_SLICE_LOCATION(location);
     },
     cleanup() {
       if (this.renderSubscription) {

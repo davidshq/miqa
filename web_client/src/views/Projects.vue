@@ -26,7 +26,7 @@ export default defineComponent({
   },
   inject: ['user', 'MIQAConfig'],
   setup() {
-    const { switchReviewMode } = store.commit;
+    const { SWITCH_REVIEW_MODE } = store.commit;
     // We are loading projects
     const loadingProjects = ref(true);
     store.dispatch.loadProjects().then(() => {
@@ -125,7 +125,7 @@ export default defineComponent({
 
     return {
       reviewMode,
-      switchReviewMode,
+      SWITCH_REVIEW_MODE,
       complete,
       currentProject,
       loadingProjects,
@@ -402,7 +402,7 @@ export default defineComponent({
                 dense
                 style="display: inline-block; max-height: 40px; max-width: 60px;"
                 class="px-3 ma-0"
-                @change="switchReviewMode"
+                @change="SWITCH_REVIEW_MODE"
               />
               <span>Scans for my review</span>
             </v-subheader>

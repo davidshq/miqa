@@ -21,6 +21,15 @@ import { proxy } from '../vtk';
 import { getView } from '../vtk/viewManager';
 import { ijkMapping } from '../vtk/constants';
 
+import { RESET_STATE, SET_MIQA_CONFIG, SET_ME, SET_ALL_USERS, RESET_PROJECT, SET_CURRENT_FRAME_ID,
+         SET_FRAME, SET_SCAN, SET_RENDER_ORIENTATION, SET_CURRENT_PROJECT, SET_GLOBAL_SETTINGS,
+         SET_TASK_OVERVIEW, SET_PROJECTS, ADD_SCAN_DECISION, SET_FRAME_EVALUATION, SET_CURRENT_SCREENSHOT,
+         ADD_SCREENSHOT, REMOVE_SCREENSHOT, UPDATE_LAST_API_REQUEST_TIME, SET_LOADING_FRAME,
+         SET_ERROR_LOADING_FRAME, ADD_SCAN_FRAMES, ADD_EXPERIMENT_SCANS, ADD_EXPERIMENT,
+         UPDATE_EXPERIMENT, SET_WINDOW_LOCKED, SET_SCAN_CACHED_PERCENTAGE, SET_SLICE_LOCATION,
+         SET_CURRENT_VTK_INDEX_SLICES, SET_SHOW_CROSSHAIRS, SET_STORE_CROSSHAIRS, SWITCH_REVIEW_MODE
+       } from './mutation-types';
+
 const { convertItkToVtkImage } = ITKHelper;
 
 Vue.use(Vuex);
@@ -111,8 +120,6 @@ function getImageData(frameId, file, webWorker = null) {
         // Read image with ITK
         readImageArrayBuffer(webWorker, io.result, fileName)
           .then(({ webWorker, image }) => { // eslint-disable-line no-shadow
-            // Convert ITK to VTK image uses below from vtk.js:
-            // https://github.com/Kitware/vtk-js/blob/master/Sources/Common/DataModel/ITKHelper/index.js
             const frameData = convertItkToVtkImage(image, {
               scalarArrayName: getArrayNameFromFilename(fileName),
             });
@@ -258,7 +265,7 @@ function poolFunction(webWorker, taskInfo) {
  */
 function progressHandler(completed, total) {
   const percentComplete = completed / total;
-  store.commit.setScanCachedPercentage(percentComplete);
+  store.commit.SET_SCAN_CACHED_PERCENTAGE(percentComplete);
 }
 
 /**
@@ -588,8 +595,7 @@ const {
     },
   },
   mutations: {
-    /** Resets all state to that set in initState */
-    reset(state) {
+    [RESET_STATE] (state) {
       Object.assign(state, { ...state, ...initState });
     },
     /**
@@ -598,7 +604,7 @@ const {
      * @param state         The whole state for the MIQA Vuex store
      * @param configuration The configuration object as received from Django API
      */
-    setMIQAConfig(state, configuration) {
+    [SET_MIQA_CONFIG] (state, configuration) {
       state.MIQAConfig = configuration;
     },
     /**
@@ -607,7 +613,7 @@ const {
      * @param state Whole state associated with MIQA Vuex Store
      * @param me    Me object received from Django API
      */
-    setMe(state, me) {
+    [SET_ME] (state, me) {
       state.me = me;
     },
     /**
@@ -616,17 +622,15 @@ const {
      * @param state
      * @param allUsers
      */
-    setAllUsers(state, allUsers) {
+    [SET_ALL_USERS] (state, allUsers) {
       state.allUsers = allUsers;
     },
     /**
      * Resets project state when loading a new project
      *
      * Only called by loadProject
-     *
-     * @param state
      */
-    resetProject(state) {
+    [RESET_PROJECT] (state) {
       state.experimentIds = [];
       state.experiments = {};
       state.experimentScans = {};
@@ -640,7 +644,7 @@ const {
      * @param state
      * @param frameId
      */
-    setCurrentFrameId(state, frameId) {
+    [SET_CURRENT_FRAME_ID] (state, frameId) {
       state.currentFrameId = frameId;
     },
     /**
@@ -650,7 +654,7 @@ const {
      * @param frameId Id of passed in frame
      * @param frame   Frame object
      */
-    setFrame(state, { frameId, frame }) {
+    [SET_FRAME] (state, { frameId, frame }) {
       // Replace with a new object to trigger a Vuex update
       state.frames = { ...state.frames }; // Why do we pass in the frameId when we can access it from frame.id?
       state.frames[frameId] = frame;
@@ -662,7 +666,7 @@ const {
      * @param scanId  Id of a specific scan
      * @param scan    Scan
      */
-    setScan(state, { scanId, scan }) {
+    [SET_SCAN] (state, { scanId, scan }) {
       // Replace with a new object to trigger a Vuex update
       state.scans = { ...state.scans };
       state.scans[scanId] = scan;
@@ -675,7 +679,7 @@ const {
      * @param state
      * @param anatomy
      */
-    setRenderOrientation(state, anatomy) {
+    [SET_RENDER_ORIENTATION] (state, anatomy) {
       state.renderOrientation = anatomy;
     },
     /**
@@ -686,7 +690,7 @@ const {
      * @param state
      * @param project Project A specific Project instance
      */
-    setCurrentProject(state, project: Project | null) {
+    [SET_CURRENT_PROJECT] (state, project: Project | null) {
       state.currentProject = project; // We pass the entire Project Object here, not just its Id?
       if (project) {
         state.renderOrientation = project.settings.anatomy_orientation;
@@ -699,7 +703,7 @@ const {
      * @param state
      * @param settings  Settings from Django API
      */
-    setGlobalSettings(state, settings) {
+    [SET_GLOBAL_SETTINGS] (state, settings) {
       state.globalSettings = settings;
     },
     /**
@@ -707,7 +711,7 @@ const {
      * @param state
      * @param taskOverview  ProjectTaskOverview Instance of ProjectTaskOverview object
      */
-    setTaskOverview(state, taskOverview: ProjectTaskOverview) {
+    [SET_TASK_OVERVIEW] (state, taskOverview: ProjectTaskOverview) {
       if (!taskOverview) return;
       // Calculates total scans and scans that have been marked complete
       if (taskOverview.scan_states) {
@@ -739,7 +743,7 @@ const {
      * @param state
      * @param projects
      */
-    setProjects(state, projects: Project[]) {
+    [SET_PROJECTS] (state, projects: Project[]) {
       state.projects = projects;
     },
     /**
@@ -749,7 +753,7 @@ const {
      * @param currentScanId Id of the current scan
      * @param newDecision   A scan decision object
      */
-    addScanDecision(state, { currentScanId, newDecision }) {
+    [ADD_SCAN_DECISION] (state, { currentScanId, newDecision }) {
       state.scans[currentScanId].decisions.push(newDecision);
     },
     /**
@@ -760,7 +764,7 @@ const {
      * @param state
      * @param evaluation
      */
-    setFrameEvaluation(state, evaluation) {
+    [SET_FRAME_EVALUATION] (state, evaluation) {
       const currentFrame = state.currentFrameId ? state.frames[state.currentFrameId] : null;
       if (currentFrame) {
         currentFrame.frame_evaluation = evaluation;
@@ -774,7 +778,7 @@ const {
      * @param state
      * @param screenshot
      */
-    setCurrentScreenshot(state, screenshot) {
+    [SET_CURRENT_SCREENSHOT] (state, screenshot) {
       state.currentScreenshot = screenshot;
     },
     /**
@@ -785,7 +789,7 @@ const {
      * @param state
      * @param screenshot
      */
-    addScreenshot(state, screenshot) {
+    [ADD_SCREENSHOT] (state, screenshot) {
       state.screenshots.push(screenshot);
     },
     /**
@@ -794,7 +798,7 @@ const {
      * @param state
      * @param screenshot
      */
-    removeScreenshot(state, screenshot) {
+    [REMOVE_SCREENSHOT] (state, screenshot) {
       state.screenshots.splice(state.screenshots.indexOf(screenshot), 1);
     },
     /**
@@ -804,7 +808,7 @@ const {
      *
      * @param state
      */
-    updateLastApiRequestTime(state) {
+    [UPDATE_LAST_API_REQUEST_TIME] (state) {
       state.lastApiRequestTime = Date.now();
     },
     /**
@@ -813,7 +817,7 @@ const {
      * @param state
      * @param isLoading Boolean
      */
-    setLoadingFrame(state, isLoading) {
+    [SET_LOADING_FRAME] (state, isLoading) {
       state.loadingFrame = isLoading;
     },
     /**
@@ -822,7 +826,7 @@ const {
      * @param state
      * @param isErrorLoading Boolean
      */
-    setErrorLoadingFrame(state, isErrorLoading) {
+    [SET_ERROR_LOADING_FRAME] (state, isErrorLoading) {
       state.errorLoadingFrame = isErrorLoading;
     },
     /**
@@ -832,7 +836,7 @@ const {
      * @param scanId Scan ID
      * @param frameId Frame ID
      */
-    addScanFrames(state, { scanId, frameId }) { // TODO: Should this be addScanFrame or addScanToScanFrames?
+    [ADD_SCAN_FRAMES] (state, { scanId, frameId }) { // TODO: Should this be addScanFrame or addScanToScanFrames?
       state.scanFrames[scanId].push(frameId);
     },
     /**
@@ -842,7 +846,7 @@ const {
      * @param experimentId   Experiment ID
      * @param scanId         Scan ID
      */
-    addExperimentScans(state, { experimentId, scanId }) {
+    [ADD_EXPERIMENT_SCANS] (state, { experimentId, scanId }) {
       state.scanFrames[scanId] = []; // Why?
       state.experimentScans[experimentId].push(scanId);
     },
@@ -854,7 +858,7 @@ const {
      * @param experimentId
      * @param experiment    Object  Instance of experiment
      */
-    addExperiment(state, { experimentId, experiment }) {
+    [ADD_EXPERIMENT] (state, { experimentId, experiment }) {
       state.experimentScans[experimentId] = [];
       if (!state.experimentIds.includes(experimentId)) {
         state.experimentIds.push(experimentId);
@@ -867,7 +871,7 @@ const {
      * @param state
      * @param experiment
      */
-    updateExperiment(state, experiment) {
+    [UPDATE_EXPERIMENT] (state, experiment) {
       // Necessary for reactivity
       state.experiments = { ...state.experiments };
       state.experiments[experiment.id] = experiment;
@@ -878,7 +882,7 @@ const {
      * @param state
      * @param lockState Object  Instance of lockState object
      */
-    setWindowLocked(state, lockState) {
+    [SET_WINDOW_LOCKED] (state, lockState) {
       state.windowLocked = lockState;
     },
     /**
@@ -887,7 +891,7 @@ const {
      * @param state
      * @param percentComplete Number A number representing the percentage of images that have been downloaded
      */
-    setScanCachedPercentage(state, percentComplete) {
+    [SET_SCAN_CACHED_PERCENTAGE] (state, percentComplete) {
       state.scanCachedPercentage = percentComplete;
     },
     /**
@@ -896,7 +900,7 @@ const {
      * @param state
      * @param ijkLocation Location of cursor click for a decision
      */
-    setSliceLocation(state, ijkLocation) {
+    [SET_SLICE_LOCATION] (state, ijkLocation) {
       if (Object.values(ijkLocation).every((value) => value !== undefined)) {
         state.vtkViews.forEach(
           (view) => {
@@ -913,7 +917,7 @@ const {
      * @param indexAxis
      * @param value
      */
-    setCurrentVtkIndexSlices(state, { indexAxis, value }) {
+    [SET_CURRENT_VTK_INDEX_SLICES] (state, { indexAxis, value }) {
       state[`${indexAxis}IndexSlice`] = value;
       state.sliceLocation = undefined;
     },
@@ -923,7 +927,7 @@ const {
      * @param state
      * @param show  Boolean
      */
-    setShowCrosshairs(state, show) {
+    [SET_SHOW_CROSSHAIRS] (state, show) {
       state.showCrosshairs = show;
     },
     /**
@@ -932,7 +936,7 @@ const {
      * @param state
      * @param value Boolean
      */
-    setStoreCrosshairs(state, value) {
+    [SET_STORE_CROSSHAIRS] (state, value) {
       state.storeCrosshairs = value;
     },
     /**
@@ -941,7 +945,7 @@ const {
      * @param state
      * @param mode  Boolean
      */
-    switchReviewMode(state, mode) {
+    [SWITCH_REVIEW_MODE] (state, mode) {
       state.reviewMode = mode || false;
     },
   },
@@ -958,39 +962,39 @@ const {
         state.workerPool.cancel(taskRunId);
         taskRunId = -1;
       }
-      commit('reset');
+      commit('RESET_STATE');
       fileCache.clear();
       frameCache.clear();
     },
     /** Pulls configuration from API and loads it into state */
     async loadConfiguration({ commit }) {
       const configuration = await djangoRest.MIQAConfig();
-      commit('setMIQAConfig', configuration);
+      commit('SET_MIQA_CONFIG', configuration);
     },
     /** Pulls user from API and loads it into state */
     async loadMe({ commit }) {
       const me = await djangoRest.me();
-      commit('setMe', me);
+      commit('SET_ME', me);
     },
     /** Pulls all users from API and loads into state */
     async loadAllUsers({ commit }) {
       const allUsers = await djangoRest.allUsers();
-      commit('setAllUsers', allUsers.results);
+      commit('SET_ALL_USERS', allUsers.results);
     },
     /** Pulls global settings from API and updates currentProject and globalSettings in state */
     async loadGlobal({ commit }) {
       const globalSettings = await djangoRest.globalSettings();
-      commit('setCurrentProject', null);
-      commit('setGlobalSettings', {
+      commit('SET_CURRENT_PROJECT', null);
+      commit('SET_GLOBAL_SETTINGS', {
         import_path: globalSettings.import_path,
         export_path: globalSettings.export_path,
       });
-      commit('setTaskOverview', {});
+      commit('SET_TASK_OVERVIEW', {});
     },
     /** Pulls all projects from API and loads into state */
     async loadProjects({ commit }) {
       const projects = await djangoRest.projects();
-      commit('setProjects', projects);
+      commit('SET_PROJECTS', projects);
     },
     /**
      * Pulls an individual project from API and loads into state
@@ -999,14 +1003,14 @@ const {
      * @param project Object Instance of Project
      */
     async loadProject({ commit }, project: Project) {
-      commit('resetProject');
+      commit('RESET_PROJECT');
 
       // Build navigation links throughout the frame to improve performance.
       let firstInPrev = null;
 
       // Refresh the project from the API
       project = await djangoRest.project(project.id);
-      commit('setCurrentProject', project);
+      commit('SET_CURRENT_PROJECT', project);
 
       // place data in state, adds each experiment to experiments
       const { experiments } = project;
@@ -1016,7 +1020,7 @@ const {
         const experiment = experiments[experimentIndex];
         // set experimentScans[experiment.id] before registering the experiment.id
         // so ExperimentsView doesn't update prematurely
-        commit('addExperiment', {
+        commit('ADD_EXPERIMENT', {
           experimentId: experiment.id,
           experiment: {
             id: experiment.id,
@@ -1034,13 +1038,13 @@ const {
         const { scans } = experiment;
         for (let scanIndex = 0; scanIndex < scans.length; scanIndex += 1) {
           const scan = scans[scanIndex];
-          commit('addExperimentScans', { experimentId: experiment.id, scanId: scan.id });
+          commit('ADD_EXPERIMENT_SCANS', { experimentId: experiment.id, scanId: scan.id });
 
           // TODO these requests *can* be run in parallel, or collapsed into one XHR
           // eslint-disable-next-line no-await-in-loop
           const { frames } = scan; // Get the frames associated with a specific scan
 
-          commit('setScan', {
+          commit('SET_SCAN', {
             scanId: scan.id,
             scan: {
               id: scan.id,
@@ -1058,8 +1062,8 @@ const {
 
           for (let k = 0; k < frames.length; k += 1) { // then this is getting each frame associated with the scan
             const frame = frames[k];
-            commit('addScanFrames', { scanId: scan.id, frameId: frame.id });
-            commit('setFrame', {
+            commit('ADD_SCAN_FRAMES', { scanId: scan.id, frameId: frame.id });
+            commit('SET_FRAME', {
               frameId: frame.id,
               frame: {
                 ...frame,
@@ -1085,7 +1089,7 @@ const {
       }
       // get the task overview for this project
       const taskOverview = await djangoRest.projectTaskOverview(project.id);
-      commit('setTaskOverview', taskOverview);
+      commit('SET_TASK_OVERVIEW', taskOverview);
     },
     /**
      * Add a scan to scans
@@ -1099,7 +1103,7 @@ const {
       scanId = scanId || currentFrame.scan;
       if (!scanId) return;
       const scan = await djangoRest.scan(scanId);
-      commit('setScan', {
+      commit('SET_SCAN', {
         scanId: scan.id,
         scan: {
           id: scan.id,
@@ -1141,7 +1145,7 @@ const {
      * @param frameId
      */
     async setCurrentFrame({ commit }, frameId) {
-      commit('setCurrentFrameId', frameId);
+      commit('SET_CURRENT_FRAME_ID', frameId);
     },
     /**
      * Handles the process of changing frames in Scan.vue
@@ -1169,8 +1173,8 @@ const {
       if (getters.currentFrame === frame) {
         return;
       }
-      commit('setLoadingFrame', true);
-      commit('setErrorLoadingFrame', false);
+      commit('SET_LOADING_FRAME', true);
+      commit('SET_ERROR_LOADING_FRAME', false);
       const oldScan = getters.currentScan;
       // frame.scan returns the scan id
       const newScan = state.scans[frame.scan];
@@ -1250,10 +1254,10 @@ const {
         console.log('Caught exception loading next frame');
         console.log(err);
         state.vtkViews = [];
-        commit('setErrorLoadingFrame', true);
+        commit('SET_ERROR_LOADING_FRAME', true);
       } finally {
         dispatch('setCurrentFrame', frame.id);
-        commit('setLoadingFrame', false);
+        commit('SET_LOADING_FRAME', false);
       }
 
       // check for window lock expiry
@@ -1262,7 +1266,7 @@ const {
         const { currentViewData } = getters;
         // Handles unlocking if necessary
         const unlock = () => {
-          commit('setWindowLocked', {
+          commit('SET_WINDOW_LOCKED', {
             lock: false,
             duration: undefined,
             target: undefined,
@@ -1296,12 +1300,12 @@ const {
     async setLock({ commit }, { experimentId, lock, force }) {
       if (lock) {
         commit(
-          'updateExperiment',
+          'UPDATE_EXPERIMENT',
           await djangoRest.lockExperiment(experimentId, force),
         );
       } else {
         commit(
-          'updateExperiment',
+          'UPDATE_EXPERIMENT',
           await djangoRest.unlockExperiment(experimentId),
         );
       }
