@@ -1,5 +1,4 @@
 /* eslint-disable no-use-before-define */
-
 import { createDirectStore } from 'direct-vuex';
 import Vue from 'vue';
 import Vuex from 'vuex';
@@ -9,7 +8,6 @@ import { InterpolationType } from 'vtk.js/Sources/Rendering/Core/ImageProperty/C
 import '../utils/registerReaders';
 
 import readImageArrayBuffer from 'itk/readImageArrayBuffer';
-// https://github.com/InsightSoftwareConsortium/itk-wasm/blob/master/src/core/WorkerPool.ts
 import WorkerPool from 'itk/WorkerPool';
 import ITKHelper from 'vtk.js/Sources/Common/DataModel/ITKHelper';
 import djangoRest, { apiClient } from '@/django';
@@ -147,20 +145,28 @@ function getImageData(frameId, file, webWorker = null) {
  * @param onDownloadProgress
  */
 function loadFile(frame, { onDownloadProgress = null } = {}) {
-  // If frame is cached, return it
-  if (fileCache.has(frame.id)) {
+  if (fileCache.has(frame.id)) { // If frame is cached, return it
     return { frameId: frame.id, cachedFile: fileCache.get(frame.id) };
+  } else { // Otherwise download the frame
+    let cachedFile = downloadFile(frame, onDownloadProgress);
+    return { frameId: frame.id, cachedFile: cachedFile };
   }
-  // Otherwise download the frame
+}
+
+/**
+ * Downloads an image file.
+ *
+ * @param frame Frame object
+ * @param onDownloadProgress
+ */
+function downloadFile(frame, onDownloadProgress) {
   let client = apiClient;
   let downloadURL = `/frames/${frame.id}/download`;
   if (frame.download_url) {
     client = axios.create();
     downloadURL = frame.download_url;
   }
-  // ReaderFactory is from utils/ReaderFactory, it returns a promise which resolves to a downloaded file
-  // TODO: Why are we adding the promise to fileCache and returning it before it has resolved?
-  // TODO: Couldn't we use `.then` on promise so that these are only triggered once the file is resolved?
+
   const { promise } = ReaderFactory.downloadFrame(
     client,
     `image${frame.extension}`,
@@ -216,24 +222,13 @@ function poolFunction(webWorker, taskInfo) {
 
     let filePromise = null;
 
-    // Load file from cache if available
-    if (fileCache.has(frame.id)) {
+
+    if (fileCache.has(frame.id)) { // Load file from cache if available
       filePromise = fileCache.get(frame.id);
     } else { // Download image file
-      let client = apiClient;
-      let downloadURL = `/frames/${frame.id}/download`;
-      if (frame.download_url) {
-        client = axios.create();
-        downloadURL = frame.download_url;
-      }
-      const download = ReaderFactory.downloadFrame(
-        client,
-        `image${frame.extension}`,
-        downloadURL,
-      );
-      filePromise = download.promise; // Initial this will be a promise
-      fileCache.set(frame.id, filePromise); // So we are setting fileCache to contain a promise?
+      let download = downloadFile(frame, {});
       pendingFrameDownloads.add(download); // Adds to Set of all pending downloads
+      filePromise = download.cachedFile;
       filePromise // Delete from pending downloads once resolved/rejected
         .then(() => {
           pendingFrameDownloads.delete(download);
