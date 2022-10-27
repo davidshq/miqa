@@ -68,7 +68,7 @@ export default {
   },
   beforeDestroy() {
     // Remove lock
-    this.setLock({ experimentId: this.currentViewData.experimentId, lock: false });
+    this.setLock({ experimentId: this.currentViewData.experimentId, lockExperiment: false });
     clearInterval(this.lockCycle);
   },
   methods: {
@@ -85,9 +85,9 @@ export default {
      *
      * @param newExperimentId
      * @param oldExperimentId
-     * @param force
+     * @param forceToLock
      */
-    async switchLock(newExperimentId, oldExperimentId = null, force = false) {
+    async switchLock(newExperimentId, oldExperimentId = null, forceToLock = false) {
       // If there is a scan
       if (!this.navigateToNextIfCurrentScanNull()) {
         // And the user has edit rights
@@ -96,7 +96,7 @@ export default {
           // If there is an old experiment
           if (oldExperimentId) {
             try {
-              await this.setLock({ experimentId: oldExperimentId, lock: false, force });
+              await this.setLock({ experimentId: oldExperimentId, lockExperiment: false, forceToLock });
             } catch (err) {
               this.$snackbar({
                 text: 'Failed to release edit access on Experiment.',
@@ -104,11 +104,11 @@ export default {
               });
             }
           }
-          // Set the new lock
+          // Set the new lockExperiment
           try {
-            await this.setLock({ experimentId: newExperimentId, lock: true, force });
+            await this.setLock({ experimentId: newExperimentId, lockExperiment: true, forceToLock });
             this.lockCycle = setInterval(async (experimentId) => {
-              await this.setLock({ experimentId, lock: true });
+              await this.setLock({ experimentId, lockExperiment: true });
             }, 1000 * 60 * 5, this.currentViewData.experimentId);
           } catch (err) {
             this.$snackbar({

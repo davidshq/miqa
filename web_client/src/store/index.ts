@@ -598,38 +598,16 @@ const {
     [RESET_STATE] (state) {
       Object.assign(state, { ...state, ...initState });
     },
-    /**
-     * Sets state.MIQAConfig equal to configuration pulled from API
-     *
-     * @param state         The whole state for the MIQA Vuex store
-     * @param configuration The configuration object as received from Django API
-     */
     [SET_MIQA_CONFIG] (state, configuration) {
       state.MIQAConfig = configuration;
     },
-    /**
-     * Sets state.me to me received from API
-     *
-     * @param state Whole state associated with MIQA Vuex Store
-     * @param me    Me object received from Django API
-     */
     [SET_ME] (state, me) {
       state.me = me;
     },
-    /**
-     * Sets state.allUsers to allUsers pulled from API
-     *
-     * @param state
-     * @param allUsers
-     */
     [SET_ALL_USERS] (state, allUsers) {
       state.allUsers = allUsers;
     },
-    /**
-     * Resets project state when loading a new project
-     *
-     * Only called by loadProject
-     */
+    /** Resets project state when loading a new project */
     [RESET_PROJECT] (state) {
       state.experimentIds = [];
       state.experiments = {};
@@ -638,47 +616,21 @@ const {
       state.scanFrames = {};
       state.frames = {};
     },
-    /**
-     * Sets state.currentFrameId to a passed in frameId
-     *
-     * @param state
-     * @param frameId
-     */
     [SET_CURRENT_FRAME_ID] (state, frameId) {
       state.currentFrameId = frameId;
     },
-    /**
-     * Sets a specific index within the frames array to a specified frame
-     *
-     * @param state
-     * @param frameId Id of passed in frame
-     * @param frame   Frame object
-     */
+    /** Sets a specific index within the frames array to a specified frame */
     [SET_FRAME] (state, { frameId, frame }) {
       // Replace with a new object to trigger a Vuex update
       state.frames = { ...state.frames }; // Why do we pass in the frameId when we can access it from frame.id?
       state.frames[frameId] = frame;
     },
-    /**
-     * Adds a scan to state.scans, then adds state.scans to allScans
-     *
-     * @param state
-     * @param scanId  Id of a specific scan
-     * @param scan    Scan
-     */
+    /** Adds a scan to state.scans, then adds state.scans to allScans */
     [SET_SCAN] (state, { scanId, scan }) {
       // Replace with a new object to trigger a Vuex update
       state.scans = { ...state.scans };
       state.scans[scanId] = scan;
     },
-    /**
-     * Set the renderOrientation
-     *
-     * Only called by `ProjectSettings.vue` when saving a project's settings.
-     *
-     * @param state
-     * @param anatomy
-     */
     [SET_RENDER_ORIENTATION] (state, anatomy) {
       state.renderOrientation = anatomy;
     },
@@ -697,12 +649,6 @@ const {
         state.currentProjectPermissions = project.settings.permissions;
       }
     },
-    /**
-     * Sets state.globalSettings to settings pulled from API
-     *
-     * @param state
-     * @param settings  Settings from Django API
-     */
     [SET_GLOBAL_SETTINGS] (state, settings) {
       state.globalSettings = settings;
     },
@@ -737,115 +683,41 @@ const {
         });
       }
     },
-    /**
-     * Sets state.projects to projects pulled from API
-     *
-     * @param state
-     * @param projects
-     */
     [SET_PROJECTS] (state, projects: Project[]) {
       state.projects = projects;
     },
-    /**
-     * Adds a scanDecision to a scan
-     *
-     * @param state
-     * @param currentScanId Id of the current scan
-     * @param newDecision   A scan decision object
-     */
-    [ADD_SCAN_DECISION] (state, { currentScanId, newDecision }) {
-      state.scans[currentScanId].decisions.push(newDecision);
+    [ADD_SCAN_DECISION] (state, { currentScanId, newScanDecision }) {
+      state.scans[currentScanId].decisions.push(newScanDecision);
     },
-    /**
-     * Adds an evaluation to the current frame
-     *
-     * Note: We don't pass the frame, only the evaluation, we then append the value to `currentFrame`
-     *
-     * @param state
-     * @param evaluation
-     */
-    [SET_FRAME_EVALUATION] (state, evaluation) {
+    /** Note: We don't pass the frame, only the frame_evaluation, we then append the value to `currentFrame` */
+    [SET_FRAME_EVALUATION] (state, frame_evaluation) {
       const currentFrame = state.currentFrameId ? state.frames[state.currentFrameId] : null;
       if (currentFrame) {
-        currentFrame.frame_evaluation = evaluation;
+        currentFrame.frame_evaluation = frame_evaluation;
       }
     },
-    /**
-     * Sets state.currentScreenshot to the passed in screenshot
-     *
-     * Used by both `ScreenshotDialog.vue` and `VtkViewer.vue`
-     *
-     * @param state
-     * @param screenshot
-     */
     [SET_CURRENT_SCREENSHOT] (state, screenshot) {
       state.currentScreenshot = screenshot;
     },
-    /**
-     * Adds a screenshot to state.screenshots
-     *
-     * Only called by `ScreenshotDialog.vue`
-     *
-     * @param state
-     * @param screenshot
-     */
     [ADD_SCREENSHOT] (state, screenshot) {
       state.screenshots.push(screenshot);
     },
-    /**
-     * Removes a screenshot from state.screenshots
-     *
-     * @param state
-     * @param screenshot
-     */
     [REMOVE_SCREENSHOT] (state, screenshot) {
       state.screenshots.splice(state.screenshots.indexOf(screenshot), 1);
     },
-    /**
-     * Updates state.lastApiRequestTime to the current moment
-     *
-     * This is called by `django.ts` after an API called is made.
-     *
-     * @param state
-     */
     [UPDATE_LAST_API_REQUEST_TIME] (state) {
       state.lastApiRequestTime = Date.now();
     },
-    /**
-     * Sets whether state.loadingFrame is true or false
-     *
-     * @param state
-     * @param isLoading Boolean
-     */
-    [SET_LOADING_FRAME] (state, isLoading) {
+    [SET_LOADING_FRAME] (state, isLoading: boolean) {
       state.loadingFrame = isLoading;
     },
-    /**
-     * Sets whether state.errorLoadingFrame is true or false
-     *
-     * @param state
-     * @param isErrorLoading Boolean
-     */
-    [SET_ERROR_LOADING_FRAME] (state, isErrorLoading) {
+    [SET_ERROR_LOADING_FRAME] (state, isErrorLoading: boolean) {
       state.errorLoadingFrame = isErrorLoading;
     },
-    /**
-     * Adds a scan ID, and it's corresponding Frame ID to state.scanFrames
-     *
-     * @param state
-     * @param scanId Scan ID
-     * @param frameId Frame ID
-     */
+    /** Adds a scan ID, and it's corresponding Frame ID to state.scanFrames */
     [ADD_SCAN_FRAMES] (state, { scanId, frameId }) { // TODO: Should this be addScanFrame or addScanToScanFrames?
       state.scanFrames[scanId].push(frameId);
     },
-    /**
-     * For each scan in Experiment, add it to state.experimentScans
-     *
-     * @param state
-     * @param experimentId   Experiment ID
-     * @param scanId         Scan ID
-     */
     [ADD_EXPERIMENT_SCANS] (state, { experimentId, scanId }) {
       state.scanFrames[scanId] = []; // Why?
       state.experimentScans[experimentId].push(scanId);
@@ -865,41 +737,21 @@ const {
       }
       state.experiments[experimentId] = experiment;
     },
-    /**
-     * Update state.experiments
-     *
-     * @param state
-     * @param experiment
-     */
     [UPDATE_EXPERIMENT] (state, experiment) {
       // Necessary for reactivity
       state.experiments = { ...state.experiments };
       state.experiments[experiment.id] = experiment;
     },
-    /**
-     * Ensures that a specific image is being reviewed by a single individual
-     *
-     * @param state
-     * @param lockState Object  Instance of lockState object
-     */
+    /** Ensures that a specific image is being reviewed by a single individual */
     [SET_WINDOW_LOCKED] (state, lockState) {
       state.windowLocked = lockState;
     },
-    /**
-     * Set state.scanCachedPercentage equal to passed in percentage
-     *
-     * @param state
-     * @param percentComplete Number A number representing the percentage of images that have been downloaded
-     */
+    /** Set state.scanCachedPercentage equal to passed in percentage */
     [SET_SCAN_CACHED_PERCENTAGE] (state, percentComplete) {
       state.scanCachedPercentage = percentComplete;
     },
     /**
-     * Saves the location of a click related to a specific scan and decision
-     *
-     * @param state
-     * @param ijkLocation Location of cursor click for a decision
-     */
+     * Saves the location of the cursor click related to a specific scan and decision */
     [SET_SLICE_LOCATION] (state, ijkLocation) {
       if (Object.values(ijkLocation).every((value) => value !== undefined)) {
         state.vtkViews.forEach(
@@ -911,52 +763,22 @@ const {
         );
       }
     },
-    /**
-     *
-     * @param state
-     * @param indexAxis
-     * @param value
-     */
     [SET_CURRENT_VTK_INDEX_SLICES] (state, { indexAxis, value }) {
       state[`${indexAxis}IndexSlice`] = value;
       state.sliceLocation = undefined;
     },
-    /**
-     * Toggle true/false for state.showCrosshairs
-     *
-     * @param state
-     * @param show  Boolean
-     */
-    [SET_SHOW_CROSSHAIRS] (state, show) {
+    [SET_SHOW_CROSSHAIRS] (state, show: boolean) {
       state.showCrosshairs = show;
     },
-    /**
-     * Toggle true/false for state.storeCrosshairs
-     *
-     * @param state
-     * @param value Boolean
-     */
-    [SET_STORE_CROSSHAIRS] (state, value) {
+    [SET_STORE_CROSSHAIRS] (state, value: boolean) {
       state.storeCrosshairs = value;
     },
-    /**
-     * Toggles whether all scans or only unreviewed scans are shown
-     *
-     * @param state
-     * @param mode  Boolean
-     */
-    [SWITCH_REVIEW_MODE] (state, mode) {
+    [SWITCH_REVIEW_MODE] (state, mode: boolean) {
       state.reviewMode = mode || false;
     },
   },
   actions: {
-    /**
-     * Resets the Vuex state associated with MIQA, cancel any existing tasks in the workerPool, clear file and frame
-     * caches
-     *
-     * @param state
-     * @param commit
-     */
+    /** Reset the Vuex state of MIQA, cancel any existing tasks in the workerPool, clear file and frame caches */
     reset({ state, commit }) {
       if (taskRunId >= 0) {
         state.workerPool.cancel(taskRunId);
@@ -996,12 +818,7 @@ const {
       const projects = await djangoRest.projects();
       commit('SET_PROJECTS', projects);
     },
-    /**
-     * Pulls an individual project from API and loads into state
-     *
-     * @param commit
-     * @param project Object Instance of Project
-     */
+    /** Pulls an individual project from API and loads into state */
     async loadProject({ commit }, project: Project) {
       commit('RESET_PROJECT');
 
@@ -1091,13 +908,7 @@ const {
       const taskOverview = await djangoRest.projectTaskOverview(project.id);
       commit('SET_TASK_OVERVIEW', taskOverview);
     },
-    /**
-     * Add a scan to scans
-     *
-     * @param commit
-     * @param getters
-     * @param scanId
-     */
+    /** Add a scan to scans */
     async reloadScan({ commit, getters }, scanId) {
       const { currentFrame } = getters;
       scanId = scanId || currentFrame.scan;
@@ -1138,12 +949,7 @@ const {
       }
       return state.scans[scanId];
     },
-    /**
-     * Sets state.currentFrameId
-     *
-     * @param commit
-     * @param frameId
-     */
+    /** Sets state.currentFrameId */
     async setCurrentFrame({ commit }, frameId) {
       commit('SET_CURRENT_FRAME_ID', frameId);
     },
@@ -1294,14 +1100,14 @@ const {
      *
      * @param commit
      * @param experimentId
-     * @param lock
-     * @param force
+     * @param lockExperiment
+     * @param forceToLock
      */
-    async setLock({ commit }, { experimentId, lock, force }) {
-      if (lock) {
+    async setLock({ commit }, { experimentId, lockExperiment, forceToLock }) {
+      if (lockExperiment) {
         commit(
           'UPDATE_EXPERIMENT',
-          await djangoRest.lockExperiment(experimentId, force),
+          await djangoRest.lockExperiment(experimentId, forceToLock),
         );
       } else {
         commit(

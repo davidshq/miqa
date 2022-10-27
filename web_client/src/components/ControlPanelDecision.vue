@@ -313,7 +313,7 @@ export default {
           // Update Vuex store with scan decision
           ADD_SCAN_DECISION({
             currentScanId: this.currentViewData.scanId,
-            newDecision: savedObj,
+            newScanDecision: savedObj,
           });
           this.refreshTaskOverview(); // TODO: Should this be await?
           if (AUTO_ADVANCE) {
