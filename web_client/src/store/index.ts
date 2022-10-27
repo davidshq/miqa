@@ -27,7 +27,7 @@ import { RESET_STATE, SET_MIQA_CONFIG, SET_ME, SET_ALL_USERS, RESET_PROJECT_STAT
          ADD_SCREENSHOT, REMOVE_SCREENSHOT, UPDATE_LAST_API_REQUEST_TIME, SET_LOADING_FRAME,
          SET_ERROR_LOADING_FRAME, ADD_SCAN_FRAMES, ADD_EXPERIMENT_SCANS, ADD_EXPERIMENT,
          UPDATE_EXPERIMENT, SET_WINDOW_LOCKED, SET_SCAN_CACHED_PERCENTAGE, SET_SLICE_LOCATION,
-         SET_CURRENT_VTK_INDEX_SLICES, SET_SHOW_CROSSHAIRS, SET_STORE_CROSSHAIRS, SWITCH_REVIEW_MODE
+         SET_CURRENT_VTK_INDEX_SLICES, SET_SHOW_CROSSHAIRS, SET_STORE_CROSSHAIRS, SET_REVIEW_MODE
        } from './mutation-types';
 
 const { convertItkToVtkImage } = ITKHelper;
@@ -737,8 +737,7 @@ const {
     [SET_SCAN_CACHED_PERCENTAGE] (state, percentComplete) {
       state.scanCachedPercentage = percentComplete;
     },
-    /**
-     * Saves the location of the cursor click related to a specific scan and decision */
+    /** Saves the location of the cursor click related to a specific scan and decision */
     [SET_SLICE_LOCATION] (state, ijkLocation) {
       if (Object.values(ijkLocation).every((value) => value !== undefined)) {
         state.vtkViews.forEach(
@@ -760,7 +759,7 @@ const {
     [SET_STORE_CROSSHAIRS] (state, value: boolean) {
       state.storeCrosshairs = value;
     },
-    [SWITCH_REVIEW_MODE] (state, mode: boolean) {
+    [SET_REVIEW_MODE] (state, mode: boolean) {
       state.reviewMode = mode || false;
     },
   },
