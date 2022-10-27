@@ -408,6 +408,11 @@ function expandScanRange(frameId, dataRange) {
   }
 }
 
+/**
+ * Determines whether a scan will be displayed based on its reviewed status.
+ *
+ * @param scanId
+ */
 export function includeScan(scanId) {
   if (store.state.reviewMode) {
     const myRole = store.state.currentTaskOverview?.my_project_role;
@@ -484,18 +489,13 @@ const {
   getters: {
     /** Returns current view's project, experiments, scans, frames, and auto-evaluation. */
     currentView(state) {
-      // Get the current frame
       const currentFrame = state.currentFrameId ? state.frames[state.currentFrameId] : null;
-      // Get the scan for the current frame
       const scan = currentFrame ? state.scans[currentFrame.scan] : undefined;
       if (!scan) {
         // scan was removed from list by review mode; do nothing
         return {};
       }
-      // Get information about experiment associated with current frame
-      const experiment = currentFrame.experiment
-        ? state.experiments[currentFrame.experiment] : null;
-      // Get the project associated with current experiment
+      const experiment = currentFrame.experiment ? state.experiments[currentFrame.experiment] : null;
       const project = state.projects.filter((x) => x.id === experiment.project)[0];
       // Get list of scans for current experiment
       const experimentScansList = state.experimentScans[experiment.id];
@@ -535,9 +535,7 @@ const {
     },
     /** Gets the previous frame based on the currentFrame */
     previousFrame(state, getters) {
-      return getters.currentFrame
-        ? getters.currentFrame.previousFrame
-        : null;
+      return getters.currentFrame ? getters.currentFrame.previousFrame : null;
     },
     /** Gets the next frame based on the currentFrame */
     nextFrame(state, getters) {
@@ -864,10 +862,10 @@ const {
             },
           });
 
-          const nextScan = getNextFrame(experiments, experimentIndex, scanIndex); // Check where i j come from above, is this getting the current scan?
+          const nextScan = getNextFrame(experiments, experimentIndex, scanIndex);
 
-          for (let k = 0; k < frames.length; k += 1) { // then this is getting each frame associated with the scan
-            const frame = frames[k];
+          for (let frameIndex = 0; frameIndex < frames.length; frameIndex += 1) { // then this is getting each frame associated with the scan
+            const frame = frames[frameIndex];
             commit('ADD_SCAN_FRAMES', { scanId: scan.id, frameId: frame.id });
             commit('SET_FRAME', {
               frameId: frame.id,
@@ -875,9 +873,9 @@ const {
                 ...frame,
                 scan: scan.id,
                 experiment: experiment.id,
-                index: k,
-                previousFrame: k > 0 ? frames[k - 1].id : null,
-                nextFrame: k < frames.length - 1 ? frames[k + 1].id : null,
+                index: frameIndex,
+                previousFrame: frameIndex > 0 ? frames[frameIndex - 1].id : null,
+                nextFrame: frameIndex < frames.length - 1 ? frames[frameIndex + 1].id : null,
                 firstFrameInPreviousScan: firstInPrev,
                 firstFrameInNextScan: nextScan ? nextScan.id : null,
               },
