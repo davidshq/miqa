@@ -24,7 +24,7 @@ export default defineComponent({
   },
   setup(props) {
     const currentRange = ref();
-    const currentViewData = computed(() => store.getters.currentViewData);
+    const currentView = computed(() => store.getters.currentView);
     const currentFrame = computed(() => store.state.currentFrameId);
     const currentWindowWidth = computed(() => store.state.currentWindowWidth);
     const currentWindowLevel = computed(() => store.state.currentWindowLevel);
@@ -127,7 +127,7 @@ export default defineComponent({
 
     return {
       currentRange,
-      currentViewData,
+      currentView,
       currentWindowWidth,
       currentWindowLevel,
       updateFromRange,
@@ -239,7 +239,7 @@ export default defineComponent({
           >
             <v-btn
               small
-              @click="() => setWindowLock(true, 'scan', currentViewData.scanId)"
+              @click="() => setWindowLock(true, 'scan', currentView.scanId)"
             >
               <v-img
                 src="S.png"
@@ -252,7 +252,7 @@ export default defineComponent({
             </v-btn>
             <v-btn
               small
-              @click="() => setWindowLock(true, 'experiment', currentViewData.experimentId)"
+              @click="() => setWindowLock(true, 'experiment', currentView.experimentId)"
             >
               <v-img
                 src="E.png"
@@ -265,7 +265,7 @@ export default defineComponent({
             </v-btn>
             <v-btn
               small
-              @click="() => setWindowLock(true, 'project', currentViewData.projectId)"
+              @click="() => setWindowLock(true, 'project', currentView.projectId)"
             >
               <v-img
                 src="P.png"

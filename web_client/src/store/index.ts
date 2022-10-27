@@ -279,8 +279,6 @@ function startReaderWorkerPool() {
   // Reset the current array of tasks in readDataQueue
   readDataQueue = [];
 
-  // https://github.com/InsightSoftwareConsortium/itk-wasm/blob/master/src/core/WorkerPool.ts
-  // `runId` is WorkerPool.runInfo.length -1.
   const { runId, promise } = store.state.workerPool.runTasks(
     taskArgsArray,
     progressHandler,
@@ -478,21 +476,14 @@ const {
   strict: true, // TODO: turn off for production
   state: {
     ...initState,
-    // WorkerPool creates a pool of poolSize that utilizes poolFunction to process
-    // See: https://github.com/InsightSoftwareConsortium/itk-wasm/blob/master/src/core/WorkerPoolFunction.ts
     workerPool: new WorkerPool(poolSize, poolFunction),
     lastApiRequestTime: Date.now(),
   },
 
   // Getters in Vuex always take in all the state as their first parameter.
   getters: {
-    /**
-     * Returns data related to the current view's project, experiments, scans,
-     * frames, and auto-evaluation.
-     *
-     * @returns Object
-     */
-    currentViewData(state) {
+    /** Returns current view's project, experiments, scans, frames, and auto-evaluation. */
+    currentView(state) {
       // Get the current frame
       const currentFrame = state.currentFrameId ? state.frames[state.currentFrameId] : null;
       // Get the scan for the current frame
@@ -513,7 +504,6 @@ const {
 
       const scanOrder = Object.values(state.experimentScans).flat().filter(includeScan);
       const currIndexInOrder = scanOrder.indexOf(scan.id);
-      // ?
       const upTo = scanOrder[currIndexInOrder - 1];
       const downTo = scanOrder[currIndexInOrder + 1];
       return {
@@ -591,7 +581,7 @@ const {
         || getters.myCurrentProjectRoles.includes('superuser');
     },
     experimentIsEditable(state, getters) {
-      return getters.currentViewData.lockOwner && getters.currentViewData.lockOwner.id === state.me.id;
+      return getters.currentView.lockOwner && getters.currentView.lockOwner.id === state.me.id;
     },
   },
   mutations: {
@@ -625,7 +615,6 @@ const {
       state.frames = { ...state.frames }; // Why do we pass in the frameId when we can access it from frame.id?
       state.frames[frameId] = frame;
     },
-    /** Adds a scan to state.scans, then adds state.scans to allScans */
     [SET_SCAN] (state, { scanId, scan }) {
       // Replace with a new object to trigger a Vuex update
       state.scans = { ...state.scans };
@@ -1068,8 +1057,8 @@ const {
 
       // check for window lock expiry
       if (state.windowLocked.lock) {
-        // Get the currentViewData
-        const { currentViewData } = getters;
+        // Get the currentView
+        const { currentView } = getters;
         // Handles unlocking if necessary
         const unlock = () => {
           commit('SET_WINDOW_LOCKED', {
@@ -1082,27 +1071,20 @@ const {
         // Unlocks window if scan, experiment, or project has changed
         switch (state.windowLocked.duration) {
           case 'scan':
-            if (currentViewData.scanId !== state.windowLocked.target) unlock();
+            if (currentView.scanId !== state.windowLocked.target) unlock();
             break;
           case 'experiment':
-            if (currentViewData.experimentId !== state.windowLocked.target) unlock();
+            if (currentView.experimentId !== state.windowLocked.target) unlock();
             break;
           case 'project':
-            if (currentViewData.projectId !== state.windowLocked.target) unlock();
+            if (currentView.projectId !== state.windowLocked.target) unlock();
             break;
           default:
             break;
         }
       }
     },
-    /**
-     * Sets a lock on the current experiment
-     *
-     * @param commit
-     * @param experimentId
-     * @param lockExperiment
-     * @param forceToLock
-     */
+    /** Sets a lock on the current experiment */
     async setLock({ commit }, { experimentId, lockExperiment, forceToLock }) {
       if (lockExperiment) {
         commit(

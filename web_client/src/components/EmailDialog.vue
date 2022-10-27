@@ -21,9 +21,9 @@ export default defineComponent({
   },
   setup() {
     const screenshots = computed(() => store.state.screenshots);
-    const currentViewData = computed(() => store.getters.currentViewData);
+    const currentView = computed(() => store.getters.currentView);
     // TODO: Shouldn't we be able to get currentProject, currentFrame, and currentScan
-    // from currentViewData?
+    // from currentView?
     const currentProject = computed(() => store.state.currentProject);
     const currentFrame = computed(() => store.getters.currentFrame);
     const currentScan = computed(() => store.getters.currentScan);
@@ -33,7 +33,7 @@ export default defineComponent({
 
     return {
       screenshots,
-      currentViewData,
+      currentView,
       currentProject,
       currentFrame,
       currentScan,
@@ -88,16 +88,16 @@ export default defineComponent({
       }
       this.showCC = !!this.cc.length;
       this.showBCC = !!this.bcc.length;
-      this.subject = `Regarding ${this.currentViewData.projectName}, ${this.currentViewData.experimentName}, ${this.currentScan.name}`;
-      this.body = `Project: ${this.currentViewData.projectName}\n`;
-      this.body += `Experiment: ${this.currentViewData.experimentName}\n`;
+      this.subject = `Regarding ${this.currentView.projectName}, ${this.currentView.experimentName}, ${this.currentScan.name}`;
+      this.body = `Project: ${this.currentView.projectName}\n`;
+      this.body += `Experiment: ${this.currentView.experimentName}\n`;
       this.body += `Scan: ${this.currentScan.name}`;
       if (this.currentScan.link) this.body += ` (${this.currentScan.link})`;
       if (this.currentScan.subjectID) this.body += `, Subject: ${this.currentScan.subjectID}`;
       if (this.currentScan.sessionID) this.body += `, Session: ${this.currentScan.sessionID}`;
       this.body += '\n';
-      if (this.currentViewData.scanDecisions.length > 0) {
-        this.body += `Decisions:\n${this.currentViewData.scanDecisions.map(
+      if (this.currentView.scanDecisions.length > 0) {
+        this.body += `Decisions:\n${this.currentView.scanDecisions.map(
           (decision) => `    ${decision.creator.email} (${decision.created}): `
           + `${decision.decision.toUpperCase()} ${decision.note.length > 0 ? `, ${decision.note}` : ''}`,
         ).join('\n')}`;
