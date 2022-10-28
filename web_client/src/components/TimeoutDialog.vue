@@ -35,7 +35,7 @@ export default defineComponent({
 
     const lastApiRequestTime = computed(() => store.state.lastApiRequestTime);
 
-    const reset = async () => {
+    const continueSession = async () => {
       // Pass the store so last update can be updated if authentication renewed
       await djangoRest.restoreLogin(store);
       djangoRest.projects();
@@ -97,7 +97,7 @@ export default defineComponent({
       unauthorizedTriggered,
       timeRemaining,
       timeRemainingStr,
-      reset,
+      continueSession,
       logout,
       sessionTimeout,
       idleTimeout,
@@ -141,7 +141,7 @@ export default defineComponent({
         <v-btn
           color="primary"
           text
-          @click="reset"
+          @click="continueSession"
         >
           Continue Session
         </v-btn>
