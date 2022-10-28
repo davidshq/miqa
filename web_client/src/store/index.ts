@@ -945,7 +945,6 @@ const {
      * Only used by Scan.vue
      */
     async swapToFrame({ state, dispatch, getters, commit, }, { frame, onDownloadProgress = null }) {
-      console.log('swapToFrame');
 
       // Guard Clauses
       if (!frame) {
@@ -1015,9 +1014,7 @@ const {
         if (needPrep || !state.proxyManager.getViews().length) {
           prepareProxyManager(state.proxyManager);
           // Add views to vtkViews
-          console.log('this is the vtkViews you are looking for');
           state.vtkViews = state.proxyManager.getViews(); // TODO: Can eliminate this, won't it catch on next?
-          console.log(state.vtkViews);
         }
         // If no vtkViews, get them from proxyManager
         if (!state.vtkViews.length) {

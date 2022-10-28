@@ -65,13 +65,9 @@ export default {
     },
     // Selects a specific experiment, loads list of it's scans
     async selectedExperiment(experiment) {
-      console.log('watched experiments');
       this.selectedExperiment = experiment;
-      console.log(experiment);
-      console.log('getting current scans');
       this.selectScans = [];
       const keys = Object.keys(this.scans);
-      console.log('add scans to selectScans');
       keys.forEach((key) => {
         const { name } = this.scans[key];
         const { id } = this.scans[key];
@@ -84,7 +80,6 @@ export default {
   },
   mounted() {
     this.loadProjects();
-    console.log(this.projects);
   },
   methods: {
     ...mapActions([
