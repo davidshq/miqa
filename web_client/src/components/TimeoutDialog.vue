@@ -36,8 +36,9 @@ export default defineComponent({
     const lastApiRequestTime = computed(() => store.state.lastApiRequestTime);
 
     const reset = async () => {
-      await djangoRest.restoreLogin(store); // TODO: Understand better
-      djangoRest.projects(); // TODO: Why is this called?
+      // Pass the store so last update can be updated if authentication renewed
+      await djangoRest.restoreLogin(store);
+      djangoRest.projects();
 
       // reset dialog
       show.value = false;

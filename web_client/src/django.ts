@@ -27,7 +27,11 @@ let s3ffClient;
 
 const oauthClient = new OAuthClient(OAUTH_API_ROOT, OAUTH_CLIENT_ID);
 const djangoClient = {
-  // TODO importing the actual AppStore type results in a dependency cycle
+  /**
+   * TODO: importing the actual AppStore type results in a dependency cycle
+   *
+   * @param store
+   */
   async restoreLogin(store: any) {
     await oauthClient.maybeRestoreLogin();
     if (oauthClient.isLoggedIn) {
@@ -42,7 +46,7 @@ const djangoClient = {
         },
       });
     } else {
-      this.login();
+      this.login(); // redirect to login page
     }
 
     // mark user not-idle
