@@ -935,21 +935,14 @@ const {
       }
       return state.scans[scanId];
     },
-    /** Sets state.currentFrameId */
-    async setCurrentFrame({ commit }, frameId) {
-      commit('SET_CURRENT_FRAME_ID', frameId);
-    },
     /**
      * Handles the process of changing frames in Scan.vue
      *
-     * Only used by Scan.vue
+     * onDownloadProgress passes local download state from Frame view
      *
-     * @param state
-     * @param dispatch
-     * @param getters
-     * @param commit
-     * @param frame              Frame Object
-     * @param onDownloadProgress Passes local download state from Frame view
+     * Frame is the object
+     *
+     * Only used by Scan.vue
      */
     async swapToFrame({ state, dispatch, getters, commit, }, { frame, onDownloadProgress = null }) {
       console.log('swapToFrame');
@@ -970,19 +963,13 @@ const {
       // Queue the new scan to be loaded
       if (newScan !== oldScan && newScan) {
         queueLoadScan(
-          newScan, 3, // TODO: Why 3?
+          newScan, 3,
         );
       }
 
       let newProxyManager = false;
       // We only create a new proxy manager if the newScan is not the same as oldScan
       if (oldScan !== newScan && state.proxyManager) {
-        // If we don't "shrinkProxyManager()" and reinitialize it between
-        // scans, then we can end up with no frame
-        // slices displayed, even though we have the data and attempted
-        // to render it.  This may be due to frame extents changing between
-        // scans, which is not the case from one timestep of a single scan
-        // to the next.
         shrinkProxyManager(state.proxyManager);
         newProxyManager = true;
       }
@@ -1034,17 +1021,14 @@ const {
         }
         // If no vtkViews, get them from proxyManager
         if (!state.vtkViews.length) {
-          console.log('or are these the vtkViews you are looking for?');
           state.vtkViews = state.proxyManager.getViews();
-          console.log(state.vtkViews);
         }
       } catch (err) {
-        console.log('Caught exception loading next frame');
         console.log(err);
         state.vtkViews = [];
         commit('SET_ERROR_LOADING_FRAME', true);
       } finally {
-        dispatch('setCurrentFrame', frame.id);
+        commit('SET_CURRENT_FRAME_ID', frame.id);
         commit('SET_LOADING_FRAME', false);
       }
       await this.updateLock();
