@@ -219,10 +219,11 @@ function loadFileAndGetData(frame, { onDownloadProgress = null } = {}) {
  *
  * Only used by WorkerPool
  *
+ * TODO: Where is poolFunction ever called with parameters?
+ *
  * @param webWorker
  * @param taskInfo  Object  Contains experimentId, scanId, and a frame object
  */
-// Where is poolFunction ever called with parameters?
 function poolFunction(webWorker, taskInfo) {
   return new Promise((resolve, reject) => {
     const { frame } = taskInfo;
@@ -274,7 +275,7 @@ function progressHandler(completed, total) {
  * Only called by queueLoadScan
  */
 function startReaderWorkerPool() {
-  // Get the current array of tasks
+  // Get the current array of tasks in readDataQueue
   const taskArgsArray = readDataQueue.map((taskInfo) => [taskInfo]);
   // Reset the current array of tasks in readDataQueue
   readDataQueue = [];
@@ -283,13 +284,12 @@ function startReaderWorkerPool() {
     taskArgsArray,
     progressHandler,
   );
-  // The number of tasks still running
-  taskRunId = runId;
+  taskRunId = runId; // The number of tasks still running
 
   promise
     .then(() => {
-      // Indicates no tasks are running
-      taskRunId = -1;
+
+      taskRunId = -1; // Indicates no tasks are running
     })
     .catch((err) => {
       console.error(err);
@@ -951,12 +951,8 @@ const {
      * @param frame              Frame Object
      * @param onDownloadProgress Passes local download state from Frame view
      */
-    async swapToFrame({
-      state, dispatch, getters, commit,
-    }, { frame, onDownloadProgress = null }) {
+    async swapToFrame({ state, dispatch, getters, commit, }, { frame, onDownloadProgress = null }) {
       console.log('swapToFrame');
-      console.log(frame)
-      console.log(onDownloadProgress)
 
       // Guard Clauses
       if (!frame) {
@@ -1051,10 +1047,12 @@ const {
         dispatch('setCurrentFrame', frame.id);
         commit('SET_LOADING_FRAME', false);
       }
-
+      await this.updateLock();
+    },
+    /** Determines what lock status should be and updates accordingly */
+    async updateLock({ state, getters, commit }) {
       // check for window lock expiry
       if (state.windowLocked.lock) {
-        // Get the currentView
         const { currentView } = getters;
         // Handles unlocking if necessary
         const unlock = () => {

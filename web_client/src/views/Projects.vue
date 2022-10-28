@@ -88,7 +88,7 @@ export default defineComponent({
         const taskOverview = await djangoRest.projectTaskOverview(currentProject.value.id);
         // If the store / API values differ, update store to API
         if (JSON.stringify(store.state.currentTaskOverview) !== JSON.stringify(taskOverview)) {
-          store.commit.setTaskOverview(taskOverview);
+          store.commit.SET_TASK_OVERVIEW(taskOverview);
         }
       }
     }
@@ -100,7 +100,7 @@ export default defineComponent({
           // Get the latest projectTaskOverview for each project from the API
           const taskOverview = await djangoRest.projectTaskOverview(project.id);
           // Update store with API values, this occurs even if same
-          store.commit.setTaskOverview(taskOverview);
+          store.commit.SET_TASK_OVERVIEW(taskOverview);
         },
       );
     }

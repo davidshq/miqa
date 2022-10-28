@@ -273,7 +273,7 @@ export default {
         const taskOverview = await djangoRest.projectTaskOverview(this.currentProject.id);
         // If API has different data, update taskOverview
         if (JSON.stringify(store.state.currentTaskOverview) !== JSON.stringify(taskOverview)) {
-          store.commit.setTaskOverview(taskOverview);
+          store.commit.SET_TASK_OVERVIEW(taskOverview);
         }
       }
     },
