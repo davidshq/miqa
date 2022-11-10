@@ -29,6 +29,9 @@ export default {
     selectedExperiment: '',
     selectScans: [],
     selectedScans: [],
+    selectedScan1: '',
+    selectedScan2: '',
+    selectedScan3: '',
     scanToEdit: '',
   }),
   computed: {
@@ -40,6 +43,8 @@ export default {
       'frames',
       'scanFrames',
       'vtkViews',
+      'vtkViews2',
+      'vtkViews3',
     ]),
     currentFrame() {
       return this.frames[this.currentFrameId];
@@ -77,6 +82,10 @@ export default {
     async selectedScans() {
       await this.loadImage();
     },
+    async selectedScan1() {
+      console.log('selectedScan1');
+      await this.loadImage();
+    },
   },
   mounted() {
     this.loadProjects();
@@ -86,10 +95,11 @@ export default {
       'loadProjects',
       'loadProject',
       'swapToFrame',
+      'loadFrame',
     ]),
     async loadImage() {
       // Attempting to load 1 image to start.
-      const scan = this.selectedScans[0];
+      const scan = this.selectedScan1;
       const frameId = this.scanFrames[scan.id][0];
       console.log('loadImage: frameId');
       console.log(frameId);
@@ -165,7 +175,7 @@ export default {
       <v-row>
         <v-col>
           <v-select
-            v-model="selectedScans[0]"
+            v-model="selectedScan1"
             label="Select Scan"
             :items="selectScans"
             item-text="name"
@@ -175,7 +185,7 @@ export default {
         </v-col>
         <v-col>
           <v-select
-            v-model="selectedScans[1]"
+            v-model="selectedScan2"
             label="Select Scan"
             :items="selectScans"
             item-text="name"
@@ -185,7 +195,7 @@ export default {
         </v-col>
         <v-col>
           <v-select
-            v-model="selectedScans[2]"
+            v-model="selectedScan3"
             label="Select Scan"
             :items="selectScans"
             item-text="name"
@@ -211,10 +221,10 @@ export default {
             <VtkViewer :view="vtkViews[0]" />
           </div>
           <div class="view">
-            <VtkViewer :view="vtkViews[1]" />
+           <!-- <VtkViewer :view="vtkViews2[0]" /> -->
           </div>
           <div class="view">
-            <VtkViewer :view="vtkViews[2]" />
+           <!-- <VtkViewer :view="vtkViews3[0]" /> -->
           </div>
         </div>
       </template>

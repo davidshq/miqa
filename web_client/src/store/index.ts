@@ -447,6 +447,8 @@ const initState = {
   frames: {},
   proxyManager: null,
   vtkViews: [],
+  vtkViews2: [],
+  vtkViews3: [],
   currentFrameId: null,
   loadingFrame: false,
   errorLoadingFrame: false,
@@ -945,6 +947,92 @@ const {
      * Only used by Scan.vue
      */
     async swapToFrame({ state, dispatch, getters, commit, }, { frame, onDownloadProgress = null }) {
+
+      // Guard Clauses
+      if (!frame) {
+        throw new Error("frame id doesn't exist");
+      }
+      if (getters.currentFrame === frame) {
+        return;
+      }
+      commit('SET_LOADING_FRAME', true);
+      commit('SET_ERROR_LOADING_FRAME', false);
+      const oldScan = getters.currentScan;
+      // frame.scan returns the scan id
+      const newScan = state.scans[frame.scan];
+
+      // Queue the new scan to be loaded
+      if (newScan !== oldScan && newScan) {
+        queueLoadScan(
+          newScan, 3,
+        );
+      }
+
+      let newProxyManager = false;
+      // We only create a new proxy manager if the newScan is not the same as oldScan
+      if (oldScan !== newScan && state.proxyManager) {
+        shrinkProxyManager(state.proxyManager);
+        newProxyManager = true;
+      }
+
+      // vtkProxyManager is from VTK.js
+      // If it doesn't exist, create new instance of proxyManager
+      if (!state.proxyManager || newProxyManager) {
+        state.proxyManager = vtkProxyManager.newInstance({
+          proxyConfiguration: proxy,
+        });
+        // vtkViews are set to empty
+        state.vtkViews = [];
+      }
+
+      // get the source from which we are loading the images
+      let sourceProxy = state.proxyManager.getActiveSource();
+      let needPrep = false;
+      // Provides default source
+      if (!sourceProxy) {
+        sourceProxy = state.proxyManager.createProxy(
+          'Sources',
+          'TrivialProducer',
+        );
+        needPrep = true;
+      }
+
+      // Load the frame
+      try {
+        let frameData = null;
+        // load from cache if possible
+        if (frameCache.has(frame.id)) {
+          frameData = frameCache.get(frame.id).frameData;
+        } else {
+          // download from server if not cached
+          const result = await loadFileAndGetData(
+            frame, { onDownloadProgress },
+          );
+          frameData = result.frameData;
+        }
+        // We set the source equal to the frameData we've loaded
+        sourceProxy.setInputData(frameData);
+        // If sourceProxy doesn't have valid config or proxyManager has no views
+        if (needPrep || !state.proxyManager.getViews().length) {
+          prepareProxyManager(state.proxyManager);
+          // Add views to vtkViews
+          state.vtkViews = state.proxyManager.getViews(); // TODO: Can eliminate this, won't it catch on next?
+        }
+        // If no vtkViews, get them from proxyManager
+        if (!state.vtkViews.length) {
+          state.vtkViews = state.proxyManager.getViews();
+        }
+      } catch (err) {
+        console.log(err);
+        state.vtkViews = [];
+        commit('SET_ERROR_LOADING_FRAME', true);
+      } finally {
+        commit('SET_CURRENT_FRAME_ID', frame.id);
+        commit('SET_LOADING_FRAME', false);
+      }
+      await this.updateLock();
+    },
+    async loadFrame({ state, dispatch, getters, commit, }, { frame, onDownloadProgress = null }) {
 
       // Guard Clauses
       if (!frame) {
