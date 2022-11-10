@@ -1054,9 +1054,16 @@ const {
         );
       }
 
-      // let thisProxyManager = state.proxyManager;
-      let thisProxyManager = state[`proxyManager${proxyNum}`];
-      let thisVtkViews = state.vtkViews;
+      let thisProxyManager;
+      let thisVtkViews;
+      if (proxyNum !== 1) {
+        thisProxyManager = state[`proxyManager${proxyNum}`];
+        thisVtkViews = state[`vtkViews${proxyNum}`];
+      } else {
+        thisProxyManager = state.proxyManager;
+        thisVtkViews = state.vtkViews;
+      }
+
       let newProxyManager = false;
       // We only create a new proxy manager if the newScan is not the same as oldScan
       if (oldScan !== newScan && thisProxyManager) {
@@ -1120,8 +1127,14 @@ const {
         commit('SET_LOADING_FRAME', false);
       }
 
-      state.proxyManager = thisProxyManager;
-      state.vtkViews = thisVtkViews;
+      if (proxyNum !== 1) {
+        state[`proxyManager${proxyNum}`] = thisProxyManager;
+        state[`vtkViews${proxyNum}`] = thisVtkViews;
+      } else {
+        state.proxyManager = thisProxyManager;
+        state.vtkViews = thisVtkViews;
+      }
+
       await this.updateLock();
     },
     /** Determines what lock status should be and updates accordingly */
