@@ -1032,7 +1032,7 @@ const {
       }
       await this.updateLock();
     },
-    async loadFrame({ state, dispatch, getters, commit, }, { frame, onDownloadProgress = null }) {
+    async loadFrame({ state, dispatch, getters, commit, }, { frame, onDownloadProgress = null, proxyNum = 1 }) {
 
       // Guard Clauses
       if (!frame) {
@@ -1054,7 +1054,8 @@ const {
         );
       }
 
-      let thisProxyManager = state.proxyManager;
+      // let thisProxyManager = state.proxyManager;
+      let thisProxyManager = state[`proxyManager${proxyNum}`];
       let thisVtkViews = state.vtkViews;
       let newProxyManager = false;
       // We only create a new proxy manager if the newScan is not the same as oldScan
