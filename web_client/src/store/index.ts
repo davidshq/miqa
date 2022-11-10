@@ -1054,29 +1054,31 @@ const {
         );
       }
 
+      let thisProxyManager = state.proxyManager;
+      let thisVtkViews = state.vtkViews;
       let newProxyManager = false;
       // We only create a new proxy manager if the newScan is not the same as oldScan
-      if (oldScan !== newScan && state.proxyManager) {
-        shrinkProxyManager(state.proxyManager);
+      if (oldScan !== newScan && thisProxyManager) {
+        shrinkProxyManager(thisProxyManager);
         newProxyManager = true;
       }
 
       // vtkProxyManager is from VTK.js
       // If it doesn't exist, create new instance of proxyManager
-      if (!state.proxyManager || newProxyManager) {
-        state.proxyManager = vtkProxyManager.newInstance({
+      if (!thisProxyManager || newProxyManager) {
+        thisProxyManager = vtkProxyManager.newInstance({
           proxyConfiguration: proxy,
         });
         // vtkViews are set to empty
-        state.vtkViews = [];
+        thisVtkViews = [];
       }
 
       // get the source from which we are loading the images
-      let sourceProxy = state.proxyManager.getActiveSource();
+      let sourceProxy = thisProxyManager.getActiveSource();
       let needPrep = false;
       // Provides default source
       if (!sourceProxy) {
-        sourceProxy = state.proxyManager.createProxy(
+        sourceProxy = thisProxyManager.createProxy(
           'Sources',
           'TrivialProducer',
         );
@@ -1099,18 +1101,18 @@ const {
         // We set the source equal to the frameData we've loaded
         sourceProxy.setInputData(frameData);
         // If sourceProxy doesn't have valid config or proxyManager has no views
-        if (needPrep || !state.proxyManager.getViews().length) {
-          prepareProxyManager(state.proxyManager);
+        if (needPrep || !thisProxyManager().length) {
+          prepareProxyManager(thisProxyManager);
           // Add views to vtkViews
-          state.vtkViews = state.proxyManager.getViews(); // TODO: Can eliminate this, won't it catch on next?
+          thisVtkViews = thisProxyManager.getViews(); // TODO: Can eliminate this, won't it catch on next?
         }
         // If no vtkViews, get them from proxyManager
-        if (!state.vtkViews.length) {
-          state.vtkViews = state.proxyManager.getViews();
+        if (!thisVtkViews.length) {
+          thisVtkViews = thisProxyManager.getViews();
         }
       } catch (err) {
         console.log(err);
-        state.vtkViews = [];
+        thisVtkViews = [];
         commit('SET_ERROR_LOADING_FRAME', true);
       } finally {
         commit('SET_CURRENT_FRAME_ID', frame.id);
