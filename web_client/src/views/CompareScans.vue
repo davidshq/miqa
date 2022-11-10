@@ -115,6 +115,7 @@ export default {
         await this.loadFrame({
           frame,
           onDownloadProgress: this.onFrameDownloadProgress,
+          proxyNum,
         });
         console.log('after swapToFrame');
       }
