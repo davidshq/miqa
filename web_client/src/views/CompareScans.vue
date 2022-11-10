@@ -80,7 +80,7 @@ export default {
       });
     },
     async selectedScans() {
-      await this.loadImage();
+      // await this.loadImage();
     },
     async selectedScan1() {
       console.log('selectedScan1');
@@ -107,7 +107,7 @@ export default {
       console.log('loadImage: frame');
       console.log(frame);
       if (frame) {
-        await this.swapToFrame({
+        await this.loadFrame({
           frame,
           onDownloadProgress: this.onFrameDownloadProgress,
         });
