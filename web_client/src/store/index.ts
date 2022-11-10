@@ -1118,6 +1118,9 @@ const {
         commit('SET_CURRENT_FRAME_ID', frame.id);
         commit('SET_LOADING_FRAME', false);
       }
+
+      state.proxyManager = thisProxyManager;
+      state.vtkViews = thisVtkViews;
       await this.updateLock();
     },
     /** Determines what lock status should be and updates accordingly */
