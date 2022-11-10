@@ -84,11 +84,11 @@ export default {
     },
     async selectedScan1() {
       console.log('selectedScan1');
-      await this.loadImage();
+      await this.loadImage(1);
     },
     async selectedScan2() {
       console.log(`selectedScan2`);
-      await this.loadImage();
+      await this.loadImage(2);
     },
   },
   mounted() {
@@ -101,10 +101,10 @@ export default {
       'swapToFrame',
       'loadFrame',
     ]),
-    async loadImage() {
+    async loadImage(proxyNum = 1) {
       // Attempting to load 1 image to start.
       // const scan = this.selectedScan1;
-      const scan = this[`selectedScan2`];
+      const scan = this[`selectedScan${proxyNum}`];
       const frameId = this.scanFrames[scan.id][0];
       console.log('loadImage: frameId');
       console.log(frameId);
