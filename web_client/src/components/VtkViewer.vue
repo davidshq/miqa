@@ -15,6 +15,10 @@ export default {
       required: true,
       type: Object,
     },
+    proxyNum: {
+      required: true,
+      type: Number,
+    },
   },
   data: () => ({
     slice: null,
@@ -44,11 +48,18 @@ export default {
     ]),
     // Returning representation from VTK
     representation() {
+      let currentProxy;
+      if (this.proxyNum !== 1) {
+        currentProxy = `proxyManager${this.proxyNum}`;
+      } else {
+        currentProxy = 'proxyManager';
+      }
+
       return (
         // force add dependency on currentFrame
         this.currentFrame
-        && this.proxyManager.getRepresentation(null, this.view)
-        // View is a prop we are passed from where?
+        // && this.proxyManager.getRepresentation(null, this.view)
+        && this[currentProxy].getRepresentation(null, this.view)
       );
     },
     sliceDomain() {

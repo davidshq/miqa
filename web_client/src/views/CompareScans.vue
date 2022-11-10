@@ -224,7 +224,7 @@ export default {
       <template v-if="currentFrame">
         <div class="my-layout">
           <div class="view">
-            <VtkViewer :view="vtkViews[0]" />
+            <VtkViewer :view="vtkViews[0]" :proxyNum="1" />
           </div>
           <div class="view">
            <!-- <VtkViewer :view="vtkViews2[0]" /> -->
