@@ -446,6 +446,8 @@ const initState = {
   scanFrames: {},
   frames: {},
   proxyManager: null,
+  proxyManager2: null,
+  proxyManager3: null,
   vtkViews: [],
   vtkViews2: [],
   vtkViews3: [],
