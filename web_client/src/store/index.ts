@@ -67,7 +67,7 @@ function shrinkProxyManager(proxyManager: vtkProxyManager) {
 function prepareProxyManager(proxyManager: vtkProxyManager) {
   if (!proxyManager.getViews().length) {
     ['View2D_Z:z', 'View2D_X:x', 'View2D_Y:y'].forEach((type) => {
-      // ViewManager.getView
+      // viewManager.getView
       const view = getView(proxyManager, type);
       view.setOrientationAxesVisibility(false);
       view.getRepresentations().forEach((representation) => {
