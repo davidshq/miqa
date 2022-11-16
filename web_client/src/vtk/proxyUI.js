@@ -2,33 +2,6 @@
  * Constants for Volume, Geometry, Slice, Molecule, Glyph, View3D, View2D, and Skybox
  */
 
-/**
- *
- * @type { [
- *          {
- *            domain: {}, name: string
- *          },
- *          {
- *            name: string
- *          },
- *          {
- *            name: string
- *          },
- *          {
- *            domain: {min: number, max: number, step: number}, name: string
- *          },
- *          {
- *            domain: {min: number, max: number, step: number}, name: string
- *          },
- *          null,
- *          null,
- *          null,
- *          null,
- *          null,
- *          null
- *        ]
- *      }
- */
 const Volume = [
   {
     name: 'colorBy',

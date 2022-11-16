@@ -2,34 +2,8 @@
  * Provides constants for Volume, Geometry, Slice, Molecule, Glyph, Skybox
  */
 
-/**
- *
- * @type { [
- *          {
- *            updateOnBind: boolean, link: string, property: string
- *          },
- *          {
- *            updateOnBind: boolean, link: string, property: string
- *          },
- *          {
- *            updateOnBind: boolean, link: string, property: string
- *          },
- *          {
- *            updateOnBind: boolean, link: string, property: string
- *          },
- *          {
- *            updateOnBind: boolean, link: string, property: string
- *          },
- *          null
- *         ]
- *       }
- */
 const Volume = [
-  // { link: 'ColorBy', property: 'colorBy' },
   { link: 'Visibility', property: 'visibility', updateOnBind: true },
-  // { link: 'UseShadow', property: 'useShadow' },
-  // { link: 'SampleDistance', property: 'sampleDistance' },
-  // { link: 'EdgeGradient', property: 'edgeGradient' },
   { link: 'WW', property: 'windowWidth', updateOnBind: true },
   { link: 'WL', property: 'windowLevel', updateOnBind: true },
   { link: 'SliceX', property: 'xSlice', updateOnBind: true },

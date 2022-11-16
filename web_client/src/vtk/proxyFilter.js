@@ -3,40 +3,6 @@ import vtkImageMarchingCubes from 'vtk.js/Sources/Filters/General/ImageMarchingC
 
 /**
  * Used by proxy.js
- *
- * @type { {
- *          options: {
- *            autoUpdate: boolean,
- *            ui: [
- *            {
- *              widget: string, size: number,
- *              domain: {min: number, max: number, step: number},
- *              name: string, doc: string, label: string, propType: string, type: string
- *            },
- *            {
- *              widget: string, size: number, advanced: number,
- *              name: string, doc: string, label: string, type: string
- *            },
- *            {
- *              widget: string, size: number, advanced: number,
- *              name: string, doc: string, label: string, type: string
- *            },
- *            {
- *              size: number, name: string, label: string, propType: string
- *            }
- *            ],
- *            algoFactory: {
- *              extend: function(*, *, *=): void, newInstance: any
- *            },
- *            proxyPropertyMapping: {
- *              mergePoints: {property: string, modelKey: string},
- *              computeNormals: {property: string, modelKey: string},
- *              contourValue: {property: string, modelKey: string}}, updateDomain(*, *): void
- *           },
- *           class: {
- *            extend: function(*, *, *=): void, newInstance: any
- *           }
- *       } }
  */
 const Contour = {
   class: vtkProxySource,
