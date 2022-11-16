@@ -1,3 +1,4 @@
+// Used in proxy.js
 const View3D = {
   vtkPolyData: { name: 'Geometry' },
   vtkImageData: { name: 'Volume' },
@@ -6,6 +7,7 @@ const View3D = {
   Skybox: { name: 'Skybox' },
 };
 
+// Used in proxy.js
 const View2D = {
   vtkPolyData: { name: 'Geometry' },
   vtkImageData: { name: 'Slice' },

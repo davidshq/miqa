@@ -1,15 +1,11 @@
-import vtk2DView from 'vtk.js/Sources/Proxy/Core/View2DProxy'; // Probably used
-import vtkGeometryRepresentationProxy from 'vtk.js/Sources/Proxy/Representations/GeometryRepresentationProxy';
-import vtkSkyboxRepresentationProxy from 'vtk.js/Sources/Proxy/Representations/SkyboxRepresentationProxy';
-import vtkGlyphRepresentationProxy from 'vtk.js/Sources/Proxy/Representations/GlyphRepresentationProxy';
-import vtkLookupTableProxy from 'vtk.js/Sources/Proxy/Core/LookupTableProxy'; // Probably used
-import vtkMoleculeRepresentationProxy from 'vtk.js/Sources/Proxy/Representations/MoleculeRepresentationProxy';
-import vtkPiecewiseFunctionProxy from 'vtk.js/Sources/Proxy/Core/PiecewiseFunctionProxy'; // Maybe used
-import vtkProxySource from 'vtk.js/Sources/Proxy/Core/SourceProxy'; // Probably used
-import vtkSliceRepresentationProxy from 'vtk.js/Sources/Proxy/Representations/SliceRepresentationProxy'; // Maybe used
-import vtkView from 'vtk.js/Sources/Proxy/Core/ViewProxy'; // Maybe used
-import vtkVolumeRepresentationProxy from 'vtk.js/Sources/Proxy/Representations/VolumeRepresentationProxy'; // Probably used
-import 'vtk.js/Sources/Rendering/Profiles/All'; // Probably used
+import vtk2DView from 'vtk.js/Sources/Proxy/Core/View2DProxy';
+import vtkLookupTableProxy from 'vtk.js/Sources/Proxy/Core/LookupTableProxy';
+import vtkPiecewiseFunctionProxy from 'vtk.js/Sources/Proxy/Core/PiecewiseFunctionProxy';
+import vtkProxySource from 'vtk.js/Sources/Proxy/Core/SourceProxy';
+import vtkSliceRepresentationProxy from 'vtk.js/Sources/Proxy/Representations/SliceRepresentationProxy';
+import vtkView from 'vtk.js/Sources/Proxy/Core/ViewProxy';
+import vtkVolumeRepresentationProxy from 'vtk.js/Sources/Proxy/Representations/VolumeRepresentationProxy';
+import 'vtk.js/Sources/Rendering/Profiles/All';
 
 import ConfigUtils from './configUtils';
 
@@ -70,7 +66,6 @@ function createDefaultView(classFactory, ui, options, props) {
   );
 }
 
-// ----------------------------------------------------------------------------
 export default {
   definitions: {
     Proxy: {
@@ -86,16 +81,6 @@ export default {
       Contour: proxyFilter.Contour,
     },
     Representations: {
-      Geometry: createProxyDefinition(
-        vtkGeometryRepresentationProxy,
-        proxyUI.Geometry,
-        proxyLinks.Geometry,
-      ),
-      Skybox: createProxyDefinition(
-        vtkSkyboxRepresentationProxy,
-        proxyUI.Skybox,
-        proxyLinks.Skybox,
-      ),
       Slice: createProxyDefinition(
         vtkSliceRepresentationProxy,
         proxyUI.Slice,
@@ -126,16 +111,6 @@ export default {
         vtkVolumeRepresentationProxy,
         proxyUI.Volume,
         proxyLinks.Volume,
-      ),
-      Molecule: createProxyDefinition(
-        vtkMoleculeRepresentationProxy,
-        proxyUI.Molecule,
-        proxyLinks.Molecule,
-      ),
-      Glyph: createProxyDefinition(
-        vtkGlyphRepresentationProxy,
-        proxyUI.Glyph,
-        proxyLinks.Glyph,
       ),
     },
     Views: {
@@ -178,9 +153,6 @@ export default {
     },
   },
   filters: {
-    vtkPolyData: [],
     vtkImageData: ['Contour'],
-    vtkMolecule: [],
-    Glyph: [],
   },
 };

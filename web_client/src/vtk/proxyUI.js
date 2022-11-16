@@ -46,41 +46,6 @@ const Volume = [
   },
 ];
 
-const Geometry = [
-  {
-    name: 'colorBy',
-    domain: {},
-  },
-  {
-    name: 'color',
-  },
-  {
-    name: 'representation',
-    domain: {
-      items: [
-        { text: 'Surface', value: 'Surface' },
-        { text: 'Surface with edges', value: 'Surface with edges' },
-        { text: 'Wireframe', value: 'Wireframe' },
-        { text: 'Points', value: 'Points' },
-      ],
-    },
-  },
-  {
-    name: 'opacity',
-    domain: { min: 0, max: 1, step: 0.01 },
-  },
-  {
-    name: 'interpolateScalarsBeforeMapping',
-  },
-  {
-    name: 'visibility',
-  },
-  {
-    name: 'pointSize',
-    domain: { min: 1, max: 50 },
-  },
-];
-
 const Slice = [
   {
     name: 'visibility',
@@ -96,34 +61,6 @@ const Slice = [
   {
     name: 'slice',
     domain: { min: 0, max: 255, step: 1 },
-  },
-];
-
-const Molecule = [
-  {
-    name: 'tolerance',
-    domain: { min: 0, max: 0.5, step: 0.01 },
-  },
-  {
-    name: 'atomicRadiusScaleFactor',
-    domain: { min: 0, max: 0.5, step: 0.01 },
-  },
-  {
-    name: 'bondRadius',
-    domain: { min: 0, max: 0.5, step: 0.01 },
-  },
-  {
-    name: 'deltaBondFactor',
-    domain: { min: 0, max: 0.5, step: 0.01 },
-  },
-  {
-    name: 'hideElements',
-  },
-];
-
-const Glyph = [
-  {
-    name: 'edgeVisibility',
   },
 ];
 
@@ -175,15 +112,9 @@ const View2D = [
   },
 ];
 
-const Skybox = [{ name: 'position' }];
-
 export default {
   Volume,
-  Geometry,
   Slice,
-  Molecule,
-  Glyph,
   View3D,
   View2D,
-  Skybox,
 };
