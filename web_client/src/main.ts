@@ -12,9 +12,6 @@ import router from './router';
 import store from './store';
 import { STATIC_PATH } from './constants';
 
-import 'vuetify/dist/vuetify.min.css';
-import '@mdi/font/css/materialdesignicons.min.css';
-
 import './vtk/ColorMaps';
 import vMousetrap from './vue-utilities/v-mousetrap';
 import snackbarService from './vue-utilities/snackbar-service';
@@ -24,8 +21,6 @@ import djangoRest, { oauthClient } from './django';
 import { setupHeartbeat } from './heartbeat';
 
 Vue.use(Vuetify);
-
-// import proxyConfigGenerator from './store/proxyConfigGenerator';
 
 Vue.use(VueCompositionAPI);
 Vue.use(AsyncComputed);
