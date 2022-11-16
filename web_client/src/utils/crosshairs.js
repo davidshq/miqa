@@ -70,6 +70,7 @@ class CrosshairSet {
     };
   }
 
+  // Used in VtkViewer
   getCrosshairsForAxis(axis, colors) {
     const sliceLines = this.getSliceLines();
     let horizontalLine = null;
@@ -120,6 +121,7 @@ class CrosshairSet {
     return picker;
   }
 
+  // Used in VtkViewer
   locationOfClick(clickEvent) {
     const picker = this.getPicker();
     picker.pick([clickEvent.position.x, clickEvent.position.y, 0], this.renderer);

@@ -1,6 +1,8 @@
 /**
  * Calculate the size of the images being downloaded
  *
+ * Used in LoadingMessage
+ *
  * @param size
  * @param base
  * @param unit

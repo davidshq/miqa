@@ -49,6 +49,8 @@ function getReader({ fileName }) {
 /**
  * Downloads file represent Frame.
  *
+ * Used by Vuex store
+ *
  * @param axios               The client
  * @param fileName            File to be downloaded
  * @param url                 The URL to download the file
