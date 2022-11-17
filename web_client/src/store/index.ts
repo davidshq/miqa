@@ -305,34 +305,34 @@ function startReaderWorkerPool() {
  * Will load all frames for a target scan if the scan
  * has not already been loaded.
  *
- * @param scan      Scan
+ * @param newScan      Scan
  * @param loadNext  Integer
  */
-function queueLoadScan(scan, loadNext = 0) {
-  if (!loadedData.includes(scan.id)) {
+function queueLoadScan(newScan, loadNext = 0) {
+  if (!loadedData.includes(newScan.id)) {
     // For each scan in scanFrames
-    store.state.scanFrames[scan.id].forEach(
+    store.state.scanFrames[newScan.id].forEach(
       (frameId) => {
         // Add to readDataQueue a request to get the frames associated with that scan
         readDataQueue.push({
-          experimentId: scan.experiment,
-          scanId: scan.id,
+          experimentId: newScan.experiment,
+          scanId: newScan.id,
           frame: store.state.frames[frameId],
         });
       },
     );
     // Once frame has been successfully added to queue:
-    loadedData.push(scan.id);
+    loadedData.push(newScan.id);
   }
 
   if (loadNext > 0) {
     // Get the other scans in the experiment.
-    const scansInSameExperiment = store.state.experimentScans[scan.experiment];
+    const scansInSameExperiment = store.state.experimentScans[newScan.experiment];
     let nextScan;
-    if (scan.id === scansInSameExperiment[scansInSameExperiment.length - 1]) {
+    if (newScan.id === scansInSameExperiment[scansInSameExperiment.length - 1]) {
       // load first scan in next experiment
       const experimentIds = Object.keys(store.state.experimentScans);
-      const nextExperimentId = experimentIds[experimentIds.indexOf(scan.experiment) + 1];
+      const nextExperimentId = experimentIds[experimentIds.indexOf(newScan.experiment) + 1];
       const nextExperimentScans = store.state.experimentScans[nextExperimentId];
       if (nextExperimentScans && nextExperimentScans.length > 0) {
         nextScan = store.state.scans[
@@ -344,7 +344,7 @@ function queueLoadScan(scan, loadNext = 0) {
       while (!nextScan || !includeScan(nextScan.id)) {
         // load next scan in same experiment
         nextScan = store.state.scans[scansInSameExperiment[
-          scansInSameExperiment.indexOf(scan.id) + offset
+          scansInSameExperiment.indexOf(newScan.id) + offset
         ]];
         offset += 1;
       }
@@ -949,7 +949,6 @@ const {
      * Only used by Scan.vue
      */
     async swapToFrame({ state, dispatch, getters, commit, }, { frame, onDownloadProgress = null }) {
-
       // Guard Clauses
       if (!frame) {
         throw new Error("frame id doesn't exist");
