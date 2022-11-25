@@ -31,7 +31,6 @@ export default {
     experimentId() {
       return this.currentView.experimentId;
     },
-    // TODO: Understand better
     representation() {
       return this.currentFrame && this.proxyManager.getRepresentations()[0];
     },
@@ -47,7 +46,6 @@ export default {
     },
   },
   mounted() {
-    // If there is a current scan
     if (!this.navigateToNextIfCurrentScanNull()) {
       // Switch the lock to the current experiment
       this.switchLock(this.currentView.experimentId);
@@ -76,19 +74,14 @@ export default {
       'setLock',
     ]),
     ...mapMutations([
-      'setCurrentFrameId',
+      'SET_CURRENT_FRAME_ID',
     ]),
     /**
      * Release lock on old experiment, set lock on new experiment
      *
      * Note: Lock is only set if the user has edit rights
-     *
-     * @param newExperimentId
-     * @param oldExperimentId
-     * @param forceToLock
      */
     async switchLock(newExperimentId, oldExperimentId = null, forceToLock = false) {
-      // If there is a scan
       if (!this.navigateToNextIfCurrentScanNull()) {
         // And the user has edit rights
         if (this.editRights) {
@@ -120,11 +113,6 @@ export default {
         }
       }
     },
-    /**
-     * Navigates to a different scan
-     *
-     * @param location
-     */
     navigateToScan(location) {
       if (!location) location = 'complete';
       if (location && location !== this.$route.params.scanId) {
@@ -133,19 +121,14 @@ export default {
           .catch(this.handleNavigationError);
       }
     },
-    /**
-     * Handles navigation key presses
-     *
-     * TODO: Does it make sense to rename `handleKeyPress` to `handleNavigationKeyPress`?
-     *
-     * @param direction
-     */
+    // Handles navigation key presses
+    // TODO: Does it make sense to rename `handleKeyPress` to `handleNavigationKeyPress`?
     handleKeyPress(direction) {
       this.direction = direction;
       if (this.direction === 'back') {
-        this.setCurrentFrameId(this.previousFrame);
+        this.SET_CURRENT_FRAME_ID(this.previousFrame);
       } else if (this.direction === 'forward') {
-        this.setCurrentFrameId(this.nextFrame);
+        this.SET_CURRENT_FRAME_ID(this.nextFrame);
       } else if (this.direction === 'previous') {
         this.navigateToScan(this.currentView.upTo);
       } else if (this.direction === 'next') {
@@ -153,10 +136,8 @@ export default {
       }
     },
 
-    /**
-     * If there aren't at least two keys in `currentView` we know
-     * that we aren't looking at a valid scan, so advance to next.
-     */
+    // If there aren't at least two keys in `currentView` we know
+    // that we aren't looking at a valid scan, so advance to next.
     navigateToNextIfCurrentScanNull() {
       if (Object.keys(this.currentView).length < 2) {
         this.handleKeyPress('next');

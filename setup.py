@@ -37,6 +37,7 @@ setup(
     include_package_data=True,
     install_requires=[
         'celery',
+        'dateparser',
         'django>=3.2,<4.0',
         'django-allauth',
         'django-auth-style[allauth]',
@@ -44,7 +45,7 @@ setup(
         'django-extensions',
         'django-filter',
         'django-oauth-toolkit',
-        'djangorestframework',
+        'djangorestframework==3.13.1',  # https://github.com/axnsan12/drf-yasg/issues/810
         'django-click',
         'django-guardian',
         'drf-yasg',
@@ -67,6 +68,7 @@ setup(
             'factory_boy',
             'girder-pytest-pyppeteer==0.0.9',
             'pytest-asyncio',
+            'types-dateparser',
         ],
         'learning': [
             'itk>=5.3rc4',

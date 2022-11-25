@@ -47,7 +47,6 @@ export default {
       return (
         // force add dependency on currentFrame
         this.currentFrame
-        // && this.proxyManager.getRepresentation(null, this.view)
         && this.proxyManager.getRepresentation(null, this.view)
       );
     },
@@ -311,6 +310,7 @@ export default {
       return Math.round(value * 100) / 100;
     },
     drawLine(ctx, displayLine) {
+      if (!displayLine) return;
       ctx.strokeStyle = displayLine.color;
       ctx.beginPath();
       ctx.moveTo(...displayLine.start);

@@ -17,7 +17,6 @@ export default {
   computed: {
     tooltipText() {
       let name = this.targetUser.username;
-      // If first and last name exist
       if (this.targetUser.first_name && this.targetUser.last_name) {
         name = `${this.targetUser.first_name} ${this.targetUser.last_name}`;
       }

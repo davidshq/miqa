@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from celery.schedules import crontab
 from composed_configuration import (
     ComposedConfiguration,
     ConfigMixin,
@@ -10,6 +11,7 @@ from composed_configuration import (
     HerokuProductionBaseConfiguration,
     HttpsMixin,
     ProductionBaseConfiguration,
+    S3StorageMixin,
     SmtpEmailMixin,
     TestingBaseConfiguration,
 )
@@ -38,9 +40,13 @@ class MiqaMixin(ConfigMixin):
     DEMO_MODE = values.BooleanValue(environ=True, default=False)
     # It is recommended to enable the following for demo mode:
     NORMAL_USERS_CAN_CREATE_PROJECTS = values.BooleanValue(environ=True, default=False)
+    # Enable the following to replace null creation times for scan decisions with import time
+    REPLACE_NULL_CREATION_DATETIMES = values.BooleanValue(environ=True, default=False)
 
     # Override default signup sheet to ask new users for first and last name
     ACCOUNT_FORMS = {'signup': 'miqa.core.rest.accounts.AccountSignupForm'}
+
+    CELERY_BEAT_SCHEDULE = {}
 
     # Default artifacts
     DEFAULT_ARTIFACTS = [
@@ -96,6 +102,16 @@ class MiqaMixin(ConfigMixin):
             'EXCEPTION_HANDLER'
         ] = 'miqa.core.rest.exceptions.custom_exception_handler'
 
+        if configuration.DEMO_MODE:
+            configuration.CELERY_BEAT_SCHEDULE.update(
+                {
+                    'reset-demo': {
+                        'task': 'miqa.core.tasks.reset_demo',
+                        'schedule': crontab(minute=0, hour=0),  # daily at midnight
+                    }
+                }
+            )
+
 
 class DevelopmentConfiguration(MiqaMixin, DevelopmentBaseConfiguration):
     HOMEPAGE_REDIRECT_URL = values.Value(environ=True, default='http://localhost:8081')
@@ -119,11 +135,18 @@ class DockerComposeProductionConfiguration(
     MiqaMixin,
     SmtpEmailMixin,
     HttpsMixin,
+    S3StorageMixin,
     _BaseConfiguration,
 ):
     """For the production deployment using docker-compose."""
 
     MIQA_URL_PREFIX = values.Value(environ=True, default='/')
+
+    # Configure connection to S3 bucket by setting the following environment variables:
+    # AWS_DEFAULT_REGION
+    # AWS_ACCESS_KEY_ID
+    # AWS_SECRET_ACCESS_KEY
+    # DJANGO_STORAGE_BUCKET_NAME
 
     # Needed to support the reverse proxy configuration
     USE_X_FORWARDED_HOST = True

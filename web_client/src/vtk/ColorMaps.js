@@ -19,11 +19,7 @@ function comparator(a, b) {
   return s1 > s2 ? 1 : -(s1 < s2);
 }
 
-/**
- * Register medical colormaps
- *
- * @param presets
- */
+// register medical colormaps
 function registerPresets(presets) {
   presets.forEach((preset) => {
     if (preset.Children) {

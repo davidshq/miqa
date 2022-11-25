@@ -1,8 +1,6 @@
 <script lang="ts">
-/**
- * The ExperimentsView appears on the Projects View once a project has been selected.
- * It also appears on Scan.vue inside a collapsible sidebar.
- */
+/**The ExperimentsView appears on the Projects View once a project has been selected.
+ * It also appears on Scan.vue inside a collapsible sidebar. */
 import _ from 'lodash';
 import {
   mapState, mapGetters, mapMutations, mapActions,
@@ -177,8 +175,6 @@ export default {
      * Adds a class to a scan representative of the scan's task state.
      *
      * TODO: Could add typing to parameters, e.g. scan could be changed to scan: Scan
-     *
-     * @param scan
      */
     scanStateClass(scan) {
       let classes = `body-1 state-${this.scanState(scan).replace(/ /g, '-')}`;
@@ -188,8 +184,7 @@ export default {
       return classes;
     },
     // TODO: Would be good to extract this into a separate component,
-    // This is only needed in Project view, not in Frame vue
-    // Delays for .5 seconds
+    // This is only needed in Project view, not in Frame vue, delays for .5 seconds
     delayPrepareDropZone() {
       setTimeout(this.prepareDropZone, 500);
     },

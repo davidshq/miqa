@@ -27,11 +27,7 @@ let s3ffClient;
 
 const oauthClient = new OAuthClient(OAUTH_API_ROOT, OAUTH_CLIENT_ID);
 const djangoClient = {
-  /**
-   * TODO: importing the actual AppStore type results in a dependency cycle
-   *
-   * @param store
-   */
+  // TODO importing the actual AppStore type results in a dependency cycle
   async restoreLogin(store: any) {
     await oauthClient.maybeRestoreLogin();
     if (oauthClient.isLoggedIn) {
@@ -89,8 +85,6 @@ const djangoClient = {
    * TODO: Sometimes there seems to be weird import path issues, this happens to me frequently,
    * still unsure of cause. Interesting to note that moving the csv file out to the root folder
    * allowed it to be seen, moving it back in and renaming sub-folder allowed import?
-   *
-   * @param projectId
    */
   async projectImport(projectId: string): Promise<ResponseData> {
     const response = await apiClient.post(`/projects/${projectId}/import`);

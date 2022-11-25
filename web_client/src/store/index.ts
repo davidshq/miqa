@@ -1,8 +1,10 @@
 /* eslint-disable no-use-before-define */
+
 import { createDirectStore } from 'direct-vuex';
 import Vue from 'vue';
 import Vuex from 'vuex';
 import vtkProxyManager from 'vtk.js/Sources/Proxy/Core/ProxyManager';
+import macro from 'vtk.js/Sources/macros';
 import { InterpolationType } from 'vtk.js/Sources/Rendering/Core/ImageProperty/Constants';
 
 import '../utils/registerReaders';
@@ -59,11 +61,7 @@ function shrinkProxyManager(proxyManager: vtkProxyManager) {
   });
 }
 
-/**
- * Renders each view
- *
- * Also disables Axes visibility and sets InterpolationType to nearest
- */
+/** Renders each view. Also disables Axes visibility and sets InterpolationType to nearest */
 function prepareProxyManager(proxyManager: vtkProxyManager) {
   if (!proxyManager.getViews().length) {
     ['View2D_Z:z', 'View2D_X:x', 'View2D_Y:y'].forEach((type) => {
@@ -72,9 +70,12 @@ function prepareProxyManager(proxyManager: vtkProxyManager) {
       view.setOrientationAxesVisibility(false);
       view.getRepresentations().forEach((representation) => {
         representation.setInterpolationType(InterpolationType.NEAREST);
-        representation.onModified(() => {
+        representation.onModified(macro.debounce(() => {
           view.render(true);
-        });
+        }, 0));
+        // debounce timer doesn't need a wait time because
+        // the many onModified changes that it needs to collapse to a single rerender
+        // all happen simultaneously when the input data is changed.
       });
     });
   }
@@ -84,8 +85,6 @@ function prepareProxyManager(proxyManager: vtkProxyManager) {
  * Array name is file name minus last extension
  *
  * e.g. image.nii.gz => image.nii
- *
- * @param filename
  */
 function getArrayNameFromFilename(filename) {
   const idx = filename.lastIndexOf('.');
@@ -173,7 +172,6 @@ function downloadFile(frame, onDownloadProgress) {
     client = axios.create();
     downloadURL = frame.download_url;
   }
-
   const { promise } = ReaderFactory.downloadFrame(
     client,
     `image${frame.extension}`,
@@ -229,7 +227,6 @@ function poolFunction(webWorker, taskInfo) {
     const { frame } = taskInfo;
 
     let filePromise = null;
-
 
     if (fileCache.has(frame.id)) { // Load file from cache if available
       filePromise = fileCache.get(frame.id);
@@ -288,7 +285,6 @@ function startReaderWorkerPool() {
 
   promise
     .then(() => {
-
       taskRunId = -1; // Indicates no tasks are running
     })
     .catch((err) => {
@@ -305,34 +301,34 @@ function startReaderWorkerPool() {
  * Will load all frames for a target scan if the scan
  * has not already been loaded.
  *
- * @param newScan      Scan
+ * @param scan      Scan
  * @param loadNext  Integer
  */
-function queueLoadScan(newScan, loadNext = 0) {
-  if (!loadedData.includes(newScan.id)) {
+function queueLoadScan(scan, loadNext = 0) {
+  if (!loadedData.includes(scan.id)) {
     // For each scan in scanFrames
-    store.state.scanFrames[newScan.id].forEach(
+    store.state.scanFrames[scan.id].forEach(
       (frameId) => {
         // Add to readDataQueue a request to get the frames associated with that scan
         readDataQueue.push({
-          experimentId: newScan.experiment,
-          scanId: newScan.id,
+          experimentId: scan.experiment,
+          scanId: scan.id,
           frame: store.state.frames[frameId],
         });
       },
     );
     // Once frame has been successfully added to queue:
-    loadedData.push(newScan.id);
+    loadedData.push(scan.id);
   }
 
   if (loadNext > 0) {
     // Get the other scans in the experiment.
-    const scansInSameExperiment = store.state.experimentScans[newScan.experiment];
+    const scansInSameExperiment = store.state.experimentScans[scan.experiment];
     let nextScan;
-    if (newScan.id === scansInSameExperiment[scansInSameExperiment.length - 1]) {
+    if (scan.id === scansInSameExperiment[scansInSameExperiment.length - 1]) {
       // load first scan in next experiment
       const experimentIds = Object.keys(store.state.experimentScans);
-      const nextExperimentId = experimentIds[experimentIds.indexOf(newScan.experiment) + 1];
+      const nextExperimentId = experimentIds[experimentIds.indexOf(scan.experiment) + 1];
       const nextExperimentScans = store.state.experimentScans[nextExperimentId];
       if (nextExperimentScans && nextExperimentScans.length > 0) {
         nextScan = store.state.scans[
@@ -340,13 +336,15 @@ function queueLoadScan(newScan, loadNext = 0) {
         ];
       }
     } else {
-      let offset = 1;
-      while (!nextScan || !includeScan(nextScan.id)) {
+      let newIndex = scansInSameExperiment.indexOf(scan.id) + 1;
+      while (
+        (!nextScan || !includeScan(nextScan.id))
+         && newIndex < scansInSameExperiment.length
+         && newIndex > 0
+      ) {
         // load next scan in same experiment
-        nextScan = store.state.scans[scansInSameExperiment[
-          scansInSameExperiment.indexOf(newScan.id) + offset
-        ]];
-        offset += 1;
+        nextScan = store.state.scans[scansInSameExperiment[newIndex]];
+        newIndex += 1;
       }
     }
     if (nextScan) queueLoadScan(nextScan, loadNext - 1);
@@ -408,11 +406,7 @@ function expandScanRange(frameId, dataRange) {
   }
 }
 
-/**
- * Determines whether a scan will be displayed based on its reviewed status.
- *
- * @param scanId
- */
+/** Determines whether a scan will be displayed based on its reviewed status */
 export function includeScan(scanId) {
   if (store.state.reviewMode) {
     const myRole = store.state.currentTaskOverview?.my_project_role;
@@ -430,7 +424,9 @@ export function includeScan(scanId) {
 }
 
 const initState = {
-  MIQAConfig: {},
+  MIQAConfig: {
+    version: '',
+  },
   me: null,
   allUsers: [],
   reviewMode: true,
@@ -446,11 +442,7 @@ const initState = {
   scanFrames: {},
   frames: {},
   proxyManager: null,
-  proxyManager2: null,
-  proxyManager3: null,
   vtkViews: [],
-  vtkViews2: [],
-  vtkViews3: [],
   currentFrameId: null,
   loadingFrame: false,
   errorLoadingFrame: false,
@@ -488,7 +480,6 @@ const {
     workerPool: new WorkerPool(poolSize, poolFunction),
     lastApiRequestTime: Date.now(),
   },
-
   // Getters in Vuex always take in all the state as their first parameter.
   getters: {
     /** Returns current view's project, experiments, scans, frames, and auto-evaluation. */
@@ -591,6 +582,8 @@ const {
       Object.assign(state, { ...state, ...initState });
     },
     [SET_MIQA_CONFIG] (state, configuration) {
+      if (!configuration) configuration = {};
+      if (!configuration.version) configuration.version = '';
       state.MIQAConfig = configuration;
     },
     [SET_ME] (state, me) {
@@ -932,7 +925,7 @@ const {
         return undefined;
       }
       // If currently loaded frameId does not match frameId to load
-      if (!state.scans[scanId]) {
+      if (!state.scans[scanId] && state.projects) {
         await dispatch('loadProjects');
         const targetProject = state.projects.filter((proj) => proj.id === projectId)[0];
         await dispatch('loadProject', targetProject);
@@ -966,9 +959,8 @@ const {
       if (newScan !== oldScan && newScan) {
         queueLoadScan(
           newScan, 3,
-        );
+          );
       }
-
       let newProxyManager = false;
       // We create a new proxy manager if the newScan is not the same as oldScan
       // Only if the oldScan is equal to the newScan do we retain the proxyManager
@@ -1007,7 +999,6 @@ const {
 
         // We set the source equal to the frameData we've loaded
         sourceProxy.setInputData(frameData);
-
         // If sourceProxy doesn't have valid config or proxyManager has no views
         if (needPrep || !state.proxyManager.getViews().length) {
           prepareProxyManager(state.proxyManager);
@@ -1017,6 +1008,7 @@ const {
           state.vtkViews = state.proxyManager.getViews();
         }
       } catch (err) {
+        console.log('Caught exception loading next frame');
         console.log(err);
         state.vtkViews = [];
         commit('SET_ERROR_LOADING_FRAME', true);
