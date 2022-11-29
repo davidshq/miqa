@@ -57,7 +57,7 @@ class ProjectAdmin(GuardedModelAdmin):
 @admin.register(Setting)
 class SettingAdmin(admin.ModelAdmin):
     list_display = ('key', 'value', 'type', 'group', 'is_type')
-    list_filter = ('key', 'type', 'group', 'is_type')
+    list_filter = ('type', 'group', 'is_type')
 
 @admin.register(SettingsGroup)
 class SettingsGroupAdmin(admin.ModelAdmin):
