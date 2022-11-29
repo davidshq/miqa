@@ -1,0 +1,123 @@
+[
+  {
+    "model": "core.setting",
+    "pk": "21433708-3e13-4194-a052-cada0606865c",
+    "fields": {
+      "key": "flow_artifact",
+      "value": "",
+      "type": "246d7d1c-a378-464b-84fe-e9c4cdb78651",
+      "group": "4807c3eb-7cb9-41b7-a7ac-115ab3be913f",
+      "is_type": false
+    }
+  },
+  {
+    "model": "core.setting",
+    "pk": "246d7d1c-a378-464b-84fe-e9c4cdb78651",
+    "fields": {
+      "key": "Artifacts",
+      "value": "",
+      "type": null,
+      "group": "4807c3eb-7cb9-41b7-a7ac-115ab3be913f",
+      "is_type": true
+    }
+  },
+  {
+    "model": "core.setting",
+    "pk": "42694c48-8f3d-4133-bdf1-6110c5e6b030",
+    "fields": {
+      "key": "swap_wraparound",
+      "value": "",
+      "type": "246d7d1c-a378-464b-84fe-e9c4cdb78651",
+      "group": "4807c3eb-7cb9-41b7-a7ac-115ab3be913f",
+      "is_type": false
+    }
+  },
+  {
+    "model": "core.setting",
+    "pk": "5cae622c-ba1e-4c28-af77-64006932f231",
+    "fields": {
+      "key": "ghosting_motion",
+      "value": "",
+      "type": "246d7d1c-a378-464b-84fe-e9c4cdb78651",
+      "group": "4807c3eb-7cb9-41b7-a7ac-115ab3be913f",
+      "is_type": false
+    }
+  },
+  {
+    "model": "core.setting",
+    "pk": "6429e16e-3b7b-4db8-8c74-f3a582c32efa",
+    "fields": {
+      "key": "normal_variants",
+      "value": "",
+      "type": "246d7d1c-a378-464b-84fe-e9c4cdb78651",
+      "group": "4807c3eb-7cb9-41b7-a7ac-115ab3be913f",
+      "is_type": false
+    }
+  },
+  {
+    "model": "core.setting",
+    "pk": "6db8be6f-1115-47a3-b3a5-f9f603e8d766",
+    "fields": {
+      "key": "susceptibility_metal",
+      "value": "",
+      "type": "246d7d1c-a378-464b-84fe-e9c4cdb78651",
+      "group": "4807c3eb-7cb9-41b7-a7ac-115ab3be913f",
+      "is_type": false
+    }
+  },
+  {
+    "model": "core.setting",
+    "pk": "806ab024-cf04-4910-a0a5-522c8efdc144",
+    "fields": {
+      "key": "inhomogeneity",
+      "value": "",
+      "type": "246d7d1c-a378-464b-84fe-e9c4cdb78651",
+      "group": "4807c3eb-7cb9-41b7-a7ac-115ab3be913f",
+      "is_type": false
+    }
+  },
+  {
+    "model": "core.setting",
+    "pk": "81188955-a357-43c4-8772-3e31b9fd1248",
+    "fields": {
+      "key": "lesions",
+      "value": "",
+      "type": "246d7d1c-a378-464b-84fe-e9c4cdb78651",
+      "group": "4807c3eb-7cb9-41b7-a7ac-115ab3be913f",
+      "is_type": false
+    }
+  },
+  {
+    "model": "core.setting",
+    "pk": "bfd6c74d-1cda-4e7d-a546-676ce629a9e4",
+    "fields": {
+      "key": "misalignment",
+      "value": "",
+      "type": "246d7d1c-a378-464b-84fe-e9c4cdb78651",
+      "group": "4807c3eb-7cb9-41b7-a7ac-115ab3be913f",
+      "is_type": false
+    }
+  },
+  {
+    "model": "core.setting",
+    "pk": "c1876d55-381d-4d0c-9cc0-ab1c058e2677",
+    "fields": {
+      "key": "full_brain_coverage",
+      "value": "",
+      "type": "246d7d1c-a378-464b-84fe-e9c4cdb78651",
+      "group": "4807c3eb-7cb9-41b7-a7ac-115ab3be913f",
+      "is_type": false
+    }
+  },
+  {
+    "model": "core.setting",
+    "pk": "de5b9b60-e847-4147-8b0c-20bf1804b8d0",
+    "fields": {
+      "key": "truncation_artifact",
+      "value": "",
+      "type": "246d7d1c-a378-464b-84fe-e9c4cdb78651",
+      "group": "4807c3eb-7cb9-41b7-a7ac-115ab3be913f",
+      "is_type": false
+    }
+  }
+]
