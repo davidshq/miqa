@@ -9,8 +9,8 @@ from django_extensions.db.models import TimeStampedModel
 from guardian.shortcuts import assign_perm, get_perms, get_users_with_perms, remove_perm
 
 from miqa.core.models.scan import SCAN_TYPES, Scan
-from miqa.core.models.scan_decision import ScanDecision
-
+from miqa.core.models.scan_decision import ScanDecision, ArtifactState
+from .setting import Setting
 
 def default_evaluation_model_mapping():
     return {
@@ -54,6 +54,20 @@ class Project(TimeStampedModel, models.Model):
     )
     evaluation_models = models.JSONField(default=default_evaluation_model_mapping)
     default_email_recipients = models.TextField(blank=True)
+    artifact_group = models.ForeignKey('SettingsGroup', null=True, blank=True, on_delete=models.SET_NULL, related_name="artifact_group")
+
+    @property
+    def artifacts(self) -> dict:
+        """Gets the list of artifacts associated with the project"""
+        if self.artifact_group:
+            artifacts = Setting.objects.filter(group__id=self.artifact_group_id)
+
+            return {
+                artifact_name.name: ArtifactState.UNDEFINED.value
+                for artifact_name in artifacts
+            }
+        else:
+            return {}
 
     def __str__(self):
         return self.name
