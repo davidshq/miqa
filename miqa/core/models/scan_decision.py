@@ -37,17 +37,6 @@ class ArtifactState(Enum):
     ABSENT = 0
     UNDEFINED = -1
 
-
-def default_identified_artifacts():
-    return {
-        (
-            artifact_name if artifact_name != 'full_brain_coverage' else 'partial_brain_coverage'
-        ): ArtifactState.UNDEFINED.value
-        for artifact_name in artifacts
-        if artifact_name != 'normal_variants'
-    }
-
-
 class ScanDecision(models.Model):
     class Meta:
         ordering = ['-created']
@@ -61,7 +50,7 @@ class ScanDecision(models.Model):
     creator = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
     decision = models.CharField(max_length=2, choices=DECISION_CHOICES, blank=False)
     note = models.TextField(max_length=3000, blank=True)
-    user_identified_artifacts = models.JSONField(default=default_identified_artifacts)
+    user_identified_artifacts = models.JSONField(default=dict)
     location = models.JSONField(default=dict)
 
     @property
