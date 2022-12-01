@@ -11,19 +11,6 @@ from django.utils import timezone
 if TYPE_CHECKING:
     from miqa.core.models import Experiment
 
-artifacts = [
-    'normal_variants',
-    'lesions',
-    'full_brain_coverage',
-    'misalignment',
-    'swap_wraparound',
-    'ghosting_motion',
-    'inhomogeneity',
-    'susceptibility_metal',
-    'flow_artifact',
-    'truncation_artifact',
-]
-
 DECISION_CHOICES = [
     ('U', 'Usable'),
     ('UE', 'Usable-Extra'),
