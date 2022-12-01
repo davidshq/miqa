@@ -63,7 +63,7 @@ class Project(TimeStampedModel, models.Model):
             artifacts = Setting.objects.filter(group__id=self.artifact_group_id)
 
             return {
-                artifact_name.name: ArtifactState.UNDEFINED.value
+                artifact_name.key: ArtifactState.UNDEFINED.value
                 for artifact_name in artifacts
             }
         else:
