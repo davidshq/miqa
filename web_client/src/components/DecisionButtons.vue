@@ -58,10 +58,15 @@ export default {
       'myCurrentProjectRoles',
     ]),
     artifacts() {
-      return this.MIQAConfig.artifact_options.map((name) => ({
-        value: name,
-        labelText: this.convertValueToLabel(name),
-      }));
+      if (this.currentProject.settings.artifacts !== 'undefined') {
+        const projectArtifacts = this.currentProject.settings.artifacts;
+        return projectArtifacts.map((artifactName) => ({
+          value: artifactName,
+          labelText: this.convertValueToLabel(artifactName),
+        }));
+      }
+
+      return {};
     },
     chips() {
       return this.artifacts.map((artifact) => [artifact, this.getCurrentChipState(artifact)]);
