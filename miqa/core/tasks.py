@@ -65,7 +65,7 @@ def evaluate_frame_content(frame_id):
     from miqa.learning.nn_inference import evaluate1
 
     frame = Frame.objects.get(id=frame_id)
-    eval_model_name = frame.scan.experiment.project.evaluation_models[[frame.scan.scan_type][0]]
+    eval_model_name = frame.scan.experiment.project.model_mappings[frame.scan.scan_type]
     s3_public = frame.scan.experiment.project.s3_public
     eval_model = available_evaluation_models[eval_model_name].load()
     with tempfile.TemporaryDirectory() as tmpdirname:
