@@ -55,6 +55,7 @@ class Project(TimeStampedModel, models.Model):
     evaluation_models = models.JSONField(default=default_evaluation_model_mapping)
     default_email_recipients = models.TextField(blank=True)
     artifact_group = models.ForeignKey('SettingsGroup', null=True, blank=True, on_delete=models.SET_NULL, related_name="artifact_group")
+    model_mapping_group = models.ForeignKey('SettingsGroup', null=True, blank=True, on_delete=models.SET_NULL, related_name="model_mapping_group")
 
     @property
     def artifacts(self) -> dict:
@@ -66,6 +67,18 @@ class Project(TimeStampedModel, models.Model):
                 artifact_name.key: ArtifactState.UNDEFINED.value
                 for artifact_name in artifacts
             }
+        else:
+            return {}
+    @property
+    def model_mappings(self) -> dict:
+        """Gets the list of model mappings associated with the project"""
+        if self.model_mapping_group:
+            model_mappings = Setting.objects.filter(group__id=self.model_mapping_group_id)
+            this_model_mapping = {
+                model_mapping.key: model_mapping.value
+                for model_mapping in model_mappings
+            }
+            return this_model_mapping
         else:
             return {}
 
