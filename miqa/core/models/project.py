@@ -1,4 +1,5 @@
 from uuid import uuid4
+import logging
 
 from django.apps import apps
 from django.contrib.auth.models import User
@@ -55,7 +56,10 @@ class Project(TimeStampedModel, models.Model):
     evaluation_models = models.JSONField(default=default_evaluation_model_mapping)
     default_email_recipients = models.TextField(blank=True)
     artifact_group = models.ForeignKey('SettingsGroup', null=True, blank=True, on_delete=models.SET_NULL, related_name="artifact_group")
+    model_source_type_mapping_group = models.ForeignKey('SettingsGroup', null=True, blank=True, on_delete=models.SET_NULL, related_name="model_source_type_mapping_group")
     model_mapping_group = models.ForeignKey('SettingsGroup', null=True, blank=True, on_delete=models.SET_NULL, related_name="model_mapping_group")
+    model_predictions_group = models.ForeignKey('SettingsGroup', null=True, blank=True, on_delete=models.SET_NULL, related_name="model_predictions_group")
+
 
     @property
     def artifacts(self) -> dict:
@@ -70,8 +74,21 @@ class Project(TimeStampedModel, models.Model):
         else:
             return {}
     @property
+    def model_source_type_mappings(self) -> dict:
+        """Gets the list of file type to model mappings associated with the project"""
+        if self.model_source_type_mapping_group:
+            model_source_type_mappings = Setting.objects.filter(group__id=self.model_source_type_mapping_group_id)
+            this_model_source_type_mapping = {
+                model_source_type_mapping.key: model_source_type_mapping.value
+                for model_source_type_mapping in model_source_type_mappings
+            }
+            return this_model_source_type_mapping
+        else:
+            return {}
+
+    @property
     def model_mappings(self) -> dict:
-        """Gets the list of model mappings associated with the project"""
+        """Gets the list of models associated with the project"""
         if self.model_mapping_group:
             model_mappings = Setting.objects.filter(group__id=self.model_mapping_group_id)
             this_model_mapping = {
@@ -79,6 +96,21 @@ class Project(TimeStampedModel, models.Model):
                 for model_mapping in model_mappings
             }
             return this_model_mapping
+        else:
+            return {}
+
+    @property
+    def model_predictions(self) -> dict:
+        """Gets the list of predictions associated with the project"""
+        if self.model_predictions_group:
+            logging.debug(f'self.model_predictions_group: {self.model_predictions_group_id}')
+            prediction_mappings = Setting.objects.filter(group__id=self.model_predictions_group_id)
+            logging.debug(f'project\'s prediction_mappings: {prediction_mappings}')
+            this_prediction_mapping = {}
+            for prediction in prediction_mappings:
+                this_prediction_mapping.setdefault(prediction.key, []).append(prediction.value)
+            logging.debug(f'predictions from project: {this_prediction_mapping}')
+            return this_prediction_mapping
         else:
             return {}
 
