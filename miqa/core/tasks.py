@@ -65,22 +65,22 @@ def reset_demo():
 def evaluate_frame_content(frame_id):
     from miqa.learning.nn_inference import evaluate1
 
-    logging.warning(f'Frame Id: {frame_id}')
+    logging.debug(f'Frame Id: {frame_id}')
     frame = Frame.objects.get(id=frame_id)
-    logging.warning(f'Frame: {frame}')
+    logging.debug(f'Frame: {frame}')
     # Get the model that matches the frame's file type
-    logging.warning(f'Eval Model Type Mappings: {frame.scan.experiment.project.model_source_type_mappings}')
+    logging.debug(f'Eval Model Type Mappings: {frame.scan.experiment.project.model_source_type_mappings}')
     eval_model_name = frame.scan.experiment.project.model_source_type_mappings[frame.scan.scan_type]
-    logging.warning(f'Eval Model Name: {eval_model_name}')
+    logging.debug(f'Eval Model Name: {eval_model_name}')
     # Get the PyTorch model file name
     eval_model_file = frame.scan.experiment.project.model_mappings[eval_model_name]
-    logging.warning(f'Eval Model File: {eval_model_file}')
+    logging.debug(f'Eval Model File: {eval_model_file}')
     # Get the Predictions associated with the model
     eval_model_predictions = [
         prediction_mapping
         for prediction_mapping in frame.scan.experiment.project.model_predictions[eval_model_name]
     ]
-    logging.warning(f'All Eval Model Predictions: {eval_model_predictions}')
+    logging.debug(f'All Eval Model Predictions: {eval_model_predictions}')
     eval_model_nn = NNModel(eval_model_file, eval_model_predictions)
 
     s3_public = frame.scan.experiment.project.s3_public
