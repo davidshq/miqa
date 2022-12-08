@@ -107,7 +107,6 @@ def evaluate_frame_content(frame_id):
 
 @shared_task
 def evaluate_data(frames_by_project):
-    from miqa.learning.evaluation_models import available_evaluation_models
     from miqa.learning.nn_inference import evaluate_many
 
     model_to_frames_map = {}
@@ -117,7 +116,9 @@ def evaluate_data(frames_by_project):
             frame = Frame.objects.get(id=frame_id)
             file_path = frame.raw_path
             if frame.storage_mode == StorageMode.S3_PATH or Path(file_path).exists():
-                eval_model_name = project.evaluation_models[[frame.scan.scan_type][0]]
+                # Get the model that matches the frame's file type
+                logging.warning(f'Eval Model Type Mappings: {project.model_source_type_mappings}')
+                eval_model_name = project.model_source_type_mappings[frame.scan.scan_type]
                 if eval_model_name not in model_to_frames_map:
                     model_to_frames_map[eval_model_name] = []
                 model_to_frames_map[eval_model_name].append(frame)
@@ -125,7 +126,16 @@ def evaluate_data(frames_by_project):
     with tempfile.TemporaryDirectory() as tmpdirname:
         tmpdir = Path(tmpdirname)
         for model_name, frame_set in model_to_frames_map.items():
-            current_model = available_evaluation_models[model_name].load()
+            # Get the PyTorch model file name
+            eval_model_file = project.model_mappings[model_name]
+            # Get the predictions associated with the model
+            eval_model_predictions = [
+                prediction_mapping
+                for prediction_mapping in project.model_predictions[model_name]
+            ]
+            # Load the appropriate NNModel
+            eval_model_nn = NNModel(eval_model_file, eval_model_predictions)
+            current_model = eval_model_nn.load()
             file_paths = {frame: frame.raw_path for frame in frame_set}
             for frame, file_path in file_paths.items():
                 if frame.storage_mode == StorageMode.S3_PATH:
