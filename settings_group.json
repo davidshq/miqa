@@ -17,6 +17,14 @@
   },
   {
     "model": "core.settingsgroup",
+    "pk": "5b8b0ded-b9dc-4463-ad07-36378b7be228",
+    "fields": {
+      "name": "Lung Artifacts",
+      "description": ""
+    }
+  },
+  {
+    "model": "core.settingsgroup",
     "pk": "870e11c9-5024-4cdd-9867-c89ddb84a2f3",
     "fields": {
       "name": "Default Decision Choices",
@@ -27,7 +35,7 @@
     "model": "core.settingsgroup",
     "pk": "88f5a073-b0ee-44ec-bf4d-acd2ed182cb4",
     "fields": {
-      "name": "Default Evaluation Model Mappings",
+      "name": "Default Evaluation File Type to Model Mappings",
       "description": ""
     }
   },
@@ -35,7 +43,7 @@
     "model": "core.settingsgroup",
     "pk": "92eb3e6d-7807-46ee-a5af-395e82621d95",
     "fields": {
-      "name": "Default Available Evaluation Models",
+      "name": "Default Evaluation Model Predictions",
       "description": ""
     }
   },
@@ -43,7 +51,7 @@
     "model": "core.settingsgroup",
     "pk": "ab46c58a-f297-438c-8ab4-4d4aff9aedef",
     "fields": {
-      "name": "Default Model File Mappings",
+      "name": "Default Evaluation Models",
       "description": ""
     }
   },
