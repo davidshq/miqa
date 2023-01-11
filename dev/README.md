@@ -36,13 +36,19 @@ docker-compose run --rm django ./manage.py makeclient --username your.super.user
    5. Authorization grant type: Authorization Code
    6. Name: Any name will suffice
 
-
 ## Run the server
 Run the following command in a new shell in the same directory (this command needs to continue running as the server; use Ctrl+C to stop the server gracefully).
 ```
 docker-compose up
 ```
 Or, if you do not need to see terminal output from this command, it may be useful to run this as a background task. Add a `-d` flag to the end of the previous command to detach the command from the shell.
+
+## Load Initial Config Data
+Run the following command to set the default settings for projects:
+```
+docker-compose run --rm django ./manage.py loaddata setting.json
+docker-compose run --rm django ./manage.py loaddata settings-group.json
+```
 
 Navigate to http://localhost:8000/ to log into MIQA with the credentials you supplied to the `createsuperuser` command. If your login procedure does not work as expected, be sure you check your OAuth Application object in the Django admin console.
 
