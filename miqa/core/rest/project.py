@@ -23,7 +23,7 @@ class ProjectSettingsSerializer(serializers.ModelSerializer):
             'permissions',
             'default_email_recipients',
             'anatomy_orientation',
-            'artifact_group',
+            'artifacts_group',
             'artifacts'
         ]
 
