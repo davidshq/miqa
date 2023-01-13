@@ -14,6 +14,9 @@ from miqa.core.models.scan_decision import ScanDecision, ArtifactState
 from .setting import Setting
 
 def default_evaluation_model_mapping():
+    # NEXT:
+    # model_mapping = Setting.objects.filter(group__key__exact='Default Evaluation Model Mapping')
+    # return model_mapping
     return {
         'T1': 'MIQAMix-0',
         'T2': 'MIQAMix-0',
@@ -55,17 +58,29 @@ class Project(TimeStampedModel, models.Model):
     )
     evaluation_models = models.JSONField(default=default_evaluation_model_mapping)
     default_email_recipients = models.TextField(blank=True)
-    artifact_group = models.ForeignKey('SettingsGroup', null=True, blank=True, on_delete=models.SET_NULL, related_name="artifact_group")
-    model_source_type_mapping_group = models.ForeignKey('SettingsGroup', null=True, blank=True, on_delete=models.SET_NULL, related_name="model_source_type_mapping_group")
-    model_mapping_group = models.ForeignKey('SettingsGroup', null=True, blank=True, on_delete=models.SET_NULL, related_name="model_mapping_group")
-    model_predictions_group = models.ForeignKey('SettingsGroup', null=True, blank=True, on_delete=models.SET_NULL, related_name="model_predictions_group")
+    artifacts_group = models.ForeignKey('Setting', null=True, blank=True,
+                                        on_delete=models.SET_NULL, related_name="artifacts_group",
+                                        limit_choices_to={'group__key__exact': 'Artifact Groups'})
+    files_to_models_group = models.ForeignKey('Setting', null=True, blank=True,
+                                              on_delete=models.SET_NULL,
+                                              related_name="files_to_models_group",
+                                              limit_choices_to={'group__key__exact': 'File to Model Groups'})
+    models_group = models.ForeignKey('Setting', null=True, blank=True,
+                                     on_delete=models.SET_NULL,
+                                     related_name="models_group",
+                                     limit_choices_to={'group__key__exact': 'Evaluation Model Groups'})
+    predictions_group = models.ForeignKey('Setting', null=True, blank=True,
+                                          on_delete=models.SET_NULL,
+                                          related_name="predictions_group",
+                                          limit_choices_to={'group__key__exact': 'Prediction Groups'})
+
 
 
     @property
     def artifacts(self) -> dict:
         """Gets the list of artifacts associated with the project"""
-        if self.artifact_group:
-            artifacts = Setting.objects.filter(group__id=self.artifact_group_id)
+        if self.artifacts_group:
+            artifacts = Setting.objects.filter(group__id=self.artifacts_group_id)
 
             return {
                 artifact_name.key: ArtifactState.UNDEFINED.value
@@ -73,11 +88,13 @@ class Project(TimeStampedModel, models.Model):
             }
         else:
             return {}
+
+
     @property
     def model_source_type_mappings(self) -> dict:
         """Gets the list of file type to model mappings associated with the project"""
-        if self.model_source_type_mapping_group:
-            model_source_type_mappings = Setting.objects.filter(group__id=self.model_source_type_mapping_group_id)
+        if self.files_to_models_group:
+            model_source_type_mappings = Setting.objects.filter(group__id=self.files_to_models_group_id)
             this_model_source_type_mapping = {
                 model_source_type_mapping.key: model_source_type_mapping.value
                 for model_source_type_mapping in model_source_type_mappings
@@ -89,8 +106,8 @@ class Project(TimeStampedModel, models.Model):
     @property
     def model_mappings(self) -> dict:
         """Gets the list of models associated with the project"""
-        if self.model_mapping_group:
-            model_mappings = Setting.objects.filter(group__id=self.model_mapping_group_id)
+        if self.models_group:
+            model_mappings = Setting.objects.filter(group__id=self.models_group_id)
             this_model_mapping = {
                 model_mapping.key: model_mapping.value
                 for model_mapping in model_mappings
@@ -102,9 +119,9 @@ class Project(TimeStampedModel, models.Model):
     @property
     def model_predictions(self) -> dict:
         """Gets the list of predictions associated with the project"""
-        if self.model_predictions_group:
-            logging.debug(f'self.model_predictions_group: {self.model_predictions_group_id}')
-            prediction_mappings = Setting.objects.filter(group__id=self.model_predictions_group_id)
+        if self.predictions_group:
+            logging.debug(f'self.model_predictions_group: {self.predictions_group_id}')
+            prediction_mappings = Setting.objects.filter(group__id=self.predictions_group_id)
             logging.debug(f'project\'s prediction_mappings: {prediction_mappings}')
             this_prediction_mapping = {}
             for prediction in prediction_mappings:
