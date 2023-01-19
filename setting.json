@@ -6,7 +6,7 @@
       "key": "U",
       "value": "Usable",
       "type": "8175d154-cbd7-4988-ae56-b7441c547bc5",
-      "group": "870e11c9-5024-4cdd-9867-c89ddb84a2f3",
+      "group": "baae4031-08e8-4c7a-b9f6-9d8f45a2ebe7",
       "is_type": false
     }
   },
@@ -17,7 +17,7 @@
       "key": "MIQAMix-0",
       "value": "flow_artifact",
       "type": "f7ba1971-9ad4-45c4-9213-d8468fc370ef",
-      "group": "92eb3e6d-7807-46ee-a5af-395e82621d95",
+      "group": "11e0baca-b487-4bba-9953-3890db8a4376",
       "is_type": false
     }
   },
@@ -28,7 +28,7 @@
       "key": "MIQAMix-0",
       "value": "miqaMix-val0.pth",
       "type": "d00e2d25-984b-48f7-9eee-bb8b6fa7a07a",
-      "group": "ab46c58a-f297-438c-8ab4-4d4aff9aedef",
+      "group": "200637e3-07d5-46fd-9926-dd987e47e0fa",
       "is_type": false
     }
   },
@@ -39,7 +39,7 @@
       "key": "Q?",
       "value": "Questionable",
       "type": "8175d154-cbd7-4988-ae56-b7441c547bc5",
-      "group": "870e11c9-5024-4cdd-9867-c89ddb84a2f3",
+      "group": "baae4031-08e8-4c7a-b9f6-9d8f45a2ebe7",
       "is_type": false
     }
   },
@@ -50,7 +50,7 @@
       "key": "MIQAT1-0",
       "value": "miqaT1-val0.pth",
       "type": "d00e2d25-984b-48f7-9eee-bb8b6fa7a07a",
-      "group": "ab46c58a-f297-438c-8ab4-4d4aff9aedef",
+      "group": "200637e3-07d5-46fd-9926-dd987e47e0fa",
       "is_type": false
     }
   },
@@ -61,7 +61,7 @@
       "key": "T1",
       "value": "T1",
       "type": "f90de68b-90de-4d17-8d83-a15a7e3b30c6",
-      "group": "b4d1cc19-418c-4715-8035-9728bb4a5384",
+      "group": "a81af095-29e1-4e47-a11a-33bcb72d1e9d",
       "is_type": false
     }
   },
@@ -72,7 +72,7 @@
       "key": "T2",
       "value": "T2",
       "type": "f90de68b-90de-4d17-8d83-a15a7e3b30c6",
-      "group": "b4d1cc19-418c-4715-8035-9728bb4a5384",
+      "group": "a81af095-29e1-4e47-a11a-33bcb72d1e9d",
       "is_type": false
     }
   },
@@ -83,7 +83,7 @@
       "key": "MIQAT1-0",
       "value": "flow_artifact",
       "type": "f7ba1971-9ad4-45c4-9213-d8468fc370ef",
-      "group": "92eb3e6d-7807-46ee-a5af-395e82621d95",
+      "group": "11e0baca-b487-4bba-9953-3890db8a4376",
       "is_type": false
     }
   },
@@ -94,7 +94,18 @@
       "key": "PD",
       "value": "PD",
       "type": "f90de68b-90de-4d17-8d83-a15a7e3b30c6",
-      "group": "b4d1cc19-418c-4715-8035-9728bb4a5384",
+      "group": "a81af095-29e1-4e47-a11a-33bcb72d1e9d",
+      "is_type": false
+    }
+  },
+  {
+    "model": "core.setting",
+    "pk": "11e0baca-b487-4bba-9953-3890db8a4376",
+    "fields": {
+      "key": "Default Evaluation Model Predictions Group",
+      "value": "",
+      "type": "8a1c2132-0ce6-4f30-b1d1-481687032c01",
+      "group": "af3b025c-89bf-49cb-9879-6e385c2ea88f",
       "is_type": false
     }
   },
@@ -105,7 +116,7 @@
       "key": "Lung Artifact 3",
       "value": "",
       "type": "246d7d1c-a378-464b-84fe-e9c4cdb78651",
-      "group": "5b8b0ded-b9dc-4463-ad07-36378b7be228",
+      "group": "8aba1f29-74c5-4f94-9aa0-5bfa8e76466e",
       "is_type": false
     }
   },
@@ -116,7 +127,18 @@
       "key": "ncanda-t1spgr-v1",
       "value": "ncanda-t1spgr-v1",
       "type": "f90de68b-90de-4d17-8d83-a15a7e3b30c6",
-      "group": "b4d1cc19-418c-4715-8035-9728bb4a5384",
+      "group": "a81af095-29e1-4e47-a11a-33bcb72d1e9d",
+      "is_type": false
+    }
+  },
+  {
+    "model": "core.setting",
+    "pk": "200637e3-07d5-46fd-9926-dd987e47e0fa",
+    "fields": {
+      "key": "Default Evaluation Models Group",
+      "value": "",
+      "type": "8a1c2132-0ce6-4f30-b1d1-481687032c01",
+      "group": "ee2d32b0-1fb6-4386-b3f8-70f4a8d0a01e",
       "is_type": false
     }
   },
@@ -127,7 +149,7 @@
       "key": "flow_artifact",
       "value": "",
       "type": "246d7d1c-a378-464b-84fe-e9c4cdb78651",
-      "group": "4807c3eb-7cb9-41b7-a7ac-115ab3be913f",
+      "group": "ec995b15-af9d-4f80-8223-02ec862d37e4",
       "is_type": false
     }
   },
@@ -135,10 +157,10 @@
     "model": "core.setting",
     "pk": "21c638c0-51d1-4aa6-8a81-5072dcf60ced",
     "fields": {
-      "key": "Evaluation Models",
+      "key": "Evaluation Model Type",
       "value": "",
       "type": "b1ab832b-e790-4a39-bf6b-4d3856eae3d3",
-      "group": null,
+      "group": "a6b88215-85b2-43d1-8830-d1ee587e3093",
       "is_type": true
     }
   },
@@ -146,10 +168,10 @@
     "model": "core.setting",
     "pk": "246d7d1c-a378-464b-84fe-e9c4cdb78651",
     "fields": {
-      "key": "Artifacts",
+      "key": "Artifact Type",
       "value": "",
       "type": "b1ab832b-e790-4a39-bf6b-4d3856eae3d3",
-      "group": null,
+      "group": "a6b88215-85b2-43d1-8830-d1ee587e3093",
       "is_type": true
     }
   },
@@ -160,7 +182,7 @@
       "key": "MIQAT1-0",
       "value": "full_brain_coverage",
       "type": "f7ba1971-9ad4-45c4-9213-d8468fc370ef",
-      "group": "92eb3e6d-7807-46ee-a5af-395e82621d95",
+      "group": "11e0baca-b487-4bba-9953-3890db8a4376",
       "is_type": false
     }
   },
@@ -171,7 +193,7 @@
       "key": "MRA",
       "value": "MRA",
       "type": "f90de68b-90de-4d17-8d83-a15a7e3b30c6",
-      "group": "b4d1cc19-418c-4715-8035-9728bb4a5384",
+      "group": "a81af095-29e1-4e47-a11a-33bcb72d1e9d",
       "is_type": false
     }
   },
@@ -182,7 +204,7 @@
       "key": "MIQAT1-0",
       "value": "lesions",
       "type": "f7ba1971-9ad4-45c4-9213-d8468fc370ef",
-      "group": "92eb3e6d-7807-46ee-a5af-395e82621d95",
+      "group": "11e0baca-b487-4bba-9953-3890db8a4376",
       "is_type": false
     }
   },
@@ -190,10 +212,10 @@
     "model": "core.setting",
     "pk": "32bb77ec-935b-4691-ae23-880d090c7ee6",
     "fields": {
-      "key": "Evaluation File to Model Mappings",
+      "key": "Evaluation File to Model Mapping Type",
       "value": "",
       "type": "b1ab832b-e790-4a39-bf6b-4d3856eae3d3",
-      "group": null,
+      "group": "a6b88215-85b2-43d1-8830-d1ee587e3093",
       "is_type": true
     }
   },
@@ -204,7 +226,7 @@
       "key": "MIQAT1-0",
       "value": "ghosting_motion",
       "type": "f7ba1971-9ad4-45c4-9213-d8468fc370ef",
-      "group": "92eb3e6d-7807-46ee-a5af-395e82621d95",
+      "group": "11e0baca-b487-4bba-9953-3890db8a4376",
       "is_type": false
     }
   },
@@ -215,7 +237,7 @@
       "key": "PD",
       "value": "MIQAMix-0",
       "type": "32bb77ec-935b-4691-ae23-880d090c7ee6",
-      "group": "88f5a073-b0ee-44ec-bf4d-acd2ed182cb4",
+      "group": "c0e105ea-847e-4de3-b76f-72ec1083be5e",
       "is_type": false
     }
   },
@@ -226,7 +248,7 @@
       "key": "MIQAMix-0",
       "value": "contrast_to_noise_ratio",
       "type": "f7ba1971-9ad4-45c4-9213-d8468fc370ef",
-      "group": "92eb3e6d-7807-46ee-a5af-395e82621d95",
+      "group": "11e0baca-b487-4bba-9953-3890db8a4376",
       "is_type": false
     }
   },
@@ -237,7 +259,7 @@
       "key": "UN",
       "value": "Unusable",
       "type": "8175d154-cbd7-4988-ae56-b7441c547bc5",
-      "group": "870e11c9-5024-4cdd-9867-c89ddb84a2f3",
+      "group": "baae4031-08e8-4c7a-b9f6-9d8f45a2ebe7",
       "is_type": false
     }
   },
@@ -248,7 +270,7 @@
       "key": "MIQAMix-0",
       "value": "misalignment",
       "type": "f7ba1971-9ad4-45c4-9213-d8468fc370ef",
-      "group": "92eb3e6d-7807-46ee-a5af-395e82621d95",
+      "group": "11e0baca-b487-4bba-9953-3890db8a4376",
       "is_type": false
     }
   },
@@ -259,7 +281,18 @@
       "key": "swap_wraparound",
       "value": "",
       "type": "246d7d1c-a378-464b-84fe-e9c4cdb78651",
-      "group": "4807c3eb-7cb9-41b7-a7ac-115ab3be913f",
+      "group": "ec995b15-af9d-4f80-8223-02ec862d37e4",
+      "is_type": false
+    }
+  },
+  {
+    "model": "core.setting",
+    "pk": "4374ef43-78a8-43a2-95d5-4e27b166ccba",
+    "fields": {
+      "key": "Artifact Groups",
+      "value": "",
+      "type": "8a1c2132-0ce6-4f30-b1d1-481687032c01",
+      "group": "a6b88215-85b2-43d1-8830-d1ee587e3093",
       "is_type": false
     }
   },
@@ -269,8 +302,8 @@
     "fields": {
       "key": "LPS",
       "value": "LPS",
-      "type": null,
-      "group": "4966cd4d-a98c-4516-927b-998c558fbc2a",
+      "type": "689e094f-e96f-404b-945c-abf9e3ad1fbf",
+      "group": "8be09e75-51b0-4e47-a195-4028c24a4f9f",
       "is_type": false
     }
   },
@@ -281,7 +314,7 @@
       "key": "MIQAMix-0",
       "value": "swap_wraparound",
       "type": "f7ba1971-9ad4-45c4-9213-d8468fc370ef",
-      "group": "92eb3e6d-7807-46ee-a5af-395e82621d95",
+      "group": "11e0baca-b487-4bba-9953-3890db8a4376",
       "is_type": false
     }
   },
@@ -292,7 +325,7 @@
       "key": "UE",
       "value": "Usable-Extra",
       "type": "8175d154-cbd7-4988-ae56-b7441c547bc5",
-      "group": "870e11c9-5024-4cdd-9867-c89ddb84a2f3",
+      "group": "baae4031-08e8-4c7a-b9f6-9d8f45a2ebe7",
       "is_type": false
     }
   },
@@ -303,7 +336,7 @@
       "key": "T2",
       "value": "MIQAMix-0",
       "type": "32bb77ec-935b-4691-ae23-880d090c7ee6",
-      "group": "88f5a073-b0ee-44ec-bf4d-acd2ed182cb4",
+      "group": "c0e105ea-847e-4de3-b76f-72ec1083be5e",
       "is_type": false
     }
   },
@@ -313,8 +346,8 @@
     "fields": {
       "key": "RAS",
       "value": "RAS",
-      "type": null,
-      "group": "4966cd4d-a98c-4516-927b-998c558fbc2a",
+      "type": "689e094f-e96f-404b-945c-abf9e3ad1fbf",
+      "group": "8be09e75-51b0-4e47-a195-4028c24a4f9f",
       "is_type": false
     }
   },
@@ -325,7 +358,7 @@
       "key": "ghosting_motion",
       "value": "",
       "type": "246d7d1c-a378-464b-84fe-e9c4cdb78651",
-      "group": "4807c3eb-7cb9-41b7-a7ac-115ab3be913f",
+      "group": "ec995b15-af9d-4f80-8223-02ec862d37e4",
       "is_type": false
     }
   },
@@ -336,7 +369,7 @@
       "key": "MIQAMix-0",
       "value": "susceptibility_metal",
       "type": "f7ba1971-9ad4-45c4-9213-d8468fc370ef",
-      "group": "92eb3e6d-7807-46ee-a5af-395e82621d95",
+      "group": "11e0baca-b487-4bba-9953-3890db8a4376",
       "is_type": false
     }
   },
@@ -347,7 +380,7 @@
       "key": "MIQAMix-0",
       "value": "signal_to_noise_ratio",
       "type": "f7ba1971-9ad4-45c4-9213-d8468fc370ef",
-      "group": "92eb3e6d-7807-46ee-a5af-395e82621d95",
+      "group": "11e0baca-b487-4bba-9953-3890db8a4376",
       "is_type": false
     }
   },
@@ -358,7 +391,7 @@
       "key": "ncanda-dti6b500pepolar-v1",
       "value": "MIQAMix-0",
       "type": "32bb77ec-935b-4691-ae23-880d090c7ee6",
-      "group": "88f5a073-b0ee-44ec-bf4d-acd2ed182cb4",
+      "group": "c0e105ea-847e-4de3-b76f-72ec1083be5e",
       "is_type": false
     }
   },
@@ -369,7 +402,7 @@
       "key": "normal_variants",
       "value": "",
       "type": "246d7d1c-a378-464b-84fe-e9c4cdb78651",
-      "group": "4807c3eb-7cb9-41b7-a7ac-115ab3be913f",
+      "group": "ec995b15-af9d-4f80-8223-02ec862d37e4",
       "is_type": false
     }
   },
@@ -380,7 +413,7 @@
       "key": "PET",
       "value": "PET",
       "type": "f90de68b-90de-4d17-8d83-a15a7e3b30c6",
-      "group": "b4d1cc19-418c-4715-8035-9728bb4a5384",
+      "group": "a81af095-29e1-4e47-a11a-33bcb72d1e9d",
       "is_type": false
     }
   },
@@ -391,8 +424,19 @@
       "key": "MIQAMix-0",
       "value": "ghosting_motion",
       "type": "f7ba1971-9ad4-45c4-9213-d8468fc370ef",
-      "group": "92eb3e6d-7807-46ee-a5af-395e82621d95",
+      "group": "11e0baca-b487-4bba-9953-3890db8a4376",
       "is_type": false
+    }
+  },
+  {
+    "model": "core.setting",
+    "pk": "689e094f-e96f-404b-945c-abf9e3ad1fbf",
+    "fields": {
+      "key": "Anatomy Orientation Type",
+      "value": "",
+      "type": "b1ab832b-e790-4a39-bf6b-4d3856eae3d3",
+      "group": "a6b88215-85b2-43d1-8830-d1ee587e3093",
+      "is_type": true
     }
   },
   {
@@ -402,7 +446,7 @@
       "key": "ncanda-dti60b1000-v1",
       "value": "MIQAT1-0",
       "type": "32bb77ec-935b-4691-ae23-880d090c7ee6",
-      "group": "88f5a073-b0ee-44ec-bf4d-acd2ed182cb4",
+      "group": "c0e105ea-847e-4de3-b76f-72ec1083be5e",
       "is_type": false
     }
   },
@@ -413,7 +457,7 @@
       "key": "MIQAMix-0",
       "value": "truncation_artifact",
       "type": "f7ba1971-9ad4-45c4-9213-d8468fc370ef",
-      "group": "92eb3e6d-7807-46ee-a5af-395e82621d95",
+      "group": "11e0baca-b487-4bba-9953-3890db8a4376",
       "is_type": false
     }
   },
@@ -424,7 +468,7 @@
       "key": "susceptibility_metal",
       "value": "",
       "type": "246d7d1c-a378-464b-84fe-e9c4cdb78651",
-      "group": "4807c3eb-7cb9-41b7-a7ac-115ab3be913f",
+      "group": "ec995b15-af9d-4f80-8223-02ec862d37e4",
       "is_type": false
     }
   },
@@ -435,7 +479,7 @@
       "key": "ncanda-mprage-v1",
       "value": "ncanda-mprage-v1",
       "type": "f90de68b-90de-4d17-8d83-a15a7e3b30c6",
-      "group": "b4d1cc19-418c-4715-8035-9728bb4a5384",
+      "group": "a81af095-29e1-4e47-a11a-33bcb72d1e9d",
       "is_type": false
     }
   },
@@ -446,7 +490,7 @@
       "key": "ncanda-dti30b400-v1",
       "value": "MIQAT1-0",
       "type": "32bb77ec-935b-4691-ae23-880d090c7ee6",
-      "group": "88f5a073-b0ee-44ec-bf4d-acd2ed182cb4",
+      "group": "c0e105ea-847e-4de3-b76f-72ec1083be5e",
       "is_type": false
     }
   },
@@ -457,7 +501,7 @@
       "key": "ncanda-dti6b500pepolar-v1",
       "value": "ncanda-dti6b500pepolar-v1",
       "type": "f90de68b-90de-4d17-8d83-a15a7e3b30c6",
-      "group": "b4d1cc19-418c-4715-8035-9728bb4a5384",
+      "group": "a81af095-29e1-4e47-a11a-33bcb72d1e9d",
       "is_type": false
     }
   },
@@ -468,7 +512,7 @@
       "key": "ncanda-dti30b400-v1",
       "value": "ncanda-dti30b400-v1",
       "type": "f90de68b-90de-4d17-8d83-a15a7e3b30c6",
-      "group": "b4d1cc19-418c-4715-8035-9728bb4a5384",
+      "group": "a81af095-29e1-4e47-a11a-33bcb72d1e9d",
       "is_type": false
     }
   },
@@ -479,7 +523,7 @@
       "key": "ncanda-t2fse-v1",
       "value": "ncanda-t2fse-v1",
       "type": "f90de68b-90de-4d17-8d83-a15a7e3b30c6",
-      "group": "b4d1cc19-418c-4715-8035-9728bb4a5384",
+      "group": "a81af095-29e1-4e47-a11a-33bcb72d1e9d",
       "is_type": false
     }
   },
@@ -490,7 +534,7 @@
       "key": "inhomogeneity",
       "value": "",
       "type": "246d7d1c-a378-464b-84fe-e9c4cdb78651",
-      "group": "4807c3eb-7cb9-41b7-a7ac-115ab3be913f",
+      "group": "ec995b15-af9d-4f80-8223-02ec862d37e4",
       "is_type": false
     }
   },
@@ -501,7 +545,7 @@
       "key": "lesions",
       "value": "",
       "type": "246d7d1c-a378-464b-84fe-e9c4cdb78651",
-      "group": "4807c3eb-7cb9-41b7-a7ac-115ab3be913f",
+      "group": "ec995b15-af9d-4f80-8223-02ec862d37e4",
       "is_type": false
     }
   },
@@ -509,10 +553,10 @@
     "model": "core.setting",
     "pk": "8175d154-cbd7-4988-ae56-b7441c547bc5",
     "fields": {
-      "key": "Decision Choices",
+      "key": "Decision Choice Type",
       "value": "",
       "type": "b1ab832b-e790-4a39-bf6b-4d3856eae3d3",
-      "group": null,
+      "group": "a6b88215-85b2-43d1-8830-d1ee587e3093",
       "is_type": true
     }
   },
@@ -523,7 +567,29 @@
       "key": "Lung Artifact 1",
       "value": "",
       "type": "246d7d1c-a378-464b-84fe-e9c4cdb78651",
-      "group": "5b8b0ded-b9dc-4463-ad07-36378b7be228",
+      "group": "8aba1f29-74c5-4f94-9aa0-5bfa8e76466e",
+      "is_type": false
+    }
+  },
+  {
+    "model": "core.setting",
+    "pk": "8a1c2132-0ce6-4f30-b1d1-481687032c01",
+    "fields": {
+      "key": "Group Type",
+      "value": "",
+      "type": "b1ab832b-e790-4a39-bf6b-4d3856eae3d3",
+      "group": "a6b88215-85b2-43d1-8830-d1ee587e3093",
+      "is_type": true
+    }
+  },
+  {
+    "model": "core.setting",
+    "pk": "8aba1f29-74c5-4f94-9aa0-5bfa8e76466e",
+    "fields": {
+      "key": "Lung Artifacts Group",
+      "value": "",
+      "type": "8a1c2132-0ce6-4f30-b1d1-481687032c01",
+      "group": "4374ef43-78a8-43a2-95d5-4e27b166ccba",
       "is_type": false
     }
   },
@@ -534,7 +600,18 @@
       "key": "ncanda-t2fse-v1",
       "value": "MIQAMix-0",
       "type": "32bb77ec-935b-4691-ae23-880d090c7ee6",
-      "group": "88f5a073-b0ee-44ec-bf4d-acd2ed182cb4",
+      "group": "c0e105ea-847e-4de3-b76f-72ec1083be5e",
+      "is_type": false
+    }
+  },
+  {
+    "model": "core.setting",
+    "pk": "8be09e75-51b0-4e47-a195-4028c24a4f9f",
+    "fields": {
+      "key": "Default Anatomy Orientations Group",
+      "value": "",
+      "type": "8a1c2132-0ce6-4f30-b1d1-481687032c01",
+      "group": "a6b88215-85b2-43d1-8830-d1ee587e3093",
       "is_type": false
     }
   },
@@ -545,7 +622,7 @@
       "key": "MIQAT1-0",
       "value": "overall_quality",
       "type": "f7ba1971-9ad4-45c4-9213-d8468fc370ef",
-      "group": "92eb3e6d-7807-46ee-a5af-395e82621d95",
+      "group": "11e0baca-b487-4bba-9953-3890db8a4376",
       "is_type": false
     }
   },
@@ -556,7 +633,7 @@
       "key": "MIQAT1-0",
       "value": "truncation_artifact",
       "type": "f7ba1971-9ad4-45c4-9213-d8468fc370ef",
-      "group": "92eb3e6d-7807-46ee-a5af-395e82621d95",
+      "group": "11e0baca-b487-4bba-9953-3890db8a4376",
       "is_type": false
     }
   },
@@ -567,7 +644,7 @@
       "key": "ncanda-dti60b1000-v1",
       "value": "ncanda-dti60b1000-v1",
       "type": "f90de68b-90de-4d17-8d83-a15a7e3b30c6",
-      "group": "b4d1cc19-418c-4715-8035-9728bb4a5384",
+      "group": "a81af095-29e1-4e47-a11a-33bcb72d1e9d",
       "is_type": false
     }
   },
@@ -578,7 +655,7 @@
       "key": "FMRI",
       "value": "FMRI",
       "type": "f90de68b-90de-4d17-8d83-a15a7e3b30c6",
-      "group": "b4d1cc19-418c-4715-8035-9728bb4a5384",
+      "group": "a81af095-29e1-4e47-a11a-33bcb72d1e9d",
       "is_type": false
     }
   },
@@ -589,7 +666,7 @@
       "key": "DTI",
       "value": "DTI",
       "type": "f90de68b-90de-4d17-8d83-a15a7e3b30c6",
-      "group": "b4d1cc19-418c-4715-8035-9728bb4a5384",
+      "group": "a81af095-29e1-4e47-a11a-33bcb72d1e9d",
       "is_type": false
     }
   },
@@ -600,7 +677,29 @@
       "key": "Lung Artifact 2",
       "value": "",
       "type": "246d7d1c-a378-464b-84fe-e9c4cdb78651",
-      "group": "5b8b0ded-b9dc-4463-ad07-36378b7be228",
+      "group": "8aba1f29-74c5-4f94-9aa0-5bfa8e76466e",
+      "is_type": false
+    }
+  },
+  {
+    "model": "core.setting",
+    "pk": "a6b88215-85b2-43d1-8830-d1ee587e3093",
+    "fields": {
+      "key": "Setting Types Group",
+      "value": "",
+      "type": "8a1c2132-0ce6-4f30-b1d1-481687032c01",
+      "group": "a6b88215-85b2-43d1-8830-d1ee587e3093",
+      "is_type": false
+    }
+  },
+  {
+    "model": "core.setting",
+    "pk": "a81af095-29e1-4e47-a11a-33bcb72d1e9d",
+    "fields": {
+      "key": "Default Scan Types Group",
+      "value": "",
+      "type": "8a1c2132-0ce6-4f30-b1d1-481687032c01",
+      "group": "a6b88215-85b2-43d1-8830-d1ee587e3093",
       "is_type": false
     }
   },
@@ -611,7 +710,18 @@
       "key": "MIQAMix-0",
       "value": "lesions",
       "type": "f7ba1971-9ad4-45c4-9213-d8468fc370ef",
-      "group": "92eb3e6d-7807-46ee-a5af-395e82621d95",
+      "group": "11e0baca-b487-4bba-9953-3890db8a4376",
+      "is_type": false
+    }
+  },
+  {
+    "model": "core.setting",
+    "pk": "af3b025c-89bf-49cb-9879-6e385c2ea88f",
+    "fields": {
+      "key": "Prediction Groups",
+      "value": "",
+      "type": "8a1c2132-0ce6-4f30-b1d1-481687032c01",
+      "group": "a6b88215-85b2-43d1-8830-d1ee587e3093",
       "is_type": false
     }
   },
@@ -622,7 +732,7 @@
       "key": "MIQAT1-0",
       "value": "contrast_to_noise_ratio",
       "type": "f7ba1971-9ad4-45c4-9213-d8468fc370ef",
-      "group": "92eb3e6d-7807-46ee-a5af-395e82621d95",
+      "group": "11e0baca-b487-4bba-9953-3890db8a4376",
       "is_type": false
     }
   },
@@ -630,10 +740,10 @@
     "model": "core.setting",
     "pk": "b1ab832b-e790-4a39-bf6b-4d3856eae3d3",
     "fields": {
-      "key": "Setting Type",
+      "key": "Base Type",
       "value": "",
       "type": "b1ab832b-e790-4a39-bf6b-4d3856eae3d3",
-      "group": null,
+      "group": "a6b88215-85b2-43d1-8830-d1ee587e3093",
       "is_type": true
     }
   },
@@ -644,7 +754,7 @@
       "key": "MIQAMix-0",
       "value": "full_brain_coverage",
       "type": "f7ba1971-9ad4-45c4-9213-d8468fc370ef",
-      "group": "92eb3e6d-7807-46ee-a5af-395e82621d95",
+      "group": "11e0baca-b487-4bba-9953-3890db8a4376",
       "is_type": false
     }
   },
@@ -655,7 +765,18 @@
       "key": "MIQAT1-0",
       "value": "normal_variants",
       "type": "f7ba1971-9ad4-45c4-9213-d8468fc370ef",
-      "group": "92eb3e6d-7807-46ee-a5af-395e82621d95",
+      "group": "11e0baca-b487-4bba-9953-3890db8a4376",
+      "is_type": false
+    }
+  },
+  {
+    "model": "core.setting",
+    "pk": "baae4031-08e8-4c7a-b9f6-9d8f45a2ebe7",
+    "fields": {
+      "key": "Default Decision Choices Group",
+      "value": "",
+      "type": "8a1c2132-0ce6-4f30-b1d1-481687032c01",
+      "group": "a6b88215-85b2-43d1-8830-d1ee587e3093",
       "is_type": false
     }
   },
@@ -666,7 +787,7 @@
       "key": "T1",
       "value": "MIQAMix-0",
       "type": "32bb77ec-935b-4691-ae23-880d090c7ee6",
-      "group": "88f5a073-b0ee-44ec-bf4d-acd2ed182cb4",
+      "group": "c0e105ea-847e-4de3-b76f-72ec1083be5e",
       "is_type": false
     }
   },
@@ -677,7 +798,7 @@
       "key": "MIQAMix-0",
       "value": "inhomogeneity",
       "type": "f7ba1971-9ad4-45c4-9213-d8468fc370ef",
-      "group": "92eb3e6d-7807-46ee-a5af-395e82621d95",
+      "group": "11e0baca-b487-4bba-9953-3890db8a4376",
       "is_type": false
     }
   },
@@ -688,7 +809,18 @@
       "key": "misalignment",
       "value": "",
       "type": "246d7d1c-a378-464b-84fe-e9c4cdb78651",
-      "group": "4807c3eb-7cb9-41b7-a7ac-115ab3be913f",
+      "group": "ec995b15-af9d-4f80-8223-02ec862d37e4",
+      "is_type": false
+    }
+  },
+  {
+    "model": "core.setting",
+    "pk": "c0e105ea-847e-4de3-b76f-72ec1083be5e",
+    "fields": {
+      "key": "Default Evaluation File to Model Mappings Group",
+      "value": "",
+      "type": "8a1c2132-0ce6-4f30-b1d1-481687032c01",
+      "group": "d76a18f9-222a-48de-9d0b-8825db1fd656",
       "is_type": false
     }
   },
@@ -699,7 +831,7 @@
       "key": "full_brain_coverage",
       "value": "",
       "type": "246d7d1c-a378-464b-84fe-e9c4cdb78651",
-      "group": "4807c3eb-7cb9-41b7-a7ac-115ab3be913f",
+      "group": "ec995b15-af9d-4f80-8223-02ec862d37e4",
       "is_type": false
     }
   },
@@ -710,7 +842,7 @@
       "key": "MIQAT1-0",
       "value": "swap_wraparound",
       "type": "f7ba1971-9ad4-45c4-9213-d8468fc370ef",
-      "group": "92eb3e6d-7807-46ee-a5af-395e82621d95",
+      "group": "11e0baca-b487-4bba-9953-3890db8a4376",
       "is_type": false
     }
   },
@@ -721,7 +853,7 @@
       "key": "ncanda-rsfmri-v1",
       "value": "ncanda-rsfmri-v1",
       "type": "f90de68b-90de-4d17-8d83-a15a7e3b30c6",
-      "group": "b4d1cc19-418c-4715-8035-9728bb4a5384",
+      "group": "a81af095-29e1-4e47-a11a-33bcb72d1e9d",
       "is_type": false
     }
   },
@@ -732,7 +864,7 @@
       "key": "MRA",
       "value": "MIQAT1-0",
       "type": "32bb77ec-935b-4691-ae23-880d090c7ee6",
-      "group": "88f5a073-b0ee-44ec-bf4d-acd2ed182cb4",
+      "group": "c0e105ea-847e-4de3-b76f-72ec1083be5e",
       "is_type": false
     }
   },
@@ -740,10 +872,10 @@
     "model": "core.setting",
     "pk": "d00e2d25-984b-48f7-9eee-bb8b6fa7a07a",
     "fields": {
-      "key": "Evaluation Models",
+      "key": "Evaluation Model Type",
       "value": "",
       "type": "b1ab832b-e790-4a39-bf6b-4d3856eae3d3",
-      "group": null,
+      "group": "a6b88215-85b2-43d1-8830-d1ee587e3093",
       "is_type": true
     }
   },
@@ -754,7 +886,7 @@
       "key": "MIQAT1-0",
       "value": "inhomogeneity",
       "type": "f7ba1971-9ad4-45c4-9213-d8468fc370ef",
-      "group": "92eb3e6d-7807-46ee-a5af-395e82621d95",
+      "group": "11e0baca-b487-4bba-9953-3890db8a4376",
       "is_type": false
     }
   },
@@ -765,7 +897,18 @@
       "key": "DWI",
       "value": "DWI",
       "type": "f90de68b-90de-4d17-8d83-a15a7e3b30c6",
-      "group": "b4d1cc19-418c-4715-8035-9728bb4a5384",
+      "group": "a81af095-29e1-4e47-a11a-33bcb72d1e9d",
+      "is_type": false
+    }
+  },
+  {
+    "model": "core.setting",
+    "pk": "d76a18f9-222a-48de-9d0b-8825db1fd656",
+    "fields": {
+      "key": "File to Model Groups",
+      "value": "",
+      "type": "8a1c2132-0ce6-4f30-b1d1-481687032c01",
+      "group": "a6b88215-85b2-43d1-8830-d1ee587e3093",
       "is_type": false
     }
   },
@@ -776,7 +919,7 @@
       "key": "ncanda-grefieldmap-v1",
       "value": "ncanda-grefieldmap-v1",
       "type": "f90de68b-90de-4d17-8d83-a15a7e3b30c6",
-      "group": "b4d1cc19-418c-4715-8035-9728bb4a5384",
+      "group": "a81af095-29e1-4e47-a11a-33bcb72d1e9d",
       "is_type": false
     }
   },
@@ -787,7 +930,7 @@
       "key": "MIQAMix-0",
       "value": "overall_quality",
       "type": "f7ba1971-9ad4-45c4-9213-d8468fc370ef",
-      "group": "92eb3e6d-7807-46ee-a5af-395e82621d95",
+      "group": "11e0baca-b487-4bba-9953-3890db8a4376",
       "is_type": false
     }
   },
@@ -798,7 +941,7 @@
       "key": "truncation_artifact",
       "value": "",
       "type": "246d7d1c-a378-464b-84fe-e9c4cdb78651",
-      "group": "4807c3eb-7cb9-41b7-a7ac-115ab3be913f",
+      "group": "ec995b15-af9d-4f80-8223-02ec862d37e4",
       "is_type": false
     }
   },
@@ -809,7 +952,7 @@
       "key": "ncanda-rsfmri-v1",
       "value": "MIQAT1-0",
       "type": "32bb77ec-935b-4691-ae23-880d090c7ee6",
-      "group": "88f5a073-b0ee-44ec-bf4d-acd2ed182cb4",
+      "group": "c0e105ea-847e-4de3-b76f-72ec1083be5e",
       "is_type": false
     }
   },
@@ -820,7 +963,7 @@
       "key": "MIQAMix-0",
       "value": "normal_variants",
       "type": "f7ba1971-9ad4-45c4-9213-d8468fc370ef",
-      "group": "92eb3e6d-7807-46ee-a5af-395e82621d95",
+      "group": "11e0baca-b487-4bba-9953-3890db8a4376",
       "is_type": false
     }
   },
@@ -831,7 +974,7 @@
       "key": "DWI",
       "value": "MIQAT1-0",
       "type": "32bb77ec-935b-4691-ae23-880d090c7ee6",
-      "group": "88f5a073-b0ee-44ec-bf4d-acd2ed182cb4",
+      "group": "c0e105ea-847e-4de3-b76f-72ec1083be5e",
       "is_type": false
     }
   },
@@ -842,7 +985,29 @@
       "key": "MIQAT1-0",
       "value": "misalignment",
       "type": "f7ba1971-9ad4-45c4-9213-d8468fc370ef",
-      "group": "92eb3e6d-7807-46ee-a5af-395e82621d95",
+      "group": "11e0baca-b487-4bba-9953-3890db8a4376",
+      "is_type": false
+    }
+  },
+  {
+    "model": "core.setting",
+    "pk": "ec995b15-af9d-4f80-8223-02ec862d37e4",
+    "fields": {
+      "key": "Default Artifacts Group",
+      "value": "",
+      "type": "8a1c2132-0ce6-4f30-b1d1-481687032c01",
+      "group": "4374ef43-78a8-43a2-95d5-4e27b166ccba",
+      "is_type": false
+    }
+  },
+  {
+    "model": "core.setting",
+    "pk": "ee2d32b0-1fb6-4386-b3f8-70f4a8d0a01e",
+    "fields": {
+      "key": "Evaluation Model Groups",
+      "value": "",
+      "type": "8a1c2132-0ce6-4f30-b1d1-481687032c01",
+      "group": "a6b88215-85b2-43d1-8830-d1ee587e3093",
       "is_type": false
     }
   },
@@ -853,7 +1018,7 @@
       "key": "ncanda-t1spgr-v1",
       "value": "MIQAMix-0",
       "type": "32bb77ec-935b-4691-ae23-880d090c7ee6",
-      "group": "88f5a073-b0ee-44ec-bf4d-acd2ed182cb4",
+      "group": "c0e105ea-847e-4de3-b76f-72ec1083be5e",
       "is_type": false
     }
   },
@@ -864,7 +1029,7 @@
       "key": "CT",
       "value": "CT",
       "type": "f90de68b-90de-4d17-8d83-a15a7e3b30c6",
-      "group": "b4d1cc19-418c-4715-8035-9728bb4a5384",
+      "group": "a81af095-29e1-4e47-a11a-33bcb72d1e9d",
       "is_type": false
     }
   },
@@ -875,7 +1040,7 @@
       "key": "MIQAT1-0",
       "value": "signal_to_noise_ratio",
       "type": "f7ba1971-9ad4-45c4-9213-d8468fc370ef",
-      "group": "92eb3e6d-7807-46ee-a5af-395e82621d95",
+      "group": "11e0baca-b487-4bba-9953-3890db8a4376",
       "is_type": false
     }
   },
@@ -886,7 +1051,7 @@
       "key": "ncanda-mprage-v1",
       "value": "MIQAMix-0",
       "type": "32bb77ec-935b-4691-ae23-880d090c7ee6",
-      "group": "88f5a073-b0ee-44ec-bf4d-acd2ed182cb4",
+      "group": "c0e105ea-847e-4de3-b76f-72ec1083be5e",
       "is_type": false
     }
   },
@@ -894,10 +1059,10 @@
     "model": "core.setting",
     "pk": "f7ba1971-9ad4-45c4-9213-d8468fc370ef",
     "fields": {
-      "key": "Evaluation Model Predictions",
+      "key": "Evaluation Model Prediction Type",
       "value": "",
       "type": "b1ab832b-e790-4a39-bf6b-4d3856eae3d3",
-      "group": null,
+      "group": "a6b88215-85b2-43d1-8830-d1ee587e3093",
       "is_type": true
     }
   },
@@ -905,10 +1070,10 @@
     "model": "core.setting",
     "pk": "f90de68b-90de-4d17-8d83-a15a7e3b30c6",
     "fields": {
-      "key": "Scan Types",
+      "key": "Scan Type",
       "value": "",
       "type": "b1ab832b-e790-4a39-bf6b-4d3856eae3d3",
-      "group": null,
+      "group": "a6b88215-85b2-43d1-8830-d1ee587e3093",
       "is_type": true
     }
   },
@@ -919,7 +1084,7 @@
       "key": "DTI",
       "value": "MIQAT1-0",
       "type": "32bb77ec-935b-4691-ae23-880d090c7ee6",
-      "group": "88f5a073-b0ee-44ec-bf4d-acd2ed182cb4",
+      "group": "c0e105ea-847e-4de3-b76f-72ec1083be5e",
       "is_type": false
     }
   },
@@ -930,7 +1095,7 @@
       "key": "FMRI",
       "value": "MIQAT1-0",
       "type": "32bb77ec-935b-4691-ae23-880d090c7ee6",
-      "group": "88f5a073-b0ee-44ec-bf4d-acd2ed182cb4",
+      "group": "c0e105ea-847e-4de3-b76f-72ec1083be5e",
       "is_type": false
     }
   },
@@ -941,7 +1106,7 @@
       "key": "ncanda-grefieldmap-v1",
       "value": "MIQAMix-0",
       "type": "32bb77ec-935b-4691-ae23-880d090c7ee6",
-      "group": "88f5a073-b0ee-44ec-bf4d-acd2ed182cb4",
+      "group": "c0e105ea-847e-4de3-b76f-72ec1083be5e",
       "is_type": false
     }
   }
