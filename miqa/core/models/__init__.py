@@ -6,7 +6,6 @@ from .project import Project
 from .scan import Scan
 from .scan_decision import ScanDecision
 from .setting import Setting
-from .settings_group import SettingsGroup
 
 __all__ = [
     'Evaluation',
@@ -17,5 +16,4 @@ __all__ = [
     'Scan',
     'ScanDecision',
     'Setting',
-    'SettingsGroup',
 ]

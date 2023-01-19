@@ -60,19 +60,19 @@ class Project(TimeStampedModel, models.Model):
     default_email_recipients = models.TextField(blank=True)
     artifacts_group = models.ForeignKey('Setting', null=True, blank=True,
                                         on_delete=models.SET_NULL, related_name="artifacts_group",
-                                        limit_choices_to={'group__key__exact': 'Artifact Groups'})
+                                        limit_choices_to={'type': 'GAT'})
     files_to_models_group = models.ForeignKey('Setting', null=True, blank=True,
                                               on_delete=models.SET_NULL,
                                               related_name="files_to_models_group",
-                                              limit_choices_to={'group__key__exact': 'File to Model Groups'})
+                                              limit_choices_to={'type': 'GEFMMT'})
     models_group = models.ForeignKey('Setting', null=True, blank=True,
                                      on_delete=models.SET_NULL,
                                      related_name="models_group",
-                                     limit_choices_to={'group__key__exact': 'Evaluation Model Groups'})
+                                     limit_choices_to={'type': 'GEMT'})
     predictions_group = models.ForeignKey('Setting', null=True, blank=True,
                                           on_delete=models.SET_NULL,
                                           related_name="predictions_group",
-                                          limit_choices_to={'group__key__exact': 'Prediction Groups'})
+                                         limit_choices_to={'type': 'GEMPT'})
 
 
 

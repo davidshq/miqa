@@ -2,8 +2,7 @@
 from django.contrib import admin
 from guardian.admin import GuardedModelAdmin
 
-from .models import Evaluation, Experiment, Frame, Project, Scan, ScanDecision, Setting,\
-    SettingsGroup
+from .models import Evaluation, Experiment, Frame, Project, Scan, ScanDecision, Setting
 
 
 @admin.register(Experiment)
@@ -59,7 +58,3 @@ class SettingAdmin(admin.ModelAdmin):
     list_display = ('key', 'value', 'type', 'group', 'is_type')
     list_filter = ('type', 'group', 'is_type')
     list_editable = ('type', 'group', 'is_type')
-
-@admin.register(SettingsGroup)
-class SettingsGroupAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description')
