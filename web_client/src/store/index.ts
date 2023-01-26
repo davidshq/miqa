@@ -978,20 +978,40 @@ const {
           );
         }
         let newProxyManager = false;
-        // We create a new proxy manager if the newScan is not the same as oldScan
-        // Only if the oldScan is equal to the newScan do we retain the proxyManager
-        // TODO: Why do we create a new proxy manager?
+        // Create new proxyManager if scans are different, retain proxyManager otherwise
         if (oldScan !== newScan && state.proxyManager) {
-          // If we don't "shrinkProxyManager()" and reinitialize it between
-          // scans, then we can end up with no frame
-          // slices displayed, even though we have the data and attempted
-          // to render it.  This may be due to frame extents changing between
-          // scans, which is not the case from one timestep of a single scan
-          // to tne next.
+          // If we don't shrink and reinitialize between scans
+          // we soemtimes end up with no frame slices displayed.
+          // This may be due to the extents changing between scans,
+          // the extents do not change from one timestep to another
+          // in a single scan.
           shrinkProxyManager(state.proxyManager);
           newProxyManager = true;
         }
+        // Handles shrinking and/or instantiating a new proxyManager instance
+        await dispatch('setupProxyManager', newProxyManager);
+      }
 
+      try {
+        // Gets the data we need to display
+        let frameData = await dispatch('getFrameData', { frame });
+
+        // Handles configuring the sourceProxy and getting the views
+        await dispatch('setupSourceProxy', { frame, frameData });
+      }
+      catch (err) {
+        console.log('Caught exception loading next frame');
+        console.log(err);
+        state.vtkViews = [];
+        commit('SET_ERROR_LOADING_FRAME', true);
+      } finally {
+        commit('SET_CURRENT_FRAME_ID', frame.id);
+        commit('SET_LOADING_FRAME', false);
+      }
+
+      await this.updateLock();
+    },
+    async setupProxyManager({ state, dispatch, getters, commit }, { newProxyManager }) {
         // vtkProxyManager is from VTK.js
         // If it doesn't exist, create new instance of proxyManager
         // Also, if it does exist but was used for a different scan, create a new one
@@ -1001,12 +1021,12 @@ const {
           });
           state.vtkViews = [];
         }
-      }
-
+    },
+    async setupSourceProxy({ state, dispatch, getters, commit }, { frame, frameData }) {
       // get the source from which we are loading the images
       let sourceProxy = state.proxyManager.getActiveSource();
       let needPrep = false;
-      // Provides default source
+      // Provide default source if it doesn't exist
       if (!sourceProxy) {
         sourceProxy = state.proxyManager.createProxy(
           'Sources',
@@ -1016,9 +1036,6 @@ const {
       }
 
       // This try catch and within logic are mainly for handling data doesn't exist issue
-      try {
-        let frameData = await dispatch('getFrameData', { frame });
-
         // We set the source equal to the frameData we've loaded
         sourceProxy.setInputData(frameData);
         // If sourceProxy doesn't have valid config or proxyManager has no views
@@ -1030,16 +1047,6 @@ const {
         if (!state.vtkViews.length) {
           state.vtkViews = state.proxyManager.getViews();
         }
-      } catch (err) {
-        console.log('Caught exception loading next frame');
-        console.log(err);
-        state.vtkViews = [];
-        commit('SET_ERROR_LOADING_FRAME', true);
-      } finally {
-        commit('SET_CURRENT_FRAME_ID', frame.id);
-        commit('SET_LOADING_FRAME', false);
-      }
-      await this.updateLock();
     },
     async getFrameData({ state, dispatch, getters, commit, }, { frame, onDownloadProgress = null }) {
       let frameData = null;
@@ -1054,99 +1061,6 @@ const {
         frameData = await result.frameData;
       }
       return frameData;
-    },
-    async loadFrame({ state, dispatch, getters, commit, }, { frame, onDownloadProgress = null, proxyNum = 1 }) {
-      // Guard Clauses
-      if (!frame) {
-        throw new Error("frame id doesn't exist");
-      }
-      if (getters.currentFrame === frame) {
-        return;
-      }
-      commit('SET_LOADING_FRAME', true);
-      commit('SET_ERROR_LOADING_FRAME', false);
-      const oldScan = getters.currentScan;
-      // frame.scan returns the scan id
-      const newScan = state.scans[frame.scan];
-
-      // Queue the new scan to be loaded
-      if (newScan !== oldScan && newScan) {
-        queueLoadScan(
-          newScan, 3,
-        );
-      }
-
-      let thisProxyManager;
-      let thisVtkViews;
-      if (proxyNum !== 1) {
-        thisProxyManager = state[`proxyManager${proxyNum}`];
-        thisVtkViews = state[`vtkViews${proxyNum}`];
-      } else {
-        thisProxyManager = state.proxyManager;
-        thisVtkViews = state.vtkViews;
-      }
-
-      let newProxyManager = false;
-      // We only create a new proxy manager if the newScan is not the same as oldScan
-      if (oldScan !== newScan && thisProxyManager) {
-        shrinkProxyManager(thisProxyManager);
-        newProxyManager = true;
-      }
-
-      // vtkProxyManager is from VTK.js
-      // If it doesn't exist, create new instance of proxyManager
-      if (!thisProxyManager || newProxyManager) {
-        thisProxyManager = vtkProxyManager.newInstance({
-          proxyConfiguration: proxy,
-        });
-        // vtkViews are set to empty
-        thisVtkViews = [];
-      }
-
-      // get the source from which we are loading the images
-      let sourceProxy = thisProxyManager.getActiveSource();
-      let needPrep = false;
-      // Provides default source
-      if (!sourceProxy) {
-        sourceProxy = thisProxyManager.createProxy(
-          'Sources',
-          'TrivialProducer',
-        );
-        needPrep = true;
-      }
-
-      // Load the frame
-      try {
-        let frameData = await dispatch('getFrameData', {frame});
-
-        // We set the source equal to the frameData we've loaded
-        sourceProxy.setInputData(frameData);
-        // If sourceProxy doesn't have valid config or proxyManager has no views
-        if (needPrep || !thisProxyManager().length) {
-          prepareProxyManager(thisProxyManager);
-        }
-        // If no vtkViews, get them from proxyManager
-        if (!thisVtkViews.length) {
-          thisVtkViews = thisProxyManager.getViews();
-        }
-      } catch (err) {
-        console.log(err);
-        thisVtkViews = [];
-        commit('SET_ERROR_LOADING_FRAME', true);
-      } finally {
-        commit('SET_CURRENT_FRAME_ID', frame.id);
-        commit('SET_LOADING_FRAME', false);
-      }
-
-      if (proxyNum !== 1) {
-        state[`proxyManager${proxyNum}`] = thisProxyManager;
-        state[`vtkViews${proxyNum}`] = thisVtkViews;
-      } else {
-        state.proxyManager = thisProxyManager;
-        state.vtkViews = thisVtkViews;
-      }
-
-      await this.updateLock();
     },
     /** Determines what lock status should be and updates accordingly */
     async updateLock({ state, getters, commit }) {
