@@ -23,7 +23,7 @@ class ProjectSettingsSerializer(serializers.ModelSerializer):
             'permissions',
             'default_email_recipients',
             'anatomy_orientation',
-            'artifact_group',
+            'artifacts_group',
             'artifacts'
         ]
 
@@ -97,8 +97,7 @@ class ProjectTaskOverviewSerializer(serializers.ModelSerializer):
                     # scan is complete if it is marked usable by anyone
                     # or if marked at all by a tier 2 reviewer
                     return 'complete'
-            elif last_reviewer_role == 'tier_1_reviewer':
-                return 'needs tier 2 review'
+            return 'needs tier 2 review'
 
         return {
             str(scan.id): convert_state_string(scan.decisions.latest('created'))

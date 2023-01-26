@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import tempfile
 from typing import Dict, List, Optional
+import logging
 
 import boto3
 from botocore import UNSIGNED
@@ -14,6 +15,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 import pandas
 from rest_framework.exceptions import APIException
+from miqa.learning.evaluation_models import NNModel
 
 from miqa.core.conversion.import_export_csvs import (
     import_dataframe_to_dict,
@@ -61,13 +63,28 @@ def reset_demo():
 
 @shared_task
 def evaluate_frame_content(frame_id):
-    from miqa.learning.evaluation_models import available_evaluation_models
     from miqa.learning.nn_inference import evaluate1
 
+    logging.debug(f'Frame Id: {frame_id}')
     frame = Frame.objects.get(id=frame_id)
-    eval_model_name = frame.scan.experiment.project.evaluation_models[[frame.scan.scan_type][0]]
+    logging.debug(f'Frame: {frame}')
+    # Get the model that matches the frame's file type
+    logging.debug(f'Eval Model Type Mappings: {frame.scan.experiment.project.model_source_type_mappings}')
+    eval_model_name = frame.scan.experiment.project.model_source_type_mappings[frame.scan.scan_type]
+    logging.debug(f'Eval Model Name: {eval_model_name}')
+    # Get the PyTorch model file name
+    eval_model_file = frame.scan.experiment.project.model_mappings[eval_model_name]
+    logging.debug(f'Eval Model File: {eval_model_file}')
+    # Get the Predictions associated with the model
+    eval_model_predictions = [
+        prediction_mapping
+        for prediction_mapping in frame.scan.experiment.project.model_predictions[eval_model_name]
+    ]
+    logging.debug(f'All Eval Model Predictions: {eval_model_predictions}')
+    eval_model_nn = NNModel(eval_model_file, eval_model_predictions)
+
     s3_public = frame.scan.experiment.project.s3_public
-    eval_model = available_evaluation_models[eval_model_name].load()
+    eval_model = eval_model_nn.load()
     with tempfile.TemporaryDirectory() as tmpdirname:
         # need to send a local version to NN
         if frame.storage_mode == StorageMode.LOCAL_PATH:
@@ -90,7 +107,6 @@ def evaluate_frame_content(frame_id):
 
 @shared_task
 def evaluate_data(frames_by_project):
-    from miqa.learning.evaluation_models import available_evaluation_models
     from miqa.learning.nn_inference import evaluate_many
 
     model_to_frames_map = {}
@@ -100,7 +116,9 @@ def evaluate_data(frames_by_project):
             frame = Frame.objects.get(id=frame_id)
             file_path = frame.raw_path
             if frame.storage_mode == StorageMode.S3_PATH or Path(file_path).exists():
-                eval_model_name = project.evaluation_models[[frame.scan.scan_type][0]]
+                # Get the model that matches the frame's file type
+                logging.warning(f'Eval Model Type Mappings: {project.model_source_type_mappings}')
+                eval_model_name = project.model_source_type_mappings[frame.scan.scan_type]
                 if eval_model_name not in model_to_frames_map:
                     model_to_frames_map[eval_model_name] = []
                 model_to_frames_map[eval_model_name].append(frame)
@@ -108,7 +126,16 @@ def evaluate_data(frames_by_project):
     with tempfile.TemporaryDirectory() as tmpdirname:
         tmpdir = Path(tmpdirname)
         for model_name, frame_set in model_to_frames_map.items():
-            current_model = available_evaluation_models[model_name].load()
+            # Get the PyTorch model file name
+            eval_model_file = project.model_mappings[model_name]
+            # Get the predictions associated with the model
+            eval_model_predictions = [
+                prediction_mapping
+                for prediction_mapping in project.model_predictions[model_name]
+            ]
+            # Load the appropriate NNModel
+            eval_model_nn = NNModel(eval_model_file, eval_model_predictions)
+            current_model = eval_model_nn.load()
             file_paths = {frame: frame.raw_path for frame in frame_set}
             for frame, file_path in file_paths.items():
                 if frame.storage_mode == StorageMode.S3_PATH:

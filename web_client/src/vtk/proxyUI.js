@@ -46,6 +46,41 @@ const Volume = [
   },
 ];
 
+const Geometry = [
+  {
+    name: 'colorBy',
+    domain: {},
+  },
+  {
+    name: 'color',
+  },
+  {
+    name: 'representation',
+    domain: {
+      items: [
+        { text: 'Surface', value: 'Surface' },
+        { text: 'Surface with edges', value: 'Surface with edges' },
+        { text: 'Wireframe', value: 'Wireframe' },
+        { text: 'Points', value: 'Points' },
+      ],
+    },
+  },
+  {
+    name: 'opacity',
+    domain: { min: 0, max: 1, step: 0.01 },
+  },
+  {
+    name: 'interpolateScalarsBeforeMapping',
+  },
+  {
+    name: 'visibility',
+  },
+  {
+    name: 'pointSize',
+    domain: { min: 1, max: 50 },
+  },
+];
+
 const Slice = [
   {
     name: 'visibility',
@@ -114,6 +149,7 @@ const View2D = [
 
 export default {
   Volume,
+  Geometry,
   Slice,
   View3D,
   View2D,

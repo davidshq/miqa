@@ -71,7 +71,9 @@ function prepareProxyManager(proxyManager: vtkProxyManager) {
       view.getRepresentations().forEach((representation) => {
         representation.setInterpolationType(InterpolationType.NEAREST);
         representation.onModified(macro.debounce(() => {
-          view.render(true);
+          if (view.getRepresentations()) {
+            view.render(true);
+          }
         }, 0));
         // debounce timer doesn't need a wait time because
         // the many onModified changes that it needs to collapse to a single rerender
@@ -305,6 +307,7 @@ function startReaderWorkerPool() {
  * @param loadNext  Integer
  */
 function queueLoadScan(scan, loadNext = 0) {
+  // load all frames in target scan
   if (!loadedData.includes(scan.id)) {
     // For each scan in scanFrames
     store.state.scanFrames[scan.id].forEach(
@@ -474,7 +477,6 @@ const {
   rootGetterContext,
   moduleGetterContext,
 } = createDirectStore({
-  strict: true, // TODO: turn off for production
   state: {
     ...initState,
     workerPool: new WorkerPool(poolSize, poolFunction),
@@ -490,7 +492,8 @@ const {
         // scan was removed from list by review mode; do nothing
         return {};
       }
-      const experiment = currentFrame.experiment ? state.experiments[currentFrame.experiment] : null;
+      const experiment = currentFrame.experiment
+        ? state.experiments[currentFrame.experiment] : null;
       const project = state.projects.filter((x) => x.id === experiment.project)[0];
       // Get list of scans for current experiment
       const experimentScansList = state.experimentScans[experiment.id];
@@ -530,7 +533,9 @@ const {
     },
     /** Gets the previous frame based on the currentFrame */
     previousFrame(state, getters) {
-      return getters.currentFrame ? getters.currentFrame.previousFrame : null;
+      return getters.currentFrame
+        ? getters.currentFrame.previousFrame
+        : null;
     },
     /** Gets the next frame based on the currentFrame */
     nextFrame(state, getters) {
@@ -921,16 +926,23 @@ const {
      * @param projectId   string   ID of the currently loaded project, e.g., 2dd4e46d-0a34-4267-be8c-3ccfbd4e9fcc
      */
     async loadScan({ state, dispatch }, { scanId, projectId }) {
-      if (!scanId) {
+      if (!scanId || !state.projects) {
         return undefined;
       }
       // If currently loaded frameId does not match frameId to load
       if (!state.scans[scanId] && state.projects) {
         await dispatch('loadProjects');
-        const targetProject = state.projects.filter((proj) => proj.id === projectId)[0];
-        await dispatch('loadProject', targetProject);
+        if (state.projects) {
+          const targetProject = state.projects.filter((proj) => proj.id === projectId)[0];
+          await dispatch('loadProject', targetProject);
+        } else {
+          return undefined;
+        }
       }
       return state.scans[scanId];
+    },
+    async setCurrentFrame({ commit }, frameId) {
+      commit('setCurrentFrameId', frameId);
     },
     /**
      * Handles the process of changing frames in Scan.vue
@@ -941,7 +953,9 @@ const {
      *
      * Only used by Scan.vue
      */
-    async swapToFrame({ state, dispatch, getters, commit, }, { frame, onDownloadProgress = null }) {
+    async swapToFrame({
+      state, dispatch, getters, commit,
+    }, { frame, onDownloadProgress = null, loadAll = true }) {
       // Guard Clauses
       if (!frame) {
         throw new Error("frame id doesn't exist");
@@ -951,34 +965,42 @@ const {
       }
       commit('SET_LOADING_FRAME', true);
       commit('SET_ERROR_LOADING_FRAME', false);
-      const oldScan = getters.currentScan;
-      // frame.scan returns the scan id
-      const newScan = state.scans[frame.scan];
 
-      // Queue the new scan to be loaded
-      if (newScan !== oldScan && newScan) {
-        queueLoadScan(
-          newScan, 3,
+      if (loadAll) {
+        const oldScan = getters.currentScan;
+        // frame.scan returns the scan id
+        const newScan = state.scans[frame.scan];
+
+        // Queue the new scan to be loaded
+        if (newScan !== oldScan && newScan) {
+          queueLoadScan(
+            newScan, 3,
           );
-      }
-      let newProxyManager = false;
-      // We create a new proxy manager if the newScan is not the same as oldScan
-      // Only if the oldScan is equal to the newScan do we retain the proxyManager
-      // TODO: Why do we create a new proxy manager?
-      if (oldScan !== newScan && state.proxyManager) {
-        shrinkProxyManager(state.proxyManager);
-        newProxyManager = true;
-      }
+        }
+        let newProxyManager = false;
+        // We create a new proxy manager if the newScan is not the same as oldScan
+        // Only if the oldScan is equal to the newScan do we retain the proxyManager
+        // TODO: Why do we create a new proxy manager?
+        if (oldScan !== newScan && state.proxyManager) {
+          // If we don't "shrinkProxyManager()" and reinitialize it between
+          // scans, then we can end up with no frame
+          // slices displayed, even though we have the data and attempted
+          // to render it.  This may be due to frame extents changing between
+          // scans, which is not the case from one timestep of a single scan
+          // to tne next.
+          shrinkProxyManager(state.proxyManager);
+          newProxyManager = true;
+        }
 
-      // vtkProxyManager is from VTK.js
-      // If it doesn't exist, create new instance of proxyManager
-      // Also, if it does exist but was used for a different scan, create a new one
-      if (!state.proxyManager || newProxyManager) {
-        state.proxyManager = vtkProxyManager.newInstance({
-          proxyConfiguration: proxy,
-        });
-        // vtkViews are set to empty
-        state.vtkViews = [];
+        // vtkProxyManager is from VTK.js
+        // If it doesn't exist, create new instance of proxyManager
+        // Also, if it does exist but was used for a different scan, create a new one
+        if (!state.proxyManager || newProxyManager) {
+          state.proxyManager = vtkProxyManager.newInstance({
+            proxyConfiguration: proxy,
+          });
+          state.vtkViews = [];
+        }
       }
 
       // get the source from which we are loading the images
@@ -993,7 +1015,7 @@ const {
         needPrep = true;
       }
 
-      // Load the frame
+      // This try catch and within logic are mainly for handling data doesn't exist issue
       try {
         let frameData = await dispatch('getFrameData', { frame });
 
@@ -1002,6 +1024,7 @@ const {
         // If sourceProxy doesn't have valid config or proxyManager has no views
         if (needPrep || !state.proxyManager.getViews().length) {
           prepareProxyManager(state.proxyManager);
+          state.vtkViews = state.proxyManager.getViews();
         }
         // If no vtkViews, get them from proxyManager
         if (!state.vtkViews.length) {

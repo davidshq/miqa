@@ -156,12 +156,12 @@ export default {
         color,
       };
     },
-    /**
-     * Returns the task status for the specified scan
-     *
-     * @param scan
-     * @returns {string}
-     */
+    scanIsCurrent(scan) {
+      if (scan === this.currentScan) {
+        return ' current';
+      }
+      return '';
+    },
     scanState(scan) {
       let scanTaskState;
       // If we have a value for currentTaskOverview

@@ -1,5 +1,7 @@
 <script lang="ts">
-import { mapActions, mapState } from 'vuex';
+import {
+  mapActions, mapState
+} from 'vuex';
 
 import Navbar from '@/components/Navbar.vue';
 import ControlPanel from '@/components/ControlPanel.vue';

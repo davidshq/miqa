@@ -81,6 +81,11 @@ export default {
       Contour: proxyFilter.Contour,
     },
     Representations: {
+      Geometry: createProxyDefinition(
+        vtkGeometryRepresentationProxy,
+        proxyUI.Geometry,
+        proxyLinks.Geometry,
+      ),
       Slice: createProxyDefinition(
         vtkSliceRepresentationProxy,
         proxyUI.Slice,
