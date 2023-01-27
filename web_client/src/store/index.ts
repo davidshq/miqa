@@ -50,7 +50,7 @@ const pendingFrameDownloads = new Set<any>();
 const poolSize = Math.floor(navigator.hardwareConcurrency / 2) || 2;
 // Defines the task currently running
 let taskRunId = -1;
-// TODO: Unsure?
+// Reuse workers for performance
 let savedWorker = null;
 
 /** Delete existing VTK.js proxyManager views */
