@@ -1011,6 +1011,26 @@ const {
 
       await this.updateLock();
     },
+    async loadFrame({ state, dispatch, getters, commit }, { frame, onDownloadProgress = null, loadAll = true, whichProxy = 0 }) {
+      commit('SET_LOADING_FRAME', true);
+      commit('SET_ERROR_LOADING_FRAME', false);
+
+      const newScan = state.scans[frame.scan];
+
+      queueLoadScan(newScan, 0);
+
+      let newProxyManager = false;
+      if (state.proxyManager[whichProxy]) {
+        shrinkProxyManager(state.proxyManager[whichProxy]);
+        newProxyManager = true;
+      }
+
+      await dispatch('setuProxyManager', newProxyManager, whichProxy);
+
+      let frameData = await dispatch('getFrameData', { frame });
+
+      await dispatch('setupSourceProxy', { frame, frameData, whichProxy });
+    },
     async setupProxyManager({ state, dispatch, getters, commit }, { newProxyManager, whichProxy = 0 }) {
         // vtkProxyManager is from VTK.js
         // If it doesn't exist, create new instance of proxyManager
