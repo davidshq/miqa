@@ -295,7 +295,7 @@ export default {
             absent: this.confirmedAbsent,
           };
           const { ADD_SCAN_DECISION } = store.commit;
-          const zxyLocation = this.vtkViews.map(
+          const zxyLocation = this.vtkViews[0].map(
             (view) => this.proxyManager[0].getRepresentation(null, view).getSlice(),
           );
           // Create new scan decision using API

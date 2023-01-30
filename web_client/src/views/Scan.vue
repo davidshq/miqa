@@ -128,7 +128,7 @@ export default {
       >
         <div class="my-layout">
           <div
-            v-for="(vtkView, index) in vtkViews"
+            v-for="(vtkView, index) in vtkViews[0]"
             :key="index"
             class="view"
           >

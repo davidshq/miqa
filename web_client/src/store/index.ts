@@ -742,7 +742,7 @@ const {
     /** Saves the location of the cursor click related to a specific scan and decision */
     [SET_SLICE_LOCATION] (state, ijkLocation, whichProxy = 0) {
       if (Object.values(ijkLocation).every((value) => value !== undefined)) {
-        state.vtkViews.forEach(
+        state.vtkViews[whichProxy].forEach(
           (view) => {
             state.proxyManager[whichProxy].getRepresentation(null, view).setSlice(
               ijkLocation[ijkMapping[view.getName()]],
@@ -1002,7 +1002,7 @@ const {
       catch (err) {
         console.log('Caught exception loading next frame');
         console.log(err);
-        state.vtkViews = [];
+        state.vtkViews[whichProxy] = [];
         commit('SET_ERROR_LOADING_FRAME', true);
       } finally {
         commit('SET_CURRENT_FRAME_ID', frame.id);
@@ -1039,7 +1039,7 @@ const {
           state.proxyManager[whichProxy] = vtkProxyManager.newInstance({
             proxyConfiguration: proxy,
           });
-          state.vtkViews = [];
+          state.vtkViews[whichProxy] = [];
         }
     },
     async setupSourceProxy({ state, dispatch, getters, commit }, { frame, frameData, whichProxy = 0 }) {
@@ -1061,11 +1061,11 @@ const {
         // If sourceProxy doesn't have valid config or proxyManager has no views
         if (needPrep || !state.proxyManager[whichProxy].getViews().length) {
           prepareProxyManager(state.proxyManager[whichProxy]);
-          state.vtkViews = state.proxyManager[whichProxy].getViews();
+          state.vtkViews[whichProxy] = state.proxyManager[whichProxy].getViews();
         }
         // If no vtkViews, get them from proxyManager
-        if (!state.vtkViews.length) {
-          state.vtkViews = state.proxyManager[whichProxy].getViews();
+        if (!state.vtkViews[whichProxy].length) {
+          state.vtkViews[whichProxy] = state.proxyManager[whichProxy].getViews();
         }
     },
     async getFrameData({ state, dispatch, getters, commit, }, { frame, onDownloadProgress = null }) {
