@@ -296,7 +296,7 @@ export default {
           };
           const { ADD_SCAN_DECISION } = store.commit;
           const zxyLocation = this.vtkViews.map(
-            (view) => this.proxyManager.getRepresentation(null, view).getSlice(),
+            (view) => this.proxyManager[0].getRepresentation(null, view).getSlice(),
           );
           // Create new scan decision using API
           const savedObj = await djangoRest.setDecision(

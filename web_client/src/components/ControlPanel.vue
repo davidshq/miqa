@@ -32,7 +32,7 @@ export default {
       return this.currentView.experimentId;
     },
     representation() {
-      return this.currentFrame && this.proxyManager.getRepresentations()[0];
+      return this.currentFrame && this.proxyManager[0].getRepresentations()[0];
     },
   },
   watch: {

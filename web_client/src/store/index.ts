@@ -444,7 +444,7 @@ const initState = {
   scans: {},
   scanFrames: {},
   frames: {},
-  proxyManager: null,
+  proxyManager: [],
   vtkViews: [],
   currentFrameId: null,
   loadingFrame: false,
@@ -740,11 +740,11 @@ const {
       state.scanCachedPercentage = percentComplete;
     },
     /** Saves the location of the cursor click related to a specific scan and decision */
-    [SET_SLICE_LOCATION] (state, ijkLocation) {
+    [SET_SLICE_LOCATION] (state, ijkLocation, whichProxy = 0) {
       if (Object.values(ijkLocation).every((value) => value !== undefined)) {
         state.vtkViews.forEach(
           (view) => {
-            state.proxyManager.getRepresentation(null, view).setSlice(
+            state.proxyManager[whichProxy].getRepresentation(null, view).setSlice(
               ijkLocation[ijkMapping[view.getName()]],
             );
           },
@@ -955,7 +955,7 @@ const {
      */
     async swapToFrame({
       state, dispatch, getters, commit,
-    }, { frame, onDownloadProgress = null, loadAll = true }) {
+    }, { frame, onDownloadProgress = null, loadAll = true, whichProxy = 0 }) {
       // Guard Clauses
       if (!frame) {
         throw new Error("frame id doesn't exist");
@@ -979,13 +979,13 @@ const {
         }
         let newProxyManager = false;
         // Create new proxyManager if scans are different, retain proxyManager otherwise
-        if (oldScan !== newScan && state.proxyManager) {
+        if (oldScan !== newScan && state.proxyManager[whichProxy]) {
           // If we don't shrink and reinitialize between scans
-          // we soemtimes end up with no frame slices displayed.
+          // we sometimes end up with no frame slices displayed.
           // This may be due to the extents changing between scans,
           // the extents do not change from one timestep to another
           // in a single scan.
-          shrinkProxyManager(state.proxyManager);
+          shrinkProxyManager(state.proxyManager[whichProxy]);
           newProxyManager = true;
         }
         // Handles shrinking and/or instantiating a new proxyManager instance
@@ -1011,24 +1011,24 @@ const {
 
       await this.updateLock();
     },
-    async setupProxyManager({ state, dispatch, getters, commit }, { newProxyManager }) {
+    async setupProxyManager({ state, dispatch, getters, commit }, { newProxyManager, whichProxy = 0 }) {
         // vtkProxyManager is from VTK.js
         // If it doesn't exist, create new instance of proxyManager
         // Also, if it does exist but was used for a different scan, create a new one
-        if (!state.proxyManager || newProxyManager) {
-          state.proxyManager = vtkProxyManager.newInstance({
+        if (!state.proxyManager[whichProxy] || newProxyManager) {
+          state.proxyManager[whichProxy] = vtkProxyManager.newInstance({
             proxyConfiguration: proxy,
           });
           state.vtkViews = [];
         }
     },
-    async setupSourceProxy({ state, dispatch, getters, commit }, { frame, frameData }) {
+    async setupSourceProxy({ state, dispatch, getters, commit }, { frame, frameData, whichProxy = 0 }) {
       // get the source from which we are loading the images
-      let sourceProxy = state.proxyManager.getActiveSource();
+      let sourceProxy = state.proxyManager[whichProxy].getActiveSource();
       let needPrep = false;
       // Provide default source if it doesn't exist
       if (!sourceProxy) {
-        sourceProxy = state.proxyManager.createProxy(
+        sourceProxy = state.proxyManager[whichProxy].createProxy(
           'Sources',
           'TrivialProducer',
         );
@@ -1039,13 +1039,13 @@ const {
         // We set the source equal to the frameData we've loaded
         sourceProxy.setInputData(frameData);
         // If sourceProxy doesn't have valid config or proxyManager has no views
-        if (needPrep || !state.proxyManager.getViews().length) {
-          prepareProxyManager(state.proxyManager);
-          state.vtkViews = state.proxyManager.getViews();
+        if (needPrep || !state.proxyManager[whichProxy].getViews().length) {
+          prepareProxyManager(state.proxyManager[whichProxy]);
+          state.vtkViews = state.proxyManager[whichProxy].getViews();
         }
         // If no vtkViews, get them from proxyManager
         if (!state.vtkViews.length) {
-          state.vtkViews = state.proxyManager.getViews();
+          state.vtkViews = state.proxyManager[whichProxy].getViews();
         }
     },
     async getFrameData({ state, dispatch, getters, commit, }, { frame, onDownloadProgress = null }) {
