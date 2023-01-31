@@ -15,6 +15,11 @@ export default {
       required: true,
       type: Object,
     },
+    proxyNum: {
+      default: 0,
+      required: false,
+      type: Number,
+    },
   },
   data: () => ({
     slice: null,
