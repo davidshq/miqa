@@ -1025,11 +1025,15 @@ const {
         newProxyManager = true;
       }
 
-      await dispatch('setuProxyManager', newProxyManager, whichProxy);
+      await dispatch('setupProxyManager', { newProxyManager, whichProxy });
 
       let frameData = await dispatch('getFrameData', { frame });
 
       await dispatch('setupSourceProxy', { frame, frameData, whichProxy });
+
+      commit('SET_CURRENT_FRAME_ID', frame.id);
+      commit('SET_LOADING_FRAME', false);
+      await this.updateLock();
     },
     async setupProxyManager({ state, dispatch, getters, commit }, { newProxyManager, whichProxy = 0 }) {
         // vtkProxyManager is from VTK.js
