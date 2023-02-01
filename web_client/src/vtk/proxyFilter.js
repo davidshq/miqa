@@ -15,6 +15,7 @@ const Contour = {
       mergePoints: { modelKey: 'algo', property: 'mergePoints' },
     },
     updateDomain(self, frame) {
+      console.log('Running updateDomain');
       const arrayToProcess = frame.getPointData().getScalars();
       frame.getPointData().getArrayByIndex(0);
       if (!arrayToProcess) {

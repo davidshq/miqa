@@ -6,6 +6,7 @@ class CrosshairSet {
     imageRepresentation, imageView, imageCanvas,
     iSlice, jSlice, kSlice,
   ) {
+    console.log('Running CrosshairSet constructor');
     this.xyzName = xyzName;
     this.ijkName = ijkName;
     this.imageRepresentation = imageRepresentation;

@@ -17,6 +17,7 @@ function createProxyDefinition(
   definitionOptions = {},
   props = {},
 ) {
+  console.log('Running createProxyDefinition');
   return {
     class: classFactory,
     options: { links, ui, ...definitionOptions },
@@ -30,6 +31,7 @@ function createProxyDefinition(
  * @returns {*}
  */
 function activateOnCreate(def) {
+  console.log('Running activateOnCreate');
   /* eslint-disable no-param-reassign */
   def.options.activateOnCreate = true;
   return def;

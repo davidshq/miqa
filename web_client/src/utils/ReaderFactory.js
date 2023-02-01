@@ -2,6 +2,7 @@ const READER_MAPPING = {};
 
 const FETCH_DATA = {
   readAsArrayBuffer(axios, url, signal, { onDownloadProgress } = {}) {
+    console.log('Running FETCH_DATA - readAsArrayBuffer');
     return axios
       .get(url, {
         responseType: 'arraybuffer',
@@ -23,6 +24,7 @@ function registerReader({
   sourceType,
   binary,
 }) {
+  console.log('Running registerReader');
   READER_MAPPING[extension] = {
     name,
     vtkReader,
@@ -41,6 +43,7 @@ function registerReader({
  * @returns {*}
  */
 function getReader({ fileName }) {
+  console.log('Running getReader');
   const lowerCaseName = fileName.toLowerCase();
   const extToUse = Object.keys(READER_MAPPING).find((ext) => lowerCaseName.endsWith(ext));
   return READER_MAPPING[extToUse];
@@ -58,6 +61,7 @@ function getReader({ fileName }) {
  * @returns {{promise: Promise<unknown>, abortController: AbortController}}
  */
 function downloadFrame(axios, fileName, url, { onDownloadProgress } = {}) {
+  console.log('Running downloadFrame');
   const abortController = new AbortController();
 
   return {

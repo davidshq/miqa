@@ -31,6 +31,7 @@ const { createProxyDefinition, activateOnCreate } = ConfigUtils;
  * @returns {*}
  */
 function createDefaultView(classFactory, ui, options, props) {
+  console.log('Running createDefaultView');
   return activateOnCreate(
     createProxyDefinition(
       classFactory,
