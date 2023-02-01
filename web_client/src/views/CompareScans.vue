@@ -4,19 +4,11 @@ import {
   mapState,
 } from 'vuex';
 
-import Navbar from '@/components/Navbar.vue';
-import ControlPanel from '@/components/ControlPanel.vue';
-import ExperimentsView from '@/components/ExperimentsView.vue';
-import LoadingMessage from '@/components/LoadingMessage.vue';
 import VtkViewer from '@/components/VtkViewer.vue';
 
 export default {
   name: 'CompareScans',
   components: {
-    LoadingMessage,
-    Navbar,
-    ExperimentsView,
-    ControlPanel,
     VtkViewer,
   },
   inject: ['user'],
@@ -29,9 +21,7 @@ export default {
     selectedExperiment: '',
     selectScans: [],
     selectedScans: [],
-    selectedScan1: '',
-    selectedScan2: '',
-    selectedScan3: '',
+    selectedScan: '',
     scanToEdit: '',
   }),
   computed: {
@@ -43,8 +33,6 @@ export default {
       'frames',
       'scanFrames',
       'vtkViews',
-      'vtkViews2',
-      'vtkViews3',
     ]),
     currentFrame() {
       return this.frames[this.currentFrameId];
@@ -82,13 +70,9 @@ export default {
     async selectedScans() {
       // await this.loadImage();
     },
-    async selectedScan1() {
+    async selectedScan() {
       console.log('selectedScan1');
       await this.loadImage(1);
-    },
-    async selectedScan2() {
-      console.log(`selectedScan2`);
-      await this.loadImage(2);
     },
   },
   mounted() {
@@ -101,28 +85,21 @@ export default {
       'swapToFrame',
       'loadFrame',
     ]),
-    async loadImage(proxyNum = 1) {
-      // Attempting to load 1 image to start.
-      // const scan = this.selectedScan1;
-      const scan = this[`selectedScan${proxyNum}`];
+    async loadImage(scan) {
+      // Attempt to load one image to start
+      console.log(`Scan ID: ${scan.id}`);
       const frameId = this.scanFrames[scan.id][0];
-      console.log('loadImage: frameId');
-      console.log(frameId);
+      console.log('loadImage: frameId', frameId);
       const frame = this.frames[frameId];
-      console.log('loadImage: frame');
-      console.log(frame);
+      console.log('loadImage: frame', frame);
       if (frame) {
         await this.loadFrame({
           frame,
           onDownloadProgress: this.onFrameDownloadProgress,
-          proxyNum,
         });
         console.log('after swapToFrame');
       }
-    },
-    onFrameDownloadProgress(e) {
-      this.downloadLoaded = e.loaded;
-      this.downloadTotal = e.total;
+      console.log('vtkViews', this.vtkViews);
     },
   },
 };
@@ -132,49 +109,26 @@ export default {
   <v-row
     class="frame fill-height flex-column ma-0"
   >
-    <Navbar frame-view />
-    <v-navigation-drawer
-      expand-on-hover
-      permanent
-      app
-      width="350px"
-    >
-      <v-list>
-        <v-list-item>
-          <v-icon>fas fa-list</v-icon>
-          <v-toolbar-title class="pl-5">
-            Experiments
-          </v-toolbar-title>
-        </v-list-item>
-        <v-list-item>
-          <v-icon />
-          <ExperimentsView
-            class="mt-1"
-            minimal
-          />
-        </v-list-item>
-      </v-list>
-    </v-navigation-drawer>
     <v-col id="ProjectExperimentSelect" class="shrink">
       <v-row>
         <v-col>
-        <v-select
-          v-model="selectedProject"
-          label="Project"
-          :items="allProjects"
-          item-text="name"
-          item-value="id"
-        />
-      </v-col>
-      <v-col>
-        <v-select
-          v-model="selectedExperiment"
-          label="Experiment"
-          :items="selectExperiments"
-          item-text="name"
-          item-value="id"
-        />
-      </v-col>
+          <v-select
+            v-model="selectedProject"
+            label="Project"
+            :items="allProjects"
+            item-text="name"
+            item-value="id"
+          />
+        </v-col>
+        <v-col>
+          <v-select
+            v-model="selectedExperiment"
+            label="Experiment"
+            :items="selectExperiments"
+            item-text="name"
+            item-value="id"
+          />
+        </v-col>
       </v-row>
     </v-col>
     <v-col id="ScansSelects" class="shrink">
@@ -226,17 +180,9 @@ export default {
           <div class="view">
             <VtkViewer :view="vtkViews[0]" :proxyNum="1" />
           </div>
-          <div class="view">
-           <!-- <VtkViewer :view="vtkViews2[0]" /> -->
-          </div>
-          <div class="view">
-           <!-- <VtkViewer :view="vtkViews3[0]" /> -->
-          </div>
         </div>
       </template>
     </v-col>
-
-    <!-- Control Panel Goes Here -->
   </v-row>
 </template>
 
