@@ -232,7 +232,6 @@ function poolFunction(webWorker, taskInfo) {
         });
     }
 
-    // TODO: Could me moved into filePromise above or no?
     filePromise
       .then((file) => {
         resolve(getImageData(frame.id, file, webWorker));
@@ -279,11 +278,16 @@ function startReaderWorkerPool() {
 /** Queues scan for download Will load all frames for a target scan if the scan has not already been loaded. */
 function queueLoadScan(scan, loadNext: number = 0) {
   console.log('Running queueLoadScan');
+  console.log('queueLoadScan - scan', scan);
+  console.log('queueLoadScan - loadNext', loadNext);
+  console.log('queueLoadScan - scan.id', scan.id);
   // load all frames in target scan
   if (!loadedData.includes(scan.id)) {
+    console.log('queueLoadScan - scan.id not found in loadedData');
     // For each scan in scanFrames
     store.state.scanFrames[scan.id].forEach(
       (frameId) => {
+        console.log('queueLoadScan - adding to readDataQueue', frameId);
         // Add to readDataQueue a request to get the frames associated with that scan
         readDataQueue.push({
           experimentId: scan.experiment,
@@ -293,6 +297,7 @@ function queueLoadScan(scan, loadNext: number = 0) {
       },
     );
     // Once frame has been successfully added to queue:
+    console.log('queueLoadScan - add scan to loadedData');
     loadedData.push(scan.id);
   }
 
@@ -1013,23 +1018,27 @@ const {
 
       await this.updateLock();
     },
-    async loadFrame({ state, dispatch, getters, commit }, { frame, onDownloadProgress = null, loadAll = true, whichProxy = 0 }) {
+    async loadFrame({
+      state, dispatch, getters, commit
+    }, { frame, onDownloadProgress = null, loadAll = true, whichProxy = 0 }) {
       console.log('Running loadFrame');
       console.log('loadFrame - frame', frame);
+      console.log('loadFrame - whichProxy', whichProxy);
       commit('SET_LOADING_FRAME', true);
       commit('SET_ERROR_LOADING_FRAME', false);
 
       const newScan = state.scans[frame.scan];
 
       queueLoadScan(newScan, 0);
-
+      console.log('loadFrame - after queueLoadScan');
       let newProxyManager = false;
+      console.log('newProxyManager', newProxyManager);
       if (state.proxyManager[whichProxy]) {
         console.log('Shrinking proxyManager');
         shrinkProxyManager(state.proxyManager[whichProxy]);
         newProxyManager = true;
       }
-
+      console.log('before setupProxyManager');
       await dispatch('setupProxyManager', { newProxyManager, whichProxy });
       console.log('after setupProxyManager');
       let frameData = await dispatch('getFrameData', { frame });
