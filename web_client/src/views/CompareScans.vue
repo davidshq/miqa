@@ -20,9 +20,7 @@ export default {
     selectExperiments: [],
     selectedExperiment: '',
     selectScans: [],
-    selectedScans: [],
     selectedScan: '',
-    scanToEdit: '',
   }),
   computed: {
     ...mapState([
@@ -39,11 +37,11 @@ export default {
     },
   },
   watch: {
-    // Keeps the list of projects updated
+    /** Watch for changes to available projects */
     async projects(projects) {
       this.allProjects = projects;
     },
-    // Selects a specific project, loads list of it's experiments
+    /** Watch for project selection, load child experiments */
     async selectedProject(projectId) {
       // Pass the object, not an array with the object
       const thisProject = this.allProjects.filter((project) => project.id === projectId)[0];
@@ -56,7 +54,7 @@ export default {
         this.selectExperiments.push({ name, id });
       });
     },
-    // Selects a specific experiment, loads list of it's scans
+    /** Watch for experiment selection, load child scans */
     async selectedExperiment(experiment) {
       this.selectedExperiment = experiment;
       this.selectScans = [];
@@ -67,15 +65,13 @@ export default {
         this.selectScans.push({ name, id });
       });
     },
-    async selectedScans() {
-      // await this.loadImage();
-    },
     async selectedScan() {
       console.log('selectedScan1');
       await this.loadImage(1);
     },
   },
   mounted() {
+    /** Wait until the view is mounted before attempting to load projects. */
     this.loadProjects();
   },
   methods: {
@@ -135,7 +131,7 @@ export default {
       <v-row>
         <v-col>
           <v-select
-            v-model="selectedScan1"
+            v-model="selectedScan"
             label="Select Scan"
             :items="selectScans"
             item-text="name"
@@ -145,7 +141,7 @@ export default {
         </v-col>
         <v-col>
           <v-select
-            v-model="selectedScan2"
+            v-model="selectedScan"
             label="Select Scan"
             :items="selectScans"
             item-text="name"
@@ -155,7 +151,7 @@ export default {
         </v-col>
         <v-col>
           <v-select
-            v-model="selectedScan3"
+            v-model="selectedScan"
             label="Select Scan"
             :items="selectScans"
             item-text="name"
@@ -165,20 +161,11 @@ export default {
         </v-col>
       </v-row>
     </v-col>
-    <v-col id="ControlPanelSelect" class="shrink">
-      <v-select
-        v-model="scanToEdit"
-        label="Select Scan to Edit"
-        :items="selectedScans"
-        item-text="name"
-        item-value="id"
-      />
-    </v-col>
     <v-col id="ScanViews" class="layout-container">
       <template v-if="currentFrame">
         <div class="my-layout">
           <div class="view">
-            <VtkViewer :view="vtkViews[0]" :proxyNum="1" />
+            <VtkViewer :view="vtkViews[0]" />
           </div>
         </div>
       </template>
