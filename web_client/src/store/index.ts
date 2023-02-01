@@ -153,10 +153,22 @@ function loadFile(frame, { onDownloadProgress = null } = {}) {
     console.log({ frameId: frame.id, cachedFile: fileCache.get(frame.id) });
     return { frameId: frame.id, cachedFile: fileCache.get(frame.id) };
   } else { // Otherwise download the frame
-    let cachedFile = downloadFile(frame, onDownloadProgress);
+    let client = apiClient;
+    let downloadURL = `/frames/${frame.id}/download`;
+    if (frame.download_url) {
+      client = axios.create();
+      downloadURL = frame.download_url;
+    }
+    const { promise } = ReaderFactory.downloadFrame(
+      client,
+      `image${frame.extension}`,
+      downloadURL,
+      { onDownloadProgress },
+    );
+    fileCache.set(frame.id, promise);
     console.log('loadFile - downloaded');
-    console.log({ frameId: frame.id, cachedFile : cachedFile });
-    return { frameId: frame.id, cachedFile: cachedFile };
+    console.log({ frameId: frame.id, cachedFile : promise });
+    return { frameId: frame.id, cachedFile: promise };
   }
 }
 
