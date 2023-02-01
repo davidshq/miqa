@@ -17,9 +17,9 @@ export default {
     downloadTotal: 0,
     allProjects: [],
     selectedProject: '',
-    selectExperiments: [],
+    childExperiments: [],
     selectedExperiment: '',
-    selectScans: [],
+    childScans: [],
     selectedScan: '',
   }),
   computed: {
@@ -46,28 +46,29 @@ export default {
       // Pass the object, not an array with the object
       const thisProject = this.allProjects.filter((project) => project.id === projectId)[0];
       await this.loadProject(thisProject);
-      this.selectExperiments = [];
+      this.childExperiments = [];
       const keys = Object.keys(this.experiments);
       keys.forEach((key) => {
         const { name } = this.experiments[key];
         const { id } = this.experiments[key];
-        this.selectExperiments.push({ name, id });
+        this.childExperiments.push({ name, id });
       });
     },
     /** Watch for experiment selection, load child scans */
     async selectedExperiment(experiment) {
       this.selectedExperiment = experiment;
-      this.selectScans = [];
+      this.childScans = [];
       const keys = Object.keys(this.scans);
       keys.forEach((key) => {
         const { name } = this.scans[key];
         const { id } = this.scans[key];
-        this.selectScans.push({ name, id });
+        this.childScans.push({ name, id });
       });
     },
+    /** Watch for scan selection, load associated image */
     async selectedScan() {
-      console.log('selectedScan1');
-      await this.loadImage(1);
+      console.log('selectedScan', this.selectedScan);
+      await this.loadImage(this.selectedScan);
     },
   },
   mounted() {
@@ -81,9 +82,15 @@ export default {
       'swapToFrame',
       'loadFrame',
     ]),
+    /** Update the download progress */
+    onFrameDownloadProgress(e) {
+      this.downloadLoaded = e.loaded;
+      this.downloadTotal = e.total;
+    },
+    /** Get the specified image */
     async loadImage(scan) {
       // Attempt to load one image to start
-      console.log(`Scan ID: ${scan.id}`);
+      console.log(`loadImage: scan id: ${scan.id}`);
       const frameId = this.scanFrames[scan.id][0];
       console.log('loadImage: frameId', frameId);
       const frame = this.frames[frameId];
@@ -120,7 +127,7 @@ export default {
           <v-select
             v-model="selectedExperiment"
             label="Experiment"
-            :items="selectExperiments"
+            :items="childExperiments"
             item-text="name"
             item-value="id"
           />
@@ -133,7 +140,7 @@ export default {
           <v-select
             v-model="selectedScan"
             label="Select Scan"
-            :items="selectScans"
+            :items="childScans"
             item-text="name"
             item-value="id"
             return-object
@@ -143,7 +150,7 @@ export default {
           <v-select
             v-model="selectedScan"
             label="Select Scan"
-            :items="selectScans"
+            :items="childScans"
             item-text="name"
             item-value="id"
             return-object
@@ -153,7 +160,7 @@ export default {
           <v-select
             v-model="selectedScan"
             label="Select Scan"
-            :items="selectScans"
+            :items="childScans"
             item-text="name"
             item-value="id"
             return-object
@@ -164,8 +171,12 @@ export default {
     <v-col id="ScanViews" class="layout-container">
       <template v-if="currentFrame">
         <div class="my-layout">
-          <div class="view">
-            <VtkViewer :view="vtkViews[0]" />
+          <div
+            v-for="(vtkView, index) in vtkViews[0]"
+            :key="index"
+            class="view"
+          >
+            <VtkViewer :view="vtkView" />
           </div>
         </div>
       </template>
