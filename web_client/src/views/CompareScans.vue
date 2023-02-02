@@ -4,7 +4,7 @@ import {
   mapState,
 } from 'vuex';
 
-import VtkViewer from '@/components/VtkViewer.vue';
+import VtkViewer from '@/components/VtkViewerCompare.vue';
 
 export default {
   name: 'CompareScans',
@@ -206,24 +206,56 @@ export default {
         </v-col>
       </v-row>
     </v-col>
-    <v-col id="ScanViews" class="layout-container">
-      <div class="my-layout">
-        <template v-if="vtkView1Loaded" id="vtkView1">
-          <div style="width:35%">
-            <VtkViewer :view="vtkViews[1][1]" id="vtk1" :proxyNum="1"  />
-          </div>
-        </template>
-        <template v-if="vtkView2Loaded" id="vtkView2">
-          <div style="width:35%">
-            <VtkViewer :view="vtkViews[2][0]" id="vtk2" :proxyNum="2"  />
-          </div>
-        </template>
-        <template v-if="vtkView3Loaded" id="vtkView3">
-          <div style="width:35%">
-            <VtkViewer :view="vtkViews[3][1]" id="vtk3" :proxyNum="3"  />
-          </div>
-        </template>
-      </div>
+    <v-col
+      id="ScanViews"
+      class="layout-container"
+    >
+      <table>
+        <tr>
+          <td>
+            <template
+              v-if="vtkView1Loaded"
+              id="vtkView1"
+            >
+              <div>
+                <VtkViewer
+                  id="vtk1"
+                  :view="vtkViews[1][1]"
+                  :proxyNum="1"
+                />
+              </div>
+            </template>
+          </td>
+          <td>
+            <template
+              v-if="vtkView2Loaded"
+              id="vtkView2"
+            >
+              <div>
+                <VtkViewer
+                  id="vtk2"
+                  :view="vtkViews[2][0]"
+                  :proxyNum="2"
+                />
+              </div>
+            </template>
+          </td>
+          <td>
+            <template
+              v-if="vtkView3Loaded"
+              id="vtkView3"
+            >
+              <div>
+                <VtkViewer
+                  id="vtk3"
+                  :view="vtkViews[3][1]"
+                  :proxyNum="3"
+                />
+              </div>
+            </template>
+          </td>
+        </tr>
+      </table>
     </v-col>
   </v-row>
 </template>
