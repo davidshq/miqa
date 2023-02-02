@@ -21,6 +21,12 @@ export default {
     selectedExperiment: '',
     childScans: [],
     selectedScan: '',
+    selectedScan1: {},
+    selectedScan2: {},
+    selectedScan3: {},
+    vtkView1Loaded: false,
+    vtkView2Loaded: false,
+    vtkView3Loaded: false,
   }),
   computed: {
     ...mapState([
@@ -65,10 +71,29 @@ export default {
         this.childScans.push({ name, id });
       });
     },
-    /** Watch for scan selection, load associated image */
-    async selectedScan() {
-      console.log('selectedScan', this.selectedScan);
-      await this.loadImage(this.selectedScan);
+    async selectedScan1() {
+      console.log('selectedScan1');
+      await this.loadImage(this.selectedScan1, 1);
+    },
+    async selectedScan2() {
+      console.log('selectedScan2');
+      await this.loadImage(this.selectedScan2, 2);
+    },
+    async selectedScan3() {
+      console.log('selectedScan3');
+      await this.loadImage(this.selectedScan3, 3);
+    },
+    vtkView1Loaded(vtkView1Loaded) {
+      console.log('vtkView1Loaded from watch', vtkView1Loaded);
+      return true;
+    },
+    vtkView2Loaded(vtkView2Loaded) {
+      console.log('vtkView2Loaded from watch', vtkView2Loaded);
+      return true;
+    },
+    vtkView3Loaded(vtkView3Loaded) {
+      console.log('vtkView3Loaded from watch', vtkView3Loaded);
+      return true;
     },
   },
   mounted() {
@@ -88,7 +113,7 @@ export default {
       this.downloadTotal = e.total;
     },
     /** Get the specified image */
-    async loadImage(scan) {
+    async loadImage(scan, proxyNum) {
       // Attempt to load one image to start
       console.log(`loadImage: scan id: ${scan.id}`);
       const frameId = this.scanFrames[scan.id][0];
@@ -99,10 +124,23 @@ export default {
         await this.loadFrame({
           frame,
           onDownloadProgress: this.onFrameDownloadProgress,
+          whichProxy: proxyNum,
         });
         console.log('after swapToFrame');
       }
       console.log('vtkViews', this.vtkViews);
+      if (proxyNum === 1) {
+        this.vtkView1Loaded = true;
+        console.log('vtkView1Loaded', this.vtkView1Loaded);
+        console.log('vtkView1', this.vtkViews[1]);
+        console.log('vtkView1', this.vtkViews[1][0]);
+      } else if (proxyNum === 2) {
+        this.vtkView2Loaded = true;
+        console.log('vtkView2', this.vtkView2Loaded);
+      } else if (proxyNum === 3) {
+        this.vtkView3Loaded = true;
+        console.log('vtkView3', this.vtkView3Loaded);
+      }
     },
   },
 };
@@ -138,7 +176,7 @@ export default {
       <v-row>
         <v-col>
           <v-select
-            v-model="selectedScan"
+            v-model="selectedScan1"
             label="Select Scan"
             :items="childScans"
             item-text="name"
@@ -148,7 +186,7 @@ export default {
         </v-col>
         <v-col>
           <v-select
-            v-model="selectedScan"
+            v-model="selectedScan2"
             label="Select Scan"
             :items="childScans"
             item-text="name"
@@ -158,7 +196,7 @@ export default {
         </v-col>
         <v-col>
           <v-select
-            v-model="selectedScan"
+            v-model="selectedScan3"
             label="Select Scan"
             :items="childScans"
             item-text="name"
@@ -169,17 +207,23 @@ export default {
       </v-row>
     </v-col>
     <v-col id="ScanViews" class="layout-container">
-      <template v-if="currentFrame">
-        <div class="my-layout">
-          <div
-            v-for="(vtkView, index) in vtkViews[0]"
-            :key="index"
-            class="view"
-          >
-            <VtkViewer :view="vtkView" />
+      <div class="my-layout">
+        <template v-if="vtkView1Loaded" id="vtkView1">
+          <div style="width:35%">
+            <VtkViewer :view="vtkViews[1][1]" id="vtk1" :proxyNum="1"  />
           </div>
-        </div>
-      </template>
+        </template>
+        <template v-if="vtkView2Loaded" id="vtkView2">
+          <div style="width:35%">
+            <VtkViewer :view="vtkViews[2][0]" id="vtk2" :proxyNum="2"  />
+          </div>
+        </template>
+        <template v-if="vtkView3Loaded" id="vtkView3">
+          <div style="width:35%">
+            <VtkViewer :view="vtkViews[3][1]" id="vtk3" :proxyNum="3"  />
+          </div>
+        </template>
+      </div>
     </v-col>
   </v-row>
 </template>

@@ -1061,8 +1061,9 @@ const {
 
       commit('SET_CURRENT_FRAME_ID', frame.id);
       commit('SET_LOADING_FRAME', false);
-      await this.updateLock();
-      console.log('View', state.vtkViews[0]);
+      console.log('View0', state.vtkViews[0]);
+      console.log('View1', state.vtkViews[1]);
+      // await this.updateLock();
     },
     async setupProxyManager({ state, dispatch, getters, commit }, { newProxyManager, whichProxy = 0 }) {
       // If it doesn't exist, create new instance of proxyManager

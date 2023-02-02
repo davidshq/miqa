@@ -52,7 +52,7 @@ export default {
       return (
         // force add dependency on currentFrame
         this.currentFrame
-        && this.proxyManager[0].getRepresentation(null, this.view)
+        && this.proxyManager[this.proxyNum].getRepresentation(null, this.view)
       );
     },
     sliceDomain() {
