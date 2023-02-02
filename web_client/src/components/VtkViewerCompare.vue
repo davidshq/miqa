@@ -136,7 +136,6 @@ export default {
   methods: {
     ...mapMutations([
       'saveSlice',
-      'SET_CURRENT_SCREENSHOT',
       'SET_CURRENT_VTK_INDEX_SLICES',
       'SET_SLICE_LOCATION',
     ]),
@@ -255,13 +254,6 @@ export default {
       ];
       return trueAxis;
     },
-    toggleFullscreen() {
-      this.fullscreen = !this.fullscreen;
-      setTimeout(() => {
-        this.$refs.viewer.style.width = 'inherit';
-        this.$refs.viewer.style.width = `${this.$refs.viewer.clientWidth - 3}px`;
-      }, 100);
-    },
     changeSlice(newValue) {
       this.slice = newValue;
     },
@@ -329,7 +321,6 @@ export default {
 
 <template>
   <div
-    :class="{ fullscreen }"
     class="vtk-viewer"
     style="font-size: 20px"
   >
@@ -385,18 +376,6 @@ export default {
         {{ displayName }}
       </div>
       <v-spacer />
-      <v-btn
-        v-mousetrap="{ bind: keyboardBindings[2], handler: toggleFullscreen }"
-        icon
-        @click="toggleFullscreen"
-      >
-        <v-icon v-if="!fullscreen">
-          fullscreen
-        </v-icon>
-        <v-icon v-else>
-          fullscreen_exit
-        </v-icon>
-      </v-btn>
     </v-toolbar>
   </div>
 </template>
