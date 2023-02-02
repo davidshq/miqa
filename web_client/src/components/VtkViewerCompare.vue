@@ -255,51 +255,6 @@ export default {
       ];
       return trueAxis;
     },
-    async takeScreenshot() {
-      const dataURL = await this.view.captureImage();
-
-      const imageOutput = await (
-        async (file) : Promise<HTMLImageElement> => new Promise((resolve) => {
-          const img = new Image();
-          img.onload = () => {
-            resolve(img);
-          };
-          img.src = file;
-        })
-      )(dataURL);
-      const canvas = document.createElement('canvas');
-      canvas.width = imageOutput.width;
-      canvas.height = imageOutput.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(imageOutput, 0, 0);
-
-      if (this.showCrosshairs) {
-        const crosshairSet = new CrosshairSet(
-          this.name, this.ijkName,
-          this.representation, this.view, canvas,
-          this.iIndexSlice, this.jIndexSlice, this.kIndexSlice,
-        );
-        const originalColors = {
-          x: '#fdd835',
-          y: '#4caf50',
-          z: '#b71c1c',
-        };
-        const trueColors = Object.fromEntries(
-          Object.entries(originalColors).map(([axisName, hex]) => [this.trueAxis(axisName), hex]),
-        );
-        const [displayLine1, displayLine2] = crosshairSet.getCrosshairsForAxis(
-          this.trueAxis(this.name), trueColors,
-        );
-        this.drawLine(ctx, displayLine1);
-        this.drawLine(ctx, displayLine2);
-      }
-      this.SET_CURRENT_SCREENSHOT({
-        name: `${this.currentView.experimentName}/${
-          this.currentView.scanName
-        }/${this.currentFrame.frame_number}/${this.displayName}`,
-        dataURL: canvas.toDataURL('image/jpeg'),
-      });
-    },
     toggleFullscreen() {
       this.fullscreen = !this.fullscreen;
       setTimeout(() => {
@@ -441,12 +396,6 @@ export default {
         <v-icon v-else>
           fullscreen_exit
         </v-icon>
-      </v-btn>
-      <v-btn
-        icon
-        @click="takeScreenshot"
-      >
-        <v-icon>add_a_photo</v-icon>
       </v-btn>
     </v-toolbar>
   </div>
