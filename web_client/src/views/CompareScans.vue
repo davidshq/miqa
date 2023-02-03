@@ -210,9 +210,7 @@ export default {
       id="ScanViews"
       class="layout-container"
     >
-      <table>
-        <tr>
-          <td>
+          <div>
             <template
               v-if="vtkView1Loaded"
               id="vtkView1"
@@ -225,8 +223,8 @@ export default {
                 />
               </div>
             </template>
-          </td>
-          <td>
+          </div>
+          <div>
             <template
               v-if="vtkView2Loaded"
               id="vtkView2"
@@ -239,8 +237,8 @@ export default {
                 />
               </div>
             </template>
-          </td>
-          <td>
+          </div>
+          <div>
             <template
               v-if="vtkView3Loaded"
               id="vtkView3"
@@ -253,9 +251,7 @@ export default {
                 />
               </div>
             </template>
-          </td>
-        </tr>
-      </table>
+          </div>
     </v-col>
   </v-row>
 </template>
@@ -267,11 +263,14 @@ export default {
   bottom: 0;
   left: 0;
   right: 0;
-  display: flex;
+  //display: flex;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
 
   .view {
     position: relative;
-    flex: 1 0 0;
+    //flex: 1 0 0;
 
     border: 1.5px solid white;
     border-top: none;

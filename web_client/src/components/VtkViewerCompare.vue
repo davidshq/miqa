@@ -33,11 +33,9 @@ export default {
       'proxyManager',
       'loadingFrame',
       'showCrosshairs',
-      'sliceLocation', // Used?
       'iIndexSlice',
       'jIndexSlice',
       'kIndexSlice',
-      'windowLocked', // Used?
       'currentWindowWidth',
       'currentWindowLevel',
       'renderOrientation',
@@ -389,16 +387,11 @@ export default {
   right: 0;
   background: black;
   z-index: 0;
-  display: flex;
-  flex-direction: column;
+  // display: flex;
+  // flex-direction: column;
 
-  &.fullscreen {
-    position: fixed;
-    top: 48px;
-    left: 55px;
-    bottom: 0;
-    right: 0;
-    z-index: 2;
+  .slice-slider .v-slider {
+    height: 23px;
   }
 
   .header {
@@ -468,12 +461,12 @@ export default {
     flex: 1 1 0;
     position: relative;
     overflow-y: hidden;
-    display: flex;
-    flex-direction: column;
+    // display: flex;
+    // flex-direction: column;
   }
 
   .viewer > div {
-    flex: 1 1 0;
+    // flex: 1 1 0;
     position: relative;
     overflow-y: hidden;
     cursor: crosshair!important;
@@ -487,22 +480,5 @@ export default {
   bottom: 0;
   left: 0;
   right: 0;
-}
-</style>
-
-<style lang="scss">
-.vtk-viewer {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-
-  display: flex;
-  flex-direction: column;
-
-  .slice-slider .v-slider {
-    height: 23px;
-  }
 }
 </style>
