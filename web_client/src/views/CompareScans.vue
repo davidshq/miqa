@@ -147,116 +147,145 @@ export default {
 </script>
 
 <template>
-  <v-row
-    class="frame fill-height flex-column ma-0"
-  >
-    <v-col id="ProjectExperimentSelect" class="shrink">
-      <v-row>
-        <v-col>
-          <v-select
-            v-model="selectedProject"
-            label="Project"
-            :items="allProjects"
-            item-text="name"
-            item-value="id"
-          />
-        </v-col>
-        <v-col>
-          <v-select
-            v-model="selectedExperiment"
-            label="Experiment"
-            :items="childExperiments"
-            item-text="name"
-            item-value="id"
-          />
-        </v-col>
-      </v-row>
-    </v-col>
-    <v-col id="ScansSelects" class="shrink">
-      <v-row>
-        <v-col>
-          <v-select
-            v-model="selectedScan1"
-            label="Select Scan"
-            :items="childScans"
-            item-text="name"
-            item-value="id"
-            return-object
-          />
-        </v-col>
-        <v-col>
-          <v-select
-            v-model="selectedScan2"
-            label="Select Scan"
-            :items="childScans"
-            item-text="name"
-            item-value="id"
-            return-object
-          />
-        </v-col>
-        <v-col>
-          <v-select
-            v-model="selectedScan3"
-            label="Select Scan"
-            :items="childScans"
-            item-text="name"
-            item-value="id"
-            return-object
-          />
-        </v-col>
-      </v-row>
-    </v-col>
-    <v-col
-      id="ScanViews"
-      class="layout-container"
-    >
+  <div id="CompareScans">
+    <div class="ProjectExperimentContainer">
+      <div class="SelectProject">
+        <v-select
+          v-model="selectedProject"
+          label="Project"
+          :items="allProjects"
+          item-text="name"
+          item-value="id"
+        />
+      </div>
+      <div class="SelectExperiment">
+        <v-select
+          v-model="selectedExperiment"
+          label="Experiment"
+          :items="childExperiments"
+          item-text="name"
+          item-value="id"
+        />
+      </div>
+    </div>
+    <div class="SelectScansContainer">
+      <div class="SelectScan1">
+        <v-select
+          v-model="selectedScan1"
+          label="Select Scan"
+          :items="childScans"
+          item-text="name"
+          item-value="id"
+          return-object
+        />
+      </div>
+      <div class="SelectScan2">
+        <v-select
+          v-model="selectedScan2"
+          label="Select Scan"
+          :items="childScans"
+          item-text="name"
+          item-value="id"
+          return-object
+        />
+      </div>
+      <div class="SelectScan3">
+        <v-select
+          v-model="selectedScan3"
+          label="Select Scan"
+          :items="childScans"
+          item-text="name"
+          item-value="id"
+          return-object
+        />
+      </div>
+    </div>
+    <div class="vtkViewsContainer">
+      <div class="vtk1">
+        <template
+          v-if="vtkView1Loaded"
+          id="vtkView1"
+        >
           <div>
-            <template
-              v-if="vtkView1Loaded"
-              id="vtkView1"
-            >
-              <div>
-                <VtkViewer
-                  id="vtk1"
-                  :view="vtkViews[1][1]"
-                  :proxyNum="1"
-                />
-              </div>
-            </template>
+            <VtkViewer
+              id="vtk1"
+              :view="vtkViews[1][1]"
+              :proxyNum="1"
+            />
           </div>
+        </template>
+      </div>
+      <div class="vtk2">
+        <template
+          v-if="vtkView2Loaded"
+          id="vtkView2"
+        >
           <div>
-            <template
-              v-if="vtkView2Loaded"
-              id="vtkView2"
-            >
-              <div>
-                <VtkViewer
-                  id="vtk2"
-                  :view="vtkViews[2][0]"
-                  :proxyNum="2"
-                />
-              </div>
-            </template>
+            <VtkViewer
+              id="vtk2"
+              :view="vtkViews[2][0]"
+              :proxyNum="2"
+            />
           </div>
+        </template>
+      </div>
+      <div class="vtk3">
+        <template
+          v-if="vtkView3Loaded"
+          id="vtkView3"
+        >
           <div>
-            <template
-              v-if="vtkView3Loaded"
-              id="vtkView3"
-            >
-              <div>
-                <VtkViewer
-                  id="vtk3"
-                  :view="vtkViews[3][1]"
-                  :proxyNum="3"
-                />
-              </div>
-            </template>
+            <VtkViewer
+              id="vtk3"
+              :view="vtkViews[3][1]"
+              :proxyNum="3"
+            />
           </div>
-    </v-col>
-  </v-row>
+        </template>
+      </div>
+    </div>
+  </div>
 </template>
 
 <style lang="scss" scoped>
+.vtkViewsContainer {
+  display: grid;
+  grid-auto-columns: 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr;
+  gap: 0 0;
+  grid-template-areas: "vtk1 vtk2 vtk3";
+}
+
+.vtk1 { grid-area: vtk1; }
+.vtk2 { grid-area: vtk2; }
+.vtk3 { grid-area: vtk3; }
+
+.SelectScansContainer {
+  display: grid;
+  grid-auto-columns: 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr;
+  gap: 10px 10px;
+  grid-template-areas: "SelectScan1 SelectScan2 SelectScan3";
+}
+
+.selectScan1 { grid-area: selectScan1; }
+.selectScan2 { grid-area: selectScan2; }
+.selectScan3 { grid-area: selectScan3; }
+
+.ProjectExperimentContainer {
+  display: grid;
+  grid-auto-columns: 1fr;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr;
+  gap: 10px 10px;
+  grid-template-areas: "SelectProject SelectExperiment";
+}
+
+.selectProject { grid-area: selectProject; }
+.selectExperiment { grid-area: selectExperiment; }
+
 .my-layout {
   position: absolute;
   top: 0;
