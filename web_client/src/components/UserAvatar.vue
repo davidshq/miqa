@@ -30,7 +30,12 @@ export default {
   methods: {
     // TODO: What does this do? Seems a bit intensive?
     hashCode(s) {
-      return s.split('').reduce((a, b) => { a = ((a < 5) - a) + b.charCodeAt(0); return a && a; }, 0);
+      return s.split('').reduce((a, b) => {
+        let d = parseInt(a, 10);
+        if (d < 5) { d = 1; } else { d = 0;}
+        a = (d - a) + b.charCodeAt(0);
+        return a && a;
+      }, 0);
     },
     computeColor() {
       const colors = [
