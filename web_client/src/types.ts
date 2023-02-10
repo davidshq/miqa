@@ -13,6 +13,9 @@ interface ResponseData {
   detail: string,
   errors: string[],
   warnings: string[],
+  id?: any,
+  permissions?: any,
+  default_email_recipients?: any,
 }
 
 interface Frame {

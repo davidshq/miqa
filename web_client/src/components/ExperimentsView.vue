@@ -9,6 +9,7 @@ import UserAvatar from '@/components/UserAvatar.vue';
 import djangoRest from '@/django';
 import { includeScan } from '@/store';
 import { API_URL, decisionOptions } from '@/constants';
+import { Experiment } from '@/types';
 
 export default {
   name: 'ExperimentsView',
@@ -225,9 +226,11 @@ export default {
           experimentId = newExperiment.id;
         } else { // If uploading to existing experiment
           // Find the experiment's id that matches the experiment selected
-          experimentId = Object.values(this.experiments).find(
-            (experiment) => experiment.name === this.experimentNameForUpload,
-          ).id;
+          const foundExperiment = Object.values(this.experiments).find((experiment) =>
+            (experiment as Experiment).name === this.experimentNameForUpload);
+          if (typeof foundExperiment === 'object' && 'id' in foundExperiment) {
+            experimentId = foundExperiment.id;
+          }
         }
         await djangoRest.uploadToExperiment(experimentId, this.fileSetForUpload);
         this.loadProject(this.currentProject);
