@@ -2,6 +2,7 @@
 import { mapState, mapActions, mapMutations } from 'vuex';
 import UserAvatar from '@/components/UserAvatar.vue';
 import djangoRest from '@/django';
+import { ProjectSettings } from '@/types';
 
 export default {
   name: 'ProjectUsers',
@@ -65,7 +66,7 @@ export default {
     ...mapActions(['loadAllUsers']),
     ...mapMutations(['setCurrentProject']),
     getGroup(user) {
-      return Object.entries(this.permissions).filter(
+      return Object.entries(this.permissions as Object).filter(
         ([, value]) => value.includes(user),
       )[0][0].replace(/_/g, ' ');
     },
@@ -89,7 +90,7 @@ export default {
     async savePermissions() {
       const newSettings = { ...this.currentProject.settings };
       newSettings.permissions = Object.fromEntries(
-        Object.entries(this.selectedPermissionSet).map(
+        Object.entries(this.selectedPermissionSet as Object).map(
           ([group, list]) => [group, list.map((user) => user.username || user)],
         ),
       );
