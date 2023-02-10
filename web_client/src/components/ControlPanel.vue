@@ -51,7 +51,13 @@ export default {
       this.switchLock(this.currentView.experimentId);
       // Handles key presses
       window.addEventListener('keydown', (event) => {
-        if (['textarea', 'input'].includes(document.activeElement.type)) return;
+        if (
+          (document.activeElement instanceof HTMLInputElement
+            && ['text', 'password', 'email', 'number'].includes(document.activeElement.type)) ||
+          (document.activeElement instanceof HTMLTextAreaElement)
+        ) {
+          return;
+        }
         if (event.key === 'ArrowUp') {
           this.handleKeyPress('previous');
         } else if (event.key === 'ArrowDown') {
