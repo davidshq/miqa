@@ -1,5 +1,6 @@
 <script lang="ts">
-import { defineComponent, inject } from '@vue/composition-api';
+import inject from 'vue';
+import defineComponent from 'vue';
 import { User } from '@/types';
 
 // Login/Logout Button

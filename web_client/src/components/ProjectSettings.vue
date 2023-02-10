@@ -1,7 +1,9 @@
 <script lang="ts">
-import {
-  computed, defineComponent, ref, watchEffect, inject,
-} from '@vue/composition-api';
+import { ref } from 'vue';
+import computed from 'vue';
+import defineComponent from 'vue';
+import watchEffect from 'vue';
+import inject from 'vue';
 import { mapMutations } from 'vuex';
 import store from '@/store';
 import djangoRest from '@/django';
@@ -27,7 +29,7 @@ export default defineComponent({
 
     const importPath = ref('');
     const exportPath = ref('');
-    const anatomyOrientation = ref<string>();
+    const anatomyOrientation = ref<string>('');
     watchEffect(() => {
       if (isGlobal.value) {
         importPath.value = globalSettings.value.import_path;

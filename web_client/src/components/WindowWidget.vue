@@ -1,8 +1,10 @@
 <script lang="ts">
 import store from '@/store';
-import {
-  defineComponent, computed, watch, ref, onMounted,
-} from '@vue/composition-api';
+import { ref } from 'vue';
+import defineComponent from 'vue';
+import computed from 'vue';
+import watch from 'vue';
+import onMounted from 'vue';
 import { windowPresets } from '@/vtk/constants';
 import debounce from 'lodash/debounce';
 import CustomRangeSlider from './CustomRangeSlider.vue';
@@ -23,7 +25,7 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const currentRange = ref();
+    const currentRange = ref(null);
     const currentView = computed(() => store.getters.currentView);
     const currentFrame = computed(() => store.state.currentFrameId);
     const currentWindowWidth = computed(() => store.state.currentWindowWidth);
@@ -36,7 +38,7 @@ export default defineComponent({
     const distribution = computed(() => data.value.computeHistogram(data.value.getBounds()));
     const widthMin = computed(() => distribution.value.minimum || 0);
     const widthMax = computed(() => distribution.value.maximum || 0);
-    const selectedPreset = ref();
+    const selectedPreset = ref(null);
     const windowLocked = computed(() => store.state.windowLocked.lock);
     const windowLockImage = computed(() => store.state.windowLocked.associatedImage);
     const showLockOptions = ref(false);

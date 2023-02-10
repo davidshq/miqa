@@ -1,8 +1,10 @@
 <script lang="ts">
 import Vue from 'vue';
-import {
-  computed, defineComponent, ref, reactive, watch,
-} from '@vue/composition-api';
+import { ref } from 'vue';
+import watch from 'vue';
+import reactive from 'vue';
+import defineComponent from 'vue';
+import computed from 'vue';
 import Donut from 'vue-css-donut-chart';
 import 'vue-css-donut-chart/dist/vcdonut.css';
 import { mapMutations } from 'vuex';
@@ -111,7 +113,7 @@ export default defineComponent({
           (project) => project.id === window.location.hash.split('/')[1],
         );
         const targetProject = projects.value[targetProjectIndex];
-        if (targetProject) store.commit.setCurrentProject(targetProject);
+        if (targetProject) this.SET_CURRENT_PROJECT(targetProject);
         selectedProjectIndex.value = targetProjectIndex;
       }
     }
@@ -171,7 +173,7 @@ export default defineComponent({
   },
   methods: {
     // TODO: Is below using both Options API and above Composition API?
-    ...mapMutations(['setProjects', 'setCurrentProject']),
+    ...mapMutations(['setProjects', 'SET_CURRENT_PROJECT']),
     selectProject(project: Project) {
       if (this.complete) {
         this.complete = false;
