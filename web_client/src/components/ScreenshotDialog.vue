@@ -27,13 +27,19 @@ export default {
       if (this.fileType === 'png') {
         return this.currentScreenshot.dataURL;
       }
-      const { image, width, height } = await (async (file) => new Promise((resolve) => {
+      const imageObject = await (async (file) => new Promise((resolve) => {
         const img = new Image();
         img.onload = () => {
           resolve({ image: img, width: img.width, height: img.height });
         };
         img.src = file;
       }))(this.currentScreenshot.dataURL);
+      let image, width, height;
+      if (imageObject.hasOwnProperty("image") && imageObject.hasOwnProperty("width") && imageObject.hasOwnProperty("height")) {
+        ({ image, width, height } = imageObject as { image: HTMLImageElement, width: number, height: number });
+      } else {
+        return null;
+      }
       const canvas = document.createElement('canvas');
       canvas.width = width;
       canvas.height = height;
