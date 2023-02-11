@@ -1,11 +1,12 @@
 import Vue from 'vue';
 import 'polyfill-object.fromentries';
-import vuetify from './plugins/vuetify';
+import * as Sentry from '@sentry/vue';
 
 import AsyncComputed from 'vue-async-computed';
 import config from 'itk/itkConfig';
-import * as Sentry from '@sentry/vue';
 import App from './App.vue';
+import vuetify from './plugins/vuetify';
+
 import router from './router';
 
 import store from './store';
