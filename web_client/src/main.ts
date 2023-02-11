@@ -1,5 +1,4 @@
 import Vue from 'vue';
-import Vuetify from 'vuetify';
 import 'polyfill-object.fromentries';
 import vuetify from './plugins/vuetify';
 
@@ -19,8 +18,6 @@ import promptService from './vue-utilities/prompt-service';
 
 import djangoRest, { oauthClient } from './django';
 import { setupHeartbeat } from './heartbeat';
-
-Vue.use(Vuetify);
 
 Vue.use(AsyncComputed);
 Vue.use(vMousetrap);
