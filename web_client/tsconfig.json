@@ -2,6 +2,8 @@
   "compilerOptions": {
     "target": "es2020",
     "module": "esnext",
+    "allowJs": true,
+    "baseUrl": ".",
     "strict": false,
     "jsx": "preserve",
     "importHelpers": true,
