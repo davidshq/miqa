@@ -1,6 +1,6 @@
 <script lang="ts">
 import store from '@/store';
-import { ref } from 'vue';
+import ref from 'vue';
 import defineComponent from 'vue';
 import computed from 'vue';
 import watch from 'vue';

@@ -1,6 +1,6 @@
 <script lang="ts">
 import Vue from 'vue';
-import { ref } from 'vue';
+import ref from 'vue';
 import watch from 'vue';
 import reactive from 'vue';
 import defineComponent from 'vue';

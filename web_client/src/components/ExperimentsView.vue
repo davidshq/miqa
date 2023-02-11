@@ -229,6 +229,7 @@ export default {
           const foundExperiment = Object.values(this.experiments).find((experiment) =>
             (experiment as Experiment).name === this.experimentNameForUpload);
           if (typeof foundExperiment === 'object' && 'id' in foundExperiment) {
+            // @ts-ignore
             experimentId = foundExperiment.id;
           }
         }

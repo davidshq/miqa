@@ -1,6 +1,6 @@
 <script lang="ts">
 import IdleJS from 'idle-js';
-import { ref } from 'vue';
+import ref from 'vue';
 import computed from 'vue';
 import defineComponent from 'vue';
 import djangoRest from '@/django';
