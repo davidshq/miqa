@@ -14,7 +14,7 @@ module.exports = {
   ],
   devServer: {
     port: 8081,
-    public: process.env.PUBLIC_ADDRESS,
+    host: "127.0.0.1",
   },
   lintOnSave: false,
   publicPath: process.env.VUE_APP_STATIC_PATH,
