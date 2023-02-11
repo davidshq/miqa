@@ -9,6 +9,9 @@ const packageJson = require('./package.json');
 const stat = util.promisify(fs.stat);
 
 module.exports = {
+  transpileDependencies: [
+    'vuetify',
+  ],
   devServer: {
     port: 8081,
     public: process.env.PUBLIC_ADDRESS,
