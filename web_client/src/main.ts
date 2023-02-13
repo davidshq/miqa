@@ -5,11 +5,10 @@ import 'polyfill-object.fromentries';
 
 import AsyncComputed from 'vue-async-computed';
 import config from 'itk/itkConfig';
-import * as Sentry from '@sentry/vue';
 import App from './App.vue';
 import router from './router';
 
-import store from './store';
+import { store } from './store';
 import { STATIC_PATH } from './constants';
 
 import './vtk/ColorMaps';
@@ -21,6 +20,7 @@ import djangoRest, { oauthClient } from './django';
 import { setupHeartbeat } from './heartbeat';
 
 Vue.use(Vuetify);
+Vue.use(store);
 
 Vue.use(VueCompositionAPI);
 Vue.use(AsyncComputed);
@@ -35,11 +35,6 @@ config.itkModulesPath = STATIC_PATH + config.itkModulesPath;
 
 Vue.config.productionTip = true;
 
-Sentry.init({
-  Vue,
-  dsn: process.env.VUE_APP_SENTRY_DSN,
-});
-
 (async () => {
   // If user closes the tab, we want them to be logged out if they return to the page
   await setupHeartbeat('miqa_logout_heartbeat', async () => { oauthClient.logout(); });
@@ -53,7 +48,7 @@ Sentry.init({
   new Vue({
     vuetify,
     router,
-    store: store.original,
+    store,
     provide: {
       user: store.state.me,
       MIQAConfig: store.state.MIQAConfig,
