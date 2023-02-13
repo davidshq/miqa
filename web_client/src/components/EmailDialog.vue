@@ -149,9 +149,9 @@ export default defineComponent({
 
 <template>
   <v-dialog
-    :value="value"
+    :model-value="value"
     max-width="60%"
-    @input="$emit('input', $event)"
+    @update:model-value="$emit('input', $event)"
   >
     <v-form
       ref="form"
@@ -159,11 +159,11 @@ export default defineComponent({
       @submit.prevent="send"
     >
       <v-card>
-        <v-card-title class="text-h5 grey lighten-4">
+        <v-card-title class="text-h5 bg-grey-lighten-4">
           Send email
           <v-spacer />
           <v-btn
-            small
+            size="small"
             icon
             class="ma-0"
             @click="$emit('input', false)"
@@ -261,7 +261,7 @@ export default defineComponent({
                       aspect-ratio="1"
                     />
                     <v-card-text class="text-truncate">
-                      <v-tooltip top>
+                      <v-tooltip location="top">
                         <template #activator="{ on }">
                           <span v-on="on">{{ screenshot.name }}</span>
                         </template>
@@ -272,7 +272,7 @@ export default defineComponent({
                       <v-btn
                         v-if="hover"
                         fab
-                        small
+                        size="small"
                         color="primary"
                         class="close"
                         @click.stop="REMOVE_SCREENSHOT(screenshot)"
@@ -292,7 +292,7 @@ export default defineComponent({
             :loading="sending"
             :disabled="!valid"
             color="primary"
-            text
+            variant="text"
             type="submit"
           >
             Send

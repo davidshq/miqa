@@ -368,11 +368,11 @@ export default {
             class="pa-0 ma-0"
           >
             Indicate artifacts in this scan
-            <v-tooltip bottom>
+            <v-tooltip location="bottom">
               <template #activator="{ on, attrs }">
                 <v-icon
                   v-bind="attrs"
-                  small
+                  size="small"
                   class="pl-2"
                   v-on="on"
                 >
@@ -396,11 +396,11 @@ export default {
             >
               Auto evaluation
             </v-subheader>
-            <v-tooltip bottom>
+            <v-tooltip location="bottom">
               <template #activator="{ on, attrs }">
                 <v-icon
                   v-bind="attrs"
-                  small
+                  size="small"
                   style="height: 25px; padding: 5px"
                   v-on="on"
                 >
@@ -426,11 +426,11 @@ export default {
             >
               No Auto evaluation available
             </v-subheader>
-            <v-tooltip bottom>
+            <v-tooltip location="bottom">
               <template #activator="{ on, attrs }">
                 <v-icon
                   v-bind="attrs"
-                  small
+                  size="small"
                   style="height: 25px; padding: 5px"
                   v-on="on"
                 >
@@ -455,7 +455,7 @@ export default {
               v-for="([artifact, chipState]) in chips"
               v-bind="artifact"
               :key="artifact.value"
-              :outlined="chipState.outlined"
+              :variant="chipState.outlined && 'outlined'"
               :color="chipState.color"
               :text-color="chipState.textColor"
               :style="'text-decoration: '+chipState.textDecoration +'; margin-bottom: 3px;'"
@@ -479,13 +479,13 @@ export default {
               v-model="newComment"
               :counter="!warnDecision"
               :hide-details="warnDecision"
-              filled
+              variant="filled"
               no-resize
               height="80px"
               name="input-comment"
               label="Evaluation Comment"
               placeholder="Write a comment about the scan"
-              @input="handleCommentChange"
+              @update:model-value="handleCommentChange"
             />
           </v-col>
         </v-row>
@@ -495,7 +495,7 @@ export default {
         >
           <v-col
             cols="12"
-            class="red--text"
+            class="text-red"
             style="text-align: center"
           >
             Decisions other than "usable" must have a comment or artifact selection.

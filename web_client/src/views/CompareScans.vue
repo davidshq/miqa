@@ -154,7 +154,7 @@ export default {
           v-model="selectedProject"
           label="Project"
           :items="allProjects"
-          item-text="name"
+          item-title="name"
           item-value="id"
         />
       </div>
@@ -163,7 +163,7 @@ export default {
           v-model="selectedExperiment"
           label="Experiment"
           :items="childExperiments"
-          item-text="name"
+          item-title="name"
           item-value="id"
         />
       </div>
@@ -174,7 +174,7 @@ export default {
           v-model="selectedScan1"
           label="Select Scan"
           :items="childScans"
-          item-text="name"
+          item-title="name"
           item-value="id"
           return-object
         />
@@ -184,7 +184,7 @@ export default {
           v-model="selectedScan2"
           label="Select Scan"
           :items="childScans"
-          item-text="name"
+          item-title="name"
           item-value="id"
           return-object
         />
@@ -194,7 +194,7 @@ export default {
           v-model="selectedScan3"
           label="Select Scan"
           :items="childScans"
-          item-text="name"
+          item-title="name"
           item-value="id"
           return-object
         />
@@ -210,7 +210,7 @@ export default {
             <VtkViewer
               id="vtk1"
               :view="vtkViews[1][1]"
-              :proxyNum="1"
+              :proxy-num="1"
             />
           </div>
         </template>
@@ -224,7 +224,7 @@ export default {
             <VtkViewer
               id="vtk2"
               :view="vtkViews[2][0]"
-              :proxyNum="2"
+              :proxy-num="2"
             />
           </div>
         </template>
@@ -238,7 +238,7 @@ export default {
             <VtkViewer
               id="vtk3"
               :view="vtkViews[3][1]"
-              :proxyNum="3"
+              :proxy-num="3"
             />
           </div>
         </template>
