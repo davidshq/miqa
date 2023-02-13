@@ -51,6 +51,7 @@ export default {
       this.switchLock(this.currentView.experimentId);
       // Handles key presses
       window.addEventListener('keydown', (event) => {
+        // @ts-ignore
         if (['textarea', 'input'].includes(document.activeElement.type)) return;
         if (event.key === 'ArrowUp') {
           this.handleKeyPress('previous');
@@ -89,7 +90,11 @@ export default {
           // If there is an old experiment
           if (oldExperimentId) {
             try {
-              await this.setLock({ experimentId: oldExperimentId, lockExperiment: false, forceToLock });
+              await this.setLock({
+                experimentId: oldExperimentId,
+                lockExperiment: false,
+                forceToLock,
+              });
             } catch (err) {
               this.$snackbar({
                 text: 'Failed to release edit access on Experiment.',
@@ -99,7 +104,11 @@ export default {
           }
           // Set the new lockExperiment
           try {
-            await this.setLock({ experimentId: newExperimentId, lockExperiment: true, forceToLock });
+            await this.setLock({
+              experimentId: newExperimentId,
+              lockExperiment: true,
+              forceToLock,
+            });
             this.lockCycle = setInterval(async (experimentId) => {
               await this.setLock({ experimentId, lockExperiment: true });
             }, 1000 * 60 * 5, this.currentView.experimentId);

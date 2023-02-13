@@ -124,12 +124,12 @@ export default defineComponent({
   <div
     class="pl-3"
   >
-    <v-tooltip top>
+    <v-tooltip location="top">
       <template #activator="{ on, attrs }">
         <v-btn
           :disabled="importing || importPath === ''"
           v-bind="attrs"
-          text
+          variant="text"
           color="primary"
           v-on="on"
           @click="importDialog = true"
@@ -149,12 +149,12 @@ export default defineComponent({
       <span>Import from {{ importPath }}</span>
     </v-tooltip>
 
-    <v-tooltip top>
+    <v-tooltip location="top">
       <template #activator="{ on, attrs }">
         <v-btn
           :disabled="exporting || exportPath === ''"
           v-bind="attrs"
-          text
+          variant="text"
           color="primary"
           v-on="on"
           @click="exportData"
@@ -201,14 +201,14 @@ export default defineComponent({
           <v-spacer />
           <v-btn
             :disabled="importing"
-            text
+            variant="text"
             @click="importDialog = false"
           >
             Cancel
           </v-btn>
           <v-btn
             :loading="importing"
-            text
+            variant="text"
             color="primary"
             @click="importData"
           >
@@ -251,7 +251,7 @@ export default defineComponent({
           <v-spacer />
           <v-btn
             color="primary"
-            text
+            variant="text"
             @click="importErrors = false"
           >
             Ok

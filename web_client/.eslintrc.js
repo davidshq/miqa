@@ -4,16 +4,12 @@ module.exports = {
     node: true,
   },
   extends: [
-    'plugin:vue/recommended',
-    'plugin:vuetify/recommended',
-    '@vue/airbnb',
+    'plugin:vue/base',
+    'plugin:vuetify/base',
+    '@vue/typescript/recommended',
   ],
-  parser: 'vue-eslint-parser',
   parserOptions: {
-    parser: {
-      js: 'babel-eslint',
-      ts: '@typescript-eslint/parser',
-    },
+    ecmaVersion: 2020,
   },
   rules: {
     'no-console': 'off',

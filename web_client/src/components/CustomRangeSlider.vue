@@ -1,7 +1,8 @@
 <script lang="ts">
-import { VRangeSlider } from 'vuetify/lib';
+import { VRangeSlider } from 'vuetify/components';
 
-export default VRangeSlider.extend({
+export default {
+  extends: VRangeSlider,
   methods: {
     // override
     onSliderMouseDown(e) {
@@ -53,7 +54,7 @@ export default VRangeSlider.extend({
       this.internalValue = [low, high];
     },
   },
-});
+};
 </script>
 
 <style scoped>

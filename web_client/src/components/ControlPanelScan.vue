@@ -63,7 +63,7 @@ export default {
                 <b>{{ currentView.scanName }}</b>
               </p>
               <p
-                class="grey--text"
+                class="text-grey"
                 style="display:inline"
               >
                 ({{ currentView.scanPosition }} /
@@ -73,8 +73,8 @@ export default {
             <div>
               <v-btn
                 :disabled="!currentView.upTo"
-                small
-                depressed
+                size="small"
+                variant="flat"
                 class="transparent-btn"
                 @mousedown="$emit('handleKeyPress', 'previous')"
               >
@@ -82,8 +82,8 @@ export default {
               </v-btn>
               <v-btn
                 :disabled="!currentView.downTo"
-                small
-                depressed
+                size="small"
+                variant="flat"
                 class="transparent-btn"
                 @mousedown="$emit('handleKeyPress', 'next')"
               >
@@ -97,7 +97,7 @@ export default {
             <div>
               Frame:
               <p
-                class="grey--text"
+                class="text-grey"
                 style="display:inline"
               >
                 ({{ currentView.framePosition }} /
@@ -105,18 +105,18 @@ export default {
               </p>
             </div>
             <v-slider
-              :value="currentView.framePosition"
-              ticks="always"
+              :model-value="currentView.framePosition"
+              show-ticks="always"
               tick-size="4"
               :min="1"
               :max="currentView.scanFramesList.length"
-              @input="slideToFrame"
+              @update:model-value="slideToFrame"
             />
             <div>
               <v-btn
                 :disabled="!previousFrame"
-                small
-                depressed
+                size="small"
+                variant="flat"
                 class="transparent-btn"
                 @mousedown="$emit('handleKeyPress', 'back')"
               >
@@ -124,8 +124,8 @@ export default {
               </v-btn>
               <v-btn
                 :disabled="!nextFrame"
-                small
-                depressed
+                size="small"
+                variant="flat"
                 class="transparent-btn"
                 @mousedown="$emit('handleKeyPress', 'forward')"
               >
@@ -145,7 +145,7 @@ export default {
         <v-row class="mx-0">
           <v-col
             cols="12"
-            class="grey lighten-4"
+            class="bg-grey-lighten-4"
             style="height: 100px; overflow:auto; margin: 15px 0"
           >
             <ScanDecision
@@ -156,7 +156,7 @@ export default {
             <div
               v-if="!currentView.scanDecisions
                 || currentView.scanDecisions.length === 0"
-              class="grey--text"
+              class="text-grey"
             >
               This scan has no prior comments.
             </div>

@@ -44,9 +44,7 @@ export default {
           // TODO: This shouldn't be necessary?
           const { UPDATE_EXPERIMENT } = store.commit;
           // Save note using API
-          const newExpData = await djangoRest.setExperimentNote(
-            this.currentView.experimentId, this.newExperimentNote,
-          );
+          const newExpData = await djangoRest.setExperimentNote(this.currentView.experimentId, this.newExperimentNote);
           this.$snackbar({
             text: 'Saved note successfully.',
             timeout: 6000,
@@ -124,7 +122,7 @@ export default {
           class="px-6 py-8 align-center"
         >
           <v-progress-circular
-            :value="scanCachedPercentage * 100"
+            :model-value="scanCachedPercentage * 100"
             color="blue"
           />
           <div> Loading...</div>
@@ -132,7 +130,7 @@ export default {
       </div>
       <v-textarea
         v-model="currentView.experimentNote"
-        filled
+        variant="filled"
         :disabled="!experimentIsEditable"
         no-resize
         height="95px"
@@ -141,7 +139,7 @@ export default {
         label="Experiment Notes"
         placeholder="There are no notes on this experiment."
         class="mx-3"
-        @input="handleExperimentNoteChange"
+        @update:model-value="handleExperimentNoteChange"
       />
       <v-row no-gutters>
         <v-col
@@ -162,7 +160,7 @@ export default {
             label="Display crosshairs"
             hide-details
             class="shrink pa-0 ml-n2"
-            @change="SET_SHOW_CROSSHAIRS"
+            @update:model-value="SET_SHOW_CROSSHAIRS"
           />
         </div>
         <div style="flex-grow: 1">
@@ -171,7 +169,7 @@ export default {
             label="Store crosshairs with decision"
             hide-details
             class="shrink pa-0 ml-n2"
-            @change="SET_STORE_CROSSHAIRS"
+            @update:model-value="SET_STORE_CROSSHAIRS"
           />
         </div>
       </v-col>

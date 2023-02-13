@@ -67,7 +67,7 @@ export default defineComponent({
   >
     <v-toolbar-title>
       <v-tooltip
-        bottom
+        location="bottom"
       >
         <template #activator="{ on }">
           <span v-on="on">MIQA</span>
@@ -77,7 +77,7 @@ export default defineComponent({
     </v-toolbar-title>
     <v-tabs
       class="navigation-tabs ml-3"
-      background-color="transparent"
+      bg-color="transparent"
     >
       <v-tab
         to="/"

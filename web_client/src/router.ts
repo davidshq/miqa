@@ -3,7 +3,7 @@ import Router from 'vue-router';
 
 import Projects from './views/Projects.vue';
 import Scan from './views/Scan.vue';
-import CompareScans from "./views/CompareScans.vue";
+import CompareScans from './views/CompareScans.vue';
 
 Vue.use(Router);
 

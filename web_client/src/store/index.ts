@@ -1,8 +1,5 @@
 /* eslint-disable no-use-before-define */
-
-import { createDirectStore } from 'direct-vuex';
-import Vue from 'vue';
-import Vuex from 'vuex';
+import { createStore } from 'vuex';
 import vtkProxyManager from 'vtk.js/Sources/Proxy/Core/ProxyManager';
 import macro from 'vtk.js/Sources/macros';
 import { InterpolationType } from 'vtk.js/Sources/Rendering/Core/ImageProperty/Constants';
@@ -23,18 +20,17 @@ import { proxy } from '../vtk';
 import { getView } from '../vtk/viewManager';
 import { ijkMapping } from '../vtk/constants';
 
-import { RESET_STATE, SET_MIQA_CONFIG, SET_ME, SET_ALL_USERS, RESET_PROJECT_STATE, SET_CURRENT_FRAME_ID,
-         SET_FRAME, SET_SCAN, SET_RENDER_ORIENTATION, SET_CURRENT_PROJECT, SET_GLOBAL_SETTINGS,
-         SET_TASK_OVERVIEW, SET_PROJECTS, ADD_SCAN_DECISION, SET_FRAME_EVALUATION, SET_CURRENT_SCREENSHOT,
-         ADD_SCREENSHOT, REMOVE_SCREENSHOT, UPDATE_LAST_API_REQUEST_TIME, SET_LOADING_FRAME,
-         SET_ERROR_LOADING_FRAME, ADD_SCAN_FRAMES, ADD_EXPERIMENT_SCANS, ADD_EXPERIMENT,
-         UPDATE_EXPERIMENT, SET_WINDOW_LOCKED, SET_SCAN_CACHED_PERCENTAGE, SET_SLICE_LOCATION,
-         SET_CURRENT_VTK_INDEX_SLICES, SET_SHOW_CROSSHAIRS, SET_STORE_CROSSHAIRS, SET_REVIEW_MODE
-       } from './mutation-types';
+import {
+  RESET_STATE, SET_MIQA_CONFIG, SET_ME, SET_ALL_USERS, RESET_PROJECT_STATE, SET_CURRENT_FRAME_ID,
+  SET_FRAME, SET_SCAN, SET_RENDER_ORIENTATION, SET_CURRENT_PROJECT, SET_GLOBAL_SETTINGS,
+  SET_TASK_OVERVIEW, SET_PROJECTS, ADD_SCAN_DECISION, SET_FRAME_EVALUATION, SET_CURRENT_SCREENSHOT,
+  ADD_SCREENSHOT, REMOVE_SCREENSHOT, UPDATE_LAST_API_REQUEST_TIME, SET_LOADING_FRAME,
+  SET_ERROR_LOADING_FRAME, ADD_SCAN_FRAMES, ADD_EXPERIMENT_SCANS, ADD_EXPERIMENT,
+  UPDATE_EXPERIMENT, SET_WINDOW_LOCKED, SET_SCAN_CACHED_PERCENTAGE, SET_SLICE_LOCATION,
+  SET_CURRENT_VTK_INDEX_SLICES, SET_SHOW_CROSSHAIRS, SET_STORE_CROSSHAIRS, SET_REVIEW_MODE,
+} from './mutation-types';
 
 const { convertItkToVtkImage } = ITKHelper;
-
-Vue.use(Vuex);
 
 // Cache of downloaded files
 const fileCache = new Map();
@@ -152,24 +148,23 @@ function loadFile(frame, { onDownloadProgress = null } = {}) {
     console.log('loadFile - pulled from cache');
     console.log({ frameId: frame.id, cachedFile: fileCache.get(frame.id) });
     return { frameId: frame.id, cachedFile: fileCache.get(frame.id) };
-  } else { // Otherwise download the frame
-    let client = apiClient;
-    let downloadURL = `/frames/${frame.id}/download`;
-    if (frame.download_url) {
-      client = axios.create();
-      downloadURL = frame.download_url;
-    }
-    const { promise } = ReaderFactory.downloadFrame(
-      client,
-      `image${frame.extension}`,
-      downloadURL,
-      { onDownloadProgress },
-    );
-    fileCache.set(frame.id, promise);
-    console.log('loadFile - downloaded');
-    console.log({ frameId: frame.id, cachedFile : promise });
-    return { frameId: frame.id, cachedFile: promise };
+  } // Otherwise download the frame
+  let client = apiClient;
+  let downloadURL = `/frames/${frame.id}/download`;
+  if (frame.download_url) {
+    client = axios.create();
+    downloadURL = frame.download_url;
   }
+  const { promise } = ReaderFactory.downloadFrame(
+    client,
+    `image${frame.extension}`,
+    downloadURL,
+    { onDownloadProgress },
+  );
+  fileCache.set(frame.id, promise);
+  console.log('loadFile - downloaded');
+  console.log({ frameId: frame.id, cachedFile: promise });
+  return { frameId: frame.id, cachedFile: promise };
 }
 
 /** Downloads an image file. */
@@ -233,7 +228,7 @@ function poolFunction(webWorker, taskInfo) {
     if (fileCache.has(frame.id)) { // Load file from cache if available
       filePromise = fileCache.get(frame.id);
     } else { // Download image file
-      let download = downloadFile(frame, {});
+      const download = downloadFile(frame, {});
       pendingFrameDownloads.add(download); // Adds to Set of all pending downloads
       filePromise = download.cachedFile;
       filePromise // Delete from pending downloads once resolved/rejected
@@ -288,7 +283,7 @@ function startReaderWorkerPool() {
 }
 
 /** Queues scan for download Will load all frames for a target scan if the scan has not already been loaded. */
-function queueLoadScan(scan, loadNext: number = 0) {
+function queueLoadScan(scan, loadNext = 0) {
   console.log('Running queueLoadScan');
   console.log('queueLoadScan - scan', scan);
   console.log('queueLoadScan - loadNext', loadNext);
@@ -459,13 +454,7 @@ const initState = {
   renderOrientation: 'LPS',
 };
 
-const {
-  store,
-  rootActionContext,
-  moduleActionContext,
-  rootGetterContext,
-  moduleGetterContext,
-} = createDirectStore({
+export const store = createStore({
   state: {
     ...initState,
     workerPool: new WorkerPool(poolSize, poolFunction),
@@ -519,7 +508,7 @@ const {
     },
     /** Gets the current frame when given a frameId */
     currentFrame(state) {
-      console.log('Running currentFrame')
+      console.log('Running currentFrame');
       return state.currentFrameId ? state.frames[state.currentFrameId] : null;
     },
     /** Gets the previous frame based on the currentFrame */
@@ -556,7 +545,7 @@ const {
     myCurrentProjectRoles(state) {
       console.log('Running myCurrentProjectRoles');
       const projectPerms = Object.entries(state.currentProjectPermissions)
-        .filter((entry: [string, Array<User>]): Boolean => entry[1].map(
+        .filter((entry: [string, Array<User>]): boolean => entry[1].map(
           (user) => user.username,
         ).includes(state.me.username))
         .map((entry) => entry[0]);
@@ -582,26 +571,26 @@ const {
     },
   },
   mutations: {
-    [RESET_STATE] (state) {
+    [RESET_STATE](state) {
       console.log('Running RESET_STATE');
       Object.assign(state, { ...state, ...initState });
     },
-    [SET_MIQA_CONFIG] (state, configuration) {
+    [SET_MIQA_CONFIG](state, configuration) {
       console.log('Running SET_MIQA_CONFIG');
       if (!configuration) configuration = {};
       if (!configuration.version) configuration.version = '';
       state.MIQAConfig = configuration;
     },
-    [SET_ME] (state, me) {
+    [SET_ME](state, me) {
       console.log('Running SET_ME');
       state.me = me;
     },
-    [SET_ALL_USERS] (state, allUsers) {
+    [SET_ALL_USERS](state, allUsers) {
       console.log('Running SET_ALL_USERS');
       state.allUsers = allUsers;
     },
     /** Resets project state when loading a new project */
-    [RESET_PROJECT_STATE] (state) {
+    [RESET_PROJECT_STATE](state) {
       console.log('Running RESET_PROJECT_STATE');
       state.experimentIds = [];
       state.experiments = {};
@@ -611,29 +600,29 @@ const {
       state.frames = {};
     },
     /** Sets the currentFrameId to a specified frameId */
-    [SET_CURRENT_FRAME_ID] (state, frameId) {
+    [SET_CURRENT_FRAME_ID](state, frameId) {
       console.log('Running SET_CURRENT_FRAME_ID');
       state.currentFrameId = frameId;
     },
     /** Sets a specific index within the frames array to a specified frame */
-    [SET_FRAME] (state, { frameId, frame }) {
+    [SET_FRAME](state, { frameId, frame }) {
       console.log('Running SET_FRAME');
       // Replace with a new object to trigger a Vuex update
       state.frames = { ...state.frames }; // Why do we pass in the frameId when we can access it from frame.id?
       state.frames[frameId] = frame;
     },
-    [SET_SCAN] (state, { scanId, scan }) {
+    [SET_SCAN](state, { scanId, scan }) {
       console.log('Running SET_SCAN');
       // Replace with a new object to trigger a Vuex update
       state.scans = { ...state.scans };
       state.scans[scanId] = scan;
     },
-    [SET_RENDER_ORIENTATION] (state, anatomy) {
+    [SET_RENDER_ORIENTATION](state, anatomy) {
       console.log('Running SET_RENDER_ORIENTATION');
       state.renderOrientation = anatomy;
     },
     /** Sets state.currentProject. Also sets state.renderOrientation and state.currentProjectPermissions */
-    [SET_CURRENT_PROJECT] (state, project: Project | null) {
+    [SET_CURRENT_PROJECT](state, project: Project | null) {
       console.log('Running SET_CURRENT_PROJECT');
       state.currentProject = project; // We pass the entire Project Object here, not just its Id?
       if (project) {
@@ -641,11 +630,11 @@ const {
         state.currentProjectPermissions = project.settings.permissions;
       }
     },
-    [SET_GLOBAL_SETTINGS] (state, settings) {
+    [SET_GLOBAL_SETTINGS](state, settings) {
       console.log('Running SET_GLOBAL_SETTINGS');
       state.globalSettings = settings;
     },
-    [SET_TASK_OVERVIEW] (state, taskOverview: ProjectTaskOverview) {
+    [SET_TASK_OVERVIEW](state, taskOverview: ProjectTaskOverview) {
       console.log('Running SET_TASK_OVERVIEW');
       if (!taskOverview) return;
       // Calculates total scans and scans that have been marked complete
@@ -672,52 +661,52 @@ const {
         });
       }
     },
-    [SET_PROJECTS] (state, projects: Project[]) {
+    [SET_PROJECTS](state, projects: Project[]) {
       console.log('Running SET_PROJECTS');
       state.projects = projects;
     },
-    [ADD_SCAN_DECISION] (state, { currentScanId, newScanDecision }) {
+    [ADD_SCAN_DECISION](state, { currentScanId, newScanDecision }) {
       console.log('Running ADD_SCAN_DECISION');
       state.scans[currentScanId].decisions.push(newScanDecision);
     },
     /** Note: We don't pass the frame, only the frame_evaluation, we then append the value to `currentFrame` */
-    [SET_FRAME_EVALUATION] (state, frame_evaluation) {
+    [SET_FRAME_EVALUATION](state, frame_evaluation) {
       console.log('Running SET_FRAME_EVALUATION');
       const currentFrame = state.currentFrameId ? state.frames[state.currentFrameId] : null;
       if (currentFrame) {
         currentFrame.frame_evaluation = frame_evaluation;
       }
     },
-    [SET_CURRENT_SCREENSHOT] (state, screenshot) {
+    [SET_CURRENT_SCREENSHOT](state, screenshot) {
       console.log('Running SET_CURRENT_SCREENSHOT');
       state.currentScreenshot = screenshot;
     },
-    [ADD_SCREENSHOT] (state, screenshot) {
+    [ADD_SCREENSHOT](state, screenshot) {
       console.log('Running ADD_SCREENSHOT');
       state.screenshots.push(screenshot);
     },
-    [REMOVE_SCREENSHOT] (state, screenshot) {
+    [REMOVE_SCREENSHOT](state, screenshot) {
       console.log('Running REMOVE_SCREENSHOT');
       state.screenshots.splice(state.screenshots.indexOf(screenshot), 1);
     },
-    [UPDATE_LAST_API_REQUEST_TIME] (state) {
+    [UPDATE_LAST_API_REQUEST_TIME](state) {
       console.log('Running UPDATE_LAST_API_REQUEST_TIME');
       state.lastApiRequestTime = Date.now();
     },
-    [SET_LOADING_FRAME] (state, isLoading: boolean) {
+    [SET_LOADING_FRAME](state, isLoading: boolean) {
       console.log('Running SET_LOADING_FRAME');
       state.loadingFrame = isLoading;
     },
-    [SET_ERROR_LOADING_FRAME] (state, isErrorLoading: boolean) {
+    [SET_ERROR_LOADING_FRAME](state, isErrorLoading: boolean) {
       console.log('Running SET_ERROR_LOADING_FRAME');
       state.errorLoadingFrame = isErrorLoading;
     },
     /** Adds a scan ID, and it's corresponding Frame ID to state.scanFrames */
-    [ADD_SCAN_FRAMES] (state, { scanId, frameId }) { // TODO: Should this be addScanFrame or addScanToScanFrames?
+    [ADD_SCAN_FRAMES](state, { scanId, frameId }) { // TODO: Should this be addScanFrame or addScanToScanFrames?
       console.log('Running ADD_SCAN_FRAMES');
       state.scanFrames[scanId].push(frameId);
     },
-    [ADD_EXPERIMENT_SCANS] (state, { experimentId, scanId }) {
+    [ADD_EXPERIMENT_SCANS](state, { experimentId, scanId }) {
       console.log('Running ADD_EXPERIMENT_SCANS');
       state.scanFrames[scanId] = []; // Why?
       state.experimentScans[experimentId].push(scanId);
@@ -726,7 +715,7 @@ const {
      * Add an experiment to state.experiments, it's id to state.experimentIds, and set
      * state.experimentScans to an empty array
      */
-    [ADD_EXPERIMENT] (state, { experimentId, experiment }) {
+    [ADD_EXPERIMENT](state, { experimentId, experiment }) {
       console.log('Running ADD_EXPERIMENT');
       state.experimentScans[experimentId] = [];
       if (!state.experimentIds.includes(experimentId)) {
@@ -734,24 +723,24 @@ const {
       }
       state.experiments[experimentId] = experiment;
     },
-    [UPDATE_EXPERIMENT] (state, experiment) {
+    [UPDATE_EXPERIMENT](state, experiment) {
       console.log('Running UPDATE_EXPERIMENT');
       // Necessary for reactivity
       state.experiments = { ...state.experiments };
       state.experiments[experiment.id] = experiment;
     },
     /** Ensures that a specific image is being reviewed by a single individual */
-    [SET_WINDOW_LOCKED] (state, lockState) {
+    [SET_WINDOW_LOCKED](state, lockState) {
       console.log('Running SET_WINDOW_LOCKED');
       state.windowLocked = lockState;
     },
     /** Set state.scanCachedPercentage equal to passed in percentage */
-    [SET_SCAN_CACHED_PERCENTAGE] (state, percentComplete) {
+    [SET_SCAN_CACHED_PERCENTAGE](state, percentComplete) {
       console.log('Running SET_SCAN_CACHED_PERCENTAGE');
       state.scanCachedPercentage = percentComplete;
     },
     /** Saves the location of the cursor click related to a specific scan and decision */
-    [SET_SLICE_LOCATION] (state, ijkLocation, whichProxy = 0) {
+    [SET_SLICE_LOCATION](state, ijkLocation, whichProxy = 0) {
       console.log('Running SET_SLICE_LOCATION');
       if (Object.values(ijkLocation).every((value) => value !== undefined)) {
         state.vtkViews[whichProxy].forEach(
@@ -763,20 +752,20 @@ const {
         );
       }
     },
-    [SET_CURRENT_VTK_INDEX_SLICES] (state, { indexAxis, value }) {
+    [SET_CURRENT_VTK_INDEX_SLICES](state, { indexAxis, value }) {
       console.log('Running SET_CURRENT_VTK_INDEX_SLICES');
       state[`${indexAxis}IndexSlice`] = value;
       state.sliceLocation = undefined;
     },
-    [SET_SHOW_CROSSHAIRS] (state, show: boolean) {
+    [SET_SHOW_CROSSHAIRS](state, show: boolean) {
       console.log('Running SET_SHOW_CROSSHAIRS');
       state.showCrosshairs = show;
     },
-    [SET_STORE_CROSSHAIRS] (state, value: boolean) {
+    [SET_STORE_CROSSHAIRS](state, value: boolean) {
       console.log('Running SET_STORE_CROSSHAIRS');
       state.storeCrosshairs = value;
     },
-    [SET_REVIEW_MODE] (state, mode: boolean) {
+    [SET_REVIEW_MODE](state, mode: boolean) {
       console.log('Running SET_REVIEW_MODE');
       state.reviewMode = mode || false;
     },
@@ -973,7 +962,9 @@ const {
      */
     async swapToFrame({
       state, dispatch, getters, commit,
-    }, { frame, onDownloadProgress = null, loadAll = true, whichProxy = 0 }) {
+    }, {
+      frame, onDownloadProgress = null, loadAll = true, whichProxy = 0,
+    }) {
       console.log('Running swapToFrame');
       // Guard Clauses
       if (!frame) {
@@ -992,9 +983,7 @@ const {
 
         // Queue the new scan to be loaded
         if (newScan !== oldScan && newScan) {
-          queueLoadScan(
-            newScan, 3,
-          );
+          queueLoadScan(newScan, 3);
         }
         let newProxyManager = false;
         // Create new proxyManager if scans are different, retain proxyManager otherwise
@@ -1013,12 +1002,11 @@ const {
 
       try {
         // Gets the data we need to display
-        let frameData = await dispatch('getFrameData', { frame });
+        const frameData = await dispatch('getFrameData', { frame });
 
         // Handles configuring the sourceProxy and getting the views
         await dispatch('setupSourceProxy', { frame, frameData });
-      }
-      catch (err) {
+      } catch (err) {
         console.log('Caught exception loading next frame');
         console.log(err);
         state.vtkViews[whichProxy] = [];
@@ -1027,12 +1015,14 @@ const {
         commit('SET_CURRENT_FRAME_ID', frame.id);
         commit('SET_LOADING_FRAME', false);
       }
-
+      // @ts-ignore
       await this.updateLock();
     },
     async loadFrame({
-      state, dispatch, getters, commit
-    }, { frame, onDownloadProgress = null, loadAll = true, whichProxy = 0 }) {
+      state, dispatch, getters, commit,
+    }, {
+      frame, onDownloadProgress = null, loadAll = true, whichProxy = 0,
+    }) {
       console.log('Running loadFrame');
       console.log('loadFrame - frame', frame);
       console.log('loadFrame - whichProxy', whichProxy);
@@ -1053,7 +1043,7 @@ const {
       console.log('before setupProxyManager');
       await dispatch('setupProxyManager', { newProxyManager, whichProxy });
       console.log('after setupProxyManager');
-      let frameData = await dispatch('getFrameData', { frame });
+      const frameData = await dispatch('getFrameData', { frame });
       console.log('after frameData');
       console.log('before dispatch setupSourceProxy');
       await dispatch('setupSourceProxy', { frame, frameData, whichProxy });
@@ -1065,7 +1055,9 @@ const {
       console.log('View1', state.vtkViews[1]);
       // await this.updateLock();
     },
-    async setupProxyManager({ state, dispatch, getters, commit }, { newProxyManager, whichProxy = 0 }) {
+    async setupProxyManager({
+      state, dispatch, getters, commit,
+    }, { newProxyManager, whichProxy = 0 }) {
       // If it doesn't exist, create new instance of proxyManager
       // Also, if it does exist but was used for a different scan, create a new one
       console.log('Running setupProxyManager');
@@ -1077,7 +1069,9 @@ const {
         state.vtkViews[whichProxy] = [];
       }
     },
-    async setupSourceProxy({ state, dispatch, getters, commit }, { frameData, whichProxy = 0 }) {
+    async setupSourceProxy({
+      state, dispatch, getters, commit,
+    }, { frameData, whichProxy = 0 }) {
       console.log('Running setupSourceProxy');
       // get the source from which we are loading the images
       let sourceProxy = state.proxyManager[whichProxy].getActiveSource();
@@ -1105,7 +1099,9 @@ const {
         state.vtkViews[whichProxy] = state.proxyManager[whichProxy].getViews();
       }
     },
-    async getFrameData({ state, dispatch, getters, commit, }, { frame, onDownloadProgress = null }) {
+    async getFrameData({
+      state, dispatch, getters, commit,
+    }, { frame, onDownloadProgress = null }) {
       console.log('Running getFrameData');
       let frameData = null;
       // load from cache if possible
@@ -1115,9 +1111,7 @@ const {
         console.log('getFrameData: frameData', frameData);
       } else {
         // download from server if not cached
-        const result = await loadFileAndGetData(
-          frame, { onDownloadProgress },
-        );
+        const result = await loadFileAndGetData(frame, { onDownloadProgress });
         frameData = await result.frameData;
         console.log('getFrameData: frameData', frameData);
       }
@@ -1174,14 +1168,5 @@ const {
 
 // Export the direct-store instead of the classic Vuex store.
 export default store;
-
-// The following exports will be used to enable types in the
-// implementation of actions and getters.
-export {
-  rootActionContext,
-  moduleActionContext,
-  rootGetterContext,
-  moduleGetterContext,
-};
 
 export type AppStore = typeof store;

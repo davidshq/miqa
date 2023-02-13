@@ -142,11 +142,11 @@ export default defineComponent({
       placeholder="Specify a server path to read an import file"
       autocomplete="on"
       name="miqa-json-import-path"
-      @input="changed = true"
+      @update:model-value="changed = true"
     >
       <template #append>
         <v-tooltip
-          bottom
+          location="bottom"
         >
           <template #activator="{ on }">
             <v-icon v-on="on">
@@ -172,11 +172,11 @@ export default defineComponent({
       placeholder="Specify a server path to write an export file"
       autocomplete="on"
       name="miqa-json-export-path"
-      @input="changed = true"
+      @update:model-value="changed = true"
     >
       <template #append>
         <v-tooltip
-          bottom
+          location="bottom"
         >
           <template #activator="{ on }">
             <v-icon v-on="on">
@@ -192,7 +192,7 @@ export default defineComponent({
       v-model="anatomyOrientation"
       label="Project scans orientation"
       :items="[{text: 'Neurology (LPS)', value: 'LPS'}, {text: 'Radiology (RAS)', value: 'RAS'}]"
-      @change="changed = true"
+      @update:model-value="changed = true"
     />
     <v-col
       class="d-flex"
@@ -215,7 +215,7 @@ export default defineComponent({
       <div style="flex-grow:2">
         <v-btn
           v-if="userCanEditProject && !isGlobal"
-          class="red white--text"
+          class="bg-red text-white"
           style="float: right;"
           @click="showDeleteWarningOverlay = true"
         >
@@ -225,7 +225,7 @@ export default defineComponent({
     </v-col>
     <v-overlay
       v-if="userCanEditProject && !isGlobal"
-      :value="showDeleteWarningOverlay"
+      :model-value="showDeleteWarningOverlay"
       :dark="false"
     >
       <v-card
@@ -238,8 +238,8 @@ export default defineComponent({
           @click="showDeleteWarningOverlay = false"
         >
           <v-icon
-            large
-            color="red darken-2"
+            size="large"
+            color="red-darken-2"
           >
             mdi-close
           </v-icon>
@@ -251,7 +251,7 @@ export default defineComponent({
         project and its dependent objects (experiments, scans, etc.)?
         <br><br>
         <v-btn
-          class="red white--text"
+          class="bg-red text-white"
           block
           @click="deleteProject"
         >

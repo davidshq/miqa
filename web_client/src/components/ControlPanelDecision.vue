@@ -59,12 +59,11 @@ export default {
           value: name,
           labelText: this.convertValueToLabel(name),
         }));
-      } else {
-        return this.MIQAConfig.artifact_options.map((name) => ({
-          value: name,
-          labelText: this.convertValueToLabel(name),
-        }));
       }
+      return this.MIQAConfig.artifact_options.map((name) => ({
+        value: name,
+        labelText: this.convertValueToLabel(name),
+      }));
     },
     // Returns an array containing the name of an artifact and it's current selection state
     chips() {
@@ -87,9 +86,7 @@ export default {
       // TODO: Same here.
       if (this.currentView.scanDecisions.length > 0) {
         // Get the most recent decision
-        const lastDecision = _.sortBy(
-          this.currentView.scanDecisions, (decision) => { Date.parse(decision.created); },
-        )[0];
+        const lastDecision = _.sortBy(this.currentView.scanDecisions, (decision) => { Date.parse(decision.created); })[0];
         // Gets the artifacts associated with the most recent decision
         // TODO: Are these actually user identified or are they also auto evaluation?
         const lastDecisionArtifacts = lastDecision.user_identified_artifacts;
@@ -183,7 +180,9 @@ export default {
       // Get a frame from API
       const frameData = await djangoRest.frame(this.currentView.currentFrame.id);
       // If there is a frame_evaluation
+      // @ts-ignore
       if (frameData.frame_evaluation) {
+        // @ts-ignore
         this.SET_FRAME_EVALUATION(frameData.frame_evaluation);
         clearInterval(this.pollInterval);
       }
@@ -368,11 +367,11 @@ export default {
             class="pa-0 ma-0"
           >
             Indicate artifacts in this scan
-            <v-tooltip bottom>
+            <v-tooltip location="bottom">
               <template #activator="{ on, attrs }">
                 <v-icon
                   v-bind="attrs"
-                  small
+                  size="small"
                   class="pl-2"
                   v-on="on"
                 >
@@ -396,11 +395,11 @@ export default {
             >
               Auto evaluation
             </v-subheader>
-            <v-tooltip bottom>
+            <v-tooltip location="bottom">
               <template #activator="{ on, attrs }">
                 <v-icon
                   v-bind="attrs"
-                  small
+                  size="small"
                   style="height: 25px; padding: 5px"
                   v-on="on"
                 >
@@ -426,11 +425,11 @@ export default {
             >
               No Auto evaluation available
             </v-subheader>
-            <v-tooltip bottom>
+            <v-tooltip location="bottom">
               <template #activator="{ on, attrs }">
                 <v-icon
                   v-bind="attrs"
-                  small
+                  size="small"
                   style="height: 25px; padding: 5px"
                   v-on="on"
                 >
@@ -455,7 +454,7 @@ export default {
               v-for="([artifact, chipState]) in chips"
               v-bind="artifact"
               :key="artifact.value"
-              :outlined="chipState.outlined"
+              :variant="chipState.outlined && 'outlined'"
               :color="chipState.color"
               :text-color="chipState.textColor"
               :style="'text-decoration: '+chipState.textDecoration +'; margin-bottom: 3px;'"
@@ -479,13 +478,13 @@ export default {
               v-model="newComment"
               :counter="!warnDecision"
               :hide-details="warnDecision"
-              filled
+              variant="filled"
               no-resize
               height="80px"
               name="input-comment"
               label="Evaluation Comment"
               placeholder="Write a comment about the scan"
-              @input="handleCommentChange"
+              @update:model-value="handleCommentChange"
             />
           </v-col>
         </v-row>
@@ -495,7 +494,7 @@ export default {
         >
           <v-col
             cols="12"
-            class="red--text"
+            class="text-red"
             style="text-align: center"
           >
             Decisions other than "usable" must have a comment or artifact selection.

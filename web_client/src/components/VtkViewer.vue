@@ -275,9 +275,14 @@ export default {
 
       if (this.showCrosshairs) {
         const crosshairSet = new CrosshairSet(
-          this.name, this.ijkName,
-          this.representation, this.view, canvas,
-          this.iIndexSlice, this.jIndexSlice, this.kIndexSlice,
+          this.name,
+          this.ijkName,
+          this.representation,
+          this.view,
+          canvas,
+          this.iIndexSlice,
+          this.jIndexSlice,
+          this.kIndexSlice,
         );
         const originalColors = {
           x: '#fdd835',
@@ -287,9 +292,7 @@ export default {
         const trueColors = Object.fromEntries(
           Object.entries(originalColors).map(([axisName, hex]) => [this.trueAxis(axisName), hex]),
         );
-        const [displayLine1, displayLine2] = crosshairSet.getCrosshairsForAxis(
-          this.trueAxis(this.name), trueColors,
-        );
+        const [displayLine1, displayLine2] = crosshairSet.getCrosshairsForAxis(this.trueAxis(this.name), trueColors);
         this.drawLine(ctx, displayLine1);
         this.drawLine(ctx, displayLine2);
       }
@@ -330,9 +333,14 @@ export default {
 
         if (this.showCrosshairs) {
           const crosshairSet = new CrosshairSet(
-            this.name, this.ijkName,
-            this.representation, this.view, myCanvas,
-            this.iIndexSlice, this.jIndexSlice, this.kIndexSlice,
+            this.name,
+            this.ijkName,
+            this.representation,
+            this.view,
+            myCanvas,
+            this.iIndexSlice,
+            this.jIndexSlice,
+            this.kIndexSlice,
           );
           const originalColors = {
             x: '#fdd835',
@@ -342,9 +350,7 @@ export default {
           const trueColors = Object.fromEntries(
             Object.entries(originalColors).map(([axisName, hex]) => [this.trueAxis(axisName), hex]),
           );
-          const [displayLine1, displayLine2] = crosshairSet.getCrosshairsForAxis(
-            this.trueAxis(this.name), trueColors,
-          );
+          const [displayLine1, displayLine2] = crosshairSet.getCrosshairsForAxis(this.trueAxis(this.name), trueColors);
           this.drawLine(ctx, displayLine1);
           this.drawLine(ctx, displayLine2);
         }
@@ -352,9 +358,14 @@ export default {
     },
     placeCrosshairs(clickEvent) {
       const crosshairSet = new CrosshairSet(
-        this.name, this.ijkName,
-        this.representation, this.view, null,
-        this.iIndexSlice, this.jIndexSlice, this.kIndexSlice,
+        this.name,
+        this.ijkName,
+        this.representation,
+        this.view,
+        null,
+        this.iIndexSlice,
+        this.jIndexSlice,
+        this.kIndexSlice,
       );
       const location = crosshairSet.locationOfClick(clickEvent);
       this.SET_SLICE_LOCATION(location);
@@ -389,13 +400,13 @@ export default {
             { bind: keyboardBindings[1], handler: () => changeSlice(slice + 1)},
             { bind: keyboardBindings[0], handler: () => changeSlice(slice - 1) }
           ]"
-          :value="slice"
+          :model-value="slice"
           :min="sliceDomain.min"
           :max="sliceDomain.max"
           :step="sliceDomain.step"
           class="slice-slider mt-0 mx-4"
           hide-details
-          @input="changeSlice"
+          @update:model-value="changeSlice"
         />
         <div class="slice text-caption px-2">
           {{ roundSlice(slice) }} mm
