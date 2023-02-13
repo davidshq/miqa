@@ -4,6 +4,7 @@ const webpack = require('webpack');
 const CopyPlugin = require('copy-webpack-plugin');
 const path = require('path');
 const vtkChainWebpack = require('vtk.js/Utilities/config/chainWebpack');
+const { VuetifyPlugin } = require('webpack-plugin-vuetify');
 const packageJson = require('./package.json');
 
 const stat = util.promisify(fs.stat);
@@ -72,6 +73,7 @@ module.exports = {
           VERSION: JSON.stringify(packageJson.version),
         },
       }),
+      new VuetifyPlugin({ autoImport: true }),
     ];
     config.performance = {
       maxEntrypointSize: 4000000,

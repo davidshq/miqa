@@ -2,7 +2,9 @@ import Vue from 'vue';
 import App from './App.vue';
 import router from './router';
 import store from './store';
-import vuetify from './plugins/vuetify';
+import { createVuetify } from 'vuetify';
+import * as components from 'vuetify/components';
+import * as directives from 'vuetify/directives';
 import { loadFonts } from './plugins/webfontloader';
 import 'polyfill-object.fromentries';
 
@@ -21,6 +23,11 @@ import { setupHeartbeat } from './heartbeat';
 
 Vue.use(AsyncComputed);
 Vue.use(vMousetrap);
+
+const vuetify = createVuetify({
+  components,
+  directives,
+});
 
 Vue.use(vuetify);
 
