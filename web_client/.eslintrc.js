@@ -6,6 +6,7 @@ module.exports = {
   extends: [
     'plugin:vue/recommended',
     'plugin:vuetify/recommended',
+    '@vue/typescript/recommended',
   ],
   parser: 'vue-eslint-parser',
   parserOptions: {
