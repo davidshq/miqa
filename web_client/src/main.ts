@@ -1,6 +1,9 @@
 import Vue from 'vue';
 import VueCompositionAPI from '@vue/composition-api';
-import Vuetify from 'vuetify';
+import 'vuetify/styles';
+import { createVuetify } from "vuetify";
+import * as components from 'vuetify/components';
+import * as directives from 'vuetify/directives';
 import 'polyfill-object.fromentries';
 
 import AsyncComputed from 'vue-async-computed';
@@ -19,14 +22,16 @@ import promptService from './vue-utilities/prompt-service';
 import djangoRest, { oauthClient } from './django';
 import { setupHeartbeat } from './heartbeat';
 
-Vue.use(Vuetify);
+const vuetify = createVuetify({
+  components,
+  directives,
+});
+
 Vue.use(store);
 
 Vue.use(VueCompositionAPI);
 Vue.use(AsyncComputed);
 Vue.use(vMousetrap);
-
-const vuetify = new Vuetify();
 
 Vue.use(snackbarService(vuetify));
 Vue.use(promptService(vuetify));

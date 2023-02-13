@@ -4,6 +4,7 @@ const webpack = require('webpack');
 const CopyPlugin = require('copy-webpack-plugin');
 const path = require('path');
 const vtkChainWebpack = require('vtk.js/Utilities/config/chainWebpack');
+const { VuetifyPlugin } = require('webpack-plugin-vuetify');
 const packageJson = require('./package.json');
 
 const stat = util.promisify(fs.stat);
@@ -11,7 +12,7 @@ const stat = util.promisify(fs.stat);
 module.exports = {
   devServer: {
     port: 8081,
-    public: process.env.PUBLIC_ADDRESS,
+    host: "127.0.0.1",
   },
   lintOnSave: false,
   publicPath: process.env.VUE_APP_STATIC_PATH,
@@ -26,6 +27,7 @@ module.exports = {
     }
     config.plugins = [
       ...config.plugins,
+      new VuetifyPlugin({ autoImport: true }),
       new CopyPlugin({
         patterns: [
           {
