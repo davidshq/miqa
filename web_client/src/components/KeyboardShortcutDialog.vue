@@ -41,10 +41,10 @@ export default defineComponent({
 </script>
 <template>
   <v-dialog
-    :value="value"
+    :model-value="value"
     max-width="600"
     scrollable
-    @input="$emit('input', $event)"
+    @update:model-value="$emit('input', $event)"
   >
     <v-card>
       <v-card-title
@@ -55,12 +55,13 @@ export default defineComponent({
       </v-card-title>
       <v-divider />
       <v-card-text style="overflow-y:auto">
+        <!--
         <v-data-table
           :items="shortcuts"
           hide-default-footer
           hide-default-header
           disable-pagination
-        >
+        > -->
           <template #item="{ item }">
             <tr>
               <td>{{ item[0] }}</td>
@@ -69,13 +70,13 @@ export default defineComponent({
               <!-- eslint-enable vue/no-v-html -->
             </tr>
           </template>
-        </v-data-table>
+        <!-- </v-data-table> -->
       </v-card-text>
       <v-card-actions>
         <v-spacer />
         <v-btn
           color="primary"
-          text
+          variant="text"
           @click="$emit('input', false)"
         >
           Close

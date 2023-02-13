@@ -271,7 +271,7 @@ export default {
           dense
           style="display: inline-block; max-height: 40px; max-width: 60px;"
           class="px-3 ma-0"
-          @change="SET_REVIEW_MODE"
+          @update:model-value="SET_REVIEW_MODE"
         />
         <span>Scans for my review</span>
       </v-subheader>
@@ -297,7 +297,7 @@ export default {
                 />
                 <v-dialog
                   v-else-if="!minimal"
-                  :value="showDeleteModal === experiment.id"
+                  :model-value="showDeleteModal === experiment.id"
                   width="600px"
                 >
                   <template #activator="{ attrs }">
@@ -329,7 +329,7 @@ export default {
                       <v-btn
                         :loading="uploading"
                         color="gray"
-                        text
+                        variant="text"
                         @click="() => showDeleteModal = false"
                       >
                         Cancel
@@ -337,7 +337,7 @@ export default {
                       <v-btn
                         :loading="uploading"
                         color="red"
-                        text
+                        variant="text"
                         @click="() => deleteExperiment(experiment.id)"
                       >
                         Delete
@@ -362,7 +362,7 @@ export default {
                 :key="`s.${scan.id}`"
                 :class="scanStateClass(scan)"
               >
-                <v-tooltip right>
+                <v-tooltip location="right">
                   <template #activator="{ on, attrs }">
                     <v-btn
                       v-bind="attrs"
@@ -370,9 +370,9 @@ export default {
                       :disabled="!includeScan(scan.id)"
                       class="ml-0 px-1 scan-name"
                       href
-                      text
-                      small
-                      active-class=""
+                      variant="text"
+                      size="small"
+                      selected-class=""
                       v-on="on"
                     >
                       {{ ellipsisText(scan.name) }}
@@ -419,7 +419,7 @@ export default {
             v-on="on"
           >
             <v-btn
-              class="green white--text"
+              class="bg-green text-white"
               @click="() => {experimentNameForUpload = ''}"
             >
               + Add Scans...
@@ -453,7 +453,7 @@ export default {
                 dense
                 style="display: inline-block; max-height: 40px; max-width: 60px;"
                 class="px-3 ma-0"
-                @change="(value) => {uploadToExisting = value; experimentNameForUpload = ''}"
+                @update:model-value="(value) => {uploadToExisting = value; experimentNameForUpload = ''}"
               />
               <span
                 :class="!(orderedExperiments && orderedExperiments.length) ? 'grey--text' : ''"
@@ -466,7 +466,7 @@ export default {
                 v-if="orderedExperiments && orderedExperiments.length && uploadToExisting"
                 v-model="experimentNameForUpload"
                 :items="orderedExperiments"
-                item-text="name"
+                item-title="name"
                 label="Select Experiment"
                 dense
               />
@@ -496,7 +496,7 @@ export default {
 
                 <span
                   v-else-if="index === 2"
-                  class="text-overline grey--text text--darken-3 mx-2"
+                  class="text-overline text-grey-darken-3 mx-2"
                 >
                   +{{ fileSetForUpload.length - 2 }}
                   file{{ fileSetForUpload.length - 2 > 1 ? 's' :'' }}
@@ -527,7 +527,7 @@ export default {
               :loading="uploading"
               :disabled="fileSetForUpload.length < 1 || !experimentNameForUpload"
               color="primary"
-              text
+              variant="text"
               @click="uploadToExperiment()"
             >
               Upload

@@ -42,7 +42,7 @@ export default {
           :width="4"
           :size="56"
           :rotate="-90"
-          :value="downloadProgressPercent"
+          :model-value="downloadProgressPercent"
           :indeterminate="downloadTotal === 0 || downloadTotal === downloadLoaded"
           color="primary"
         >

@@ -243,18 +243,18 @@ export default defineComponent({
               mdi-refresh
             </v-icon>
           </v-card-title>
-          <v-list-item-group
-            v-model="selectedProjectIndex"
+          <div
             class="project-list"
           >
             <v-list-item
               v-for="project in projects"
               :key="project.id"
               @click="selectProject(project)"
+              v-model="selectedProjectIndex"
             >
               <v-tooltip
                 v-if="project.status"
-                right
+                location="right"
               >
                 <template #activator="{ on, attrs }">
                   <v-container
@@ -283,6 +283,7 @@ export default defineComponent({
             <v-list-item
               v-if="user.is_superuser || MIQAConfig.NORMAL_USERS_CAN_CREATE_PROJECTS"
               style="text-align: center"
+              v-model="selectedProjectIndex"
             >
               <v-text-field
                 v-if="creating"
@@ -290,13 +291,13 @@ export default defineComponent({
                 autofocus
                 append-icon="mdi-arrow-right"
                 label="New Project Name"
-                filled
+                variant="filled"
                 dense
                 @click:append="createProject"
               />
               <v-btn
                 v-else
-                class="green white--text"
+                class="bg-green text-white"
                 @click="creating = true"
               >
                 + Create new Project
@@ -307,13 +308,13 @@ export default defineComponent({
               class="global-settings"
             >
               <v-btn
-                class="primary white--text"
+                class="bg-primary text-white"
                 @click="selectGlobal()"
               >
                 Global import/export
               </v-btn>
             </div>
-          </v-list-item-group>
+          </div>
         </v-navigation-drawer>
       </v-card>
       <div
@@ -409,7 +410,7 @@ export default defineComponent({
                 dense
                 style="display: inline-block; max-height: 40px; max-width: 60px;"
                 class="px-3 ma-0"
-                @change="SET_REVIEW_MODE"
+                @update:model-value="SET_REVIEW_MODE"
               />
               <span>Scans for my review</span>
             </v-subheader>

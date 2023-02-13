@@ -40,7 +40,7 @@ export default {
 
 <template>
   <v-tooltip
-    left
+    location="left"
     color="rgba(0,0,0,0)"
   >
     <template #activator="{ on, attrs }">
