@@ -15,6 +15,9 @@ module.exports = {
   },
   lintOnSave: false,
   publicPath: process.env.VUE_APP_STATIC_PATH,
+  transpileDependencies: [
+    'vuetify'
+  ],
   configureWebpack: (config) => {
     if (process.env.NODE_ENV === 'development') {
       config.devtool = 'eval-source-map';
