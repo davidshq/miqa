@@ -1,15 +1,15 @@
 import Vue from 'vue';
+import App from './App.vue';
+import router from './router';
+import store from './store';
 import VueCompositionAPI from '@vue/composition-api';
-import Vuetify from 'vuetify';
+import vuetify from './plugins/vuetify';
+import { loadFonts } from './plugins/webfontloader';
 import 'polyfill-object.fromentries';
 
 import AsyncComputed from 'vue-async-computed';
 import config from 'itk/itkConfig';
-import * as Sentry from '@sentry/vue';
-import App from './App.vue';
-import router from './router';
 
-import store from './store';
 import { STATIC_PATH } from './constants';
 
 import './vtk/ColorMaps';
@@ -20,13 +20,11 @@ import promptService from './vue-utilities/prompt-service';
 import djangoRest, { oauthClient } from './django';
 import { setupHeartbeat } from './heartbeat';
 
-Vue.use(Vuetify);
-
 Vue.use(VueCompositionAPI);
 Vue.use(AsyncComputed);
 Vue.use(vMousetrap);
 
-const vuetify = new Vuetify();
+Vue.use(vuetify);
 
 Vue.use(snackbarService(vuetify));
 Vue.use(promptService(vuetify));
@@ -35,11 +33,7 @@ config.itkModulesPath = STATIC_PATH + config.itkModulesPath;
 
 Vue.config.productionTip = true;
 
-Sentry.init({
-  Vue,
-  dsn: process.env.VUE_APP_SENTRY_DSN,
-});
-
+loadFonts();
 (async () => {
   // If user closes the tab, we want them to be logged out if they return to the page
   await setupHeartbeat('miqa_logout_heartbeat', async () => { oauthClient.logout(); });
@@ -51,9 +45,9 @@ Sentry.init({
   ]);
 
   new Vue({
-    vuetify,
     router,
     store: store.original,
+    vuetify,
     provide: {
       user: store.state.me,
       MIQAConfig: store.state.MIQAConfig,
