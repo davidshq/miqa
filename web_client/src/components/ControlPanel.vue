@@ -51,6 +51,7 @@ export default {
       this.switchLock(this.currentView.experimentId);
       // Handles key presses
       window.addEventListener('keydown', (event) => {
+        // @ts-ignore
         if (['textarea', 'input'].includes(document.activeElement.type)) return;
         if (event.key === 'ArrowUp') {
           this.handleKeyPress('previous');

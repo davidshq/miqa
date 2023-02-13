@@ -1,8 +1,6 @@
 <script lang="ts">
 import IdleJS from 'idle-js';
-import {
-  computed, defineComponent, ref,
-} from '@vue/composition-api';
+import { computed, defineComponent, ref, } from 'vue';
 import djangoRest from '@/django';
 import store from '@/store';
 import { WARNING_DURATION, SESSION_TIMEOUT, IDLE_TIMEOUT } from '@/constants';

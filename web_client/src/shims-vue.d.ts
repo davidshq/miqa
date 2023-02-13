@@ -6,3 +6,10 @@ declare module 'vue' {
   const { configureCompat } = Vue
   export { configureCompat }
 }
+
+declare module '*.vue' {
+  import { Component } from 'vue';
+  var component: Component;
+
+  export default component;
+}

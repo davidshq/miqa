@@ -183,7 +183,9 @@ export default {
       // Get a frame from API
       const frameData = await djangoRest.frame(this.currentView.currentFrame.id);
       // If there is a frame_evaluation
+      // @ts-ignore
       if (frameData.frame_evaluation) {
+        // @ts-ignore
         this.SET_FRAME_EVALUATION(frameData.frame_evaluation);
         clearInterval(this.pollInterval);
       }

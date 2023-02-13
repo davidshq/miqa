@@ -204,7 +204,6 @@ export default {
       <div class="vtk1">
         <template
           v-if="vtkView1Loaded"
-          id="vtkView1"
         >
           <div>
             <VtkViewer
@@ -218,7 +217,6 @@ export default {
       <div class="vtk2">
         <template
           v-if="vtkView2Loaded"
-          id="vtkView2"
         >
           <div>
             <VtkViewer
@@ -232,7 +230,6 @@ export default {
       <div class="vtk3">
         <template
           v-if="vtkView3Loaded"
-          id="vtkView3"
         >
           <div>
             <VtkViewer

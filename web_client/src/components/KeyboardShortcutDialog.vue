@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'KeyboardShortcutDialog',
@@ -62,14 +62,14 @@ export default defineComponent({
           hide-default-header
           disable-pagination
         > -->
-          <template #item="{ item }">
-            <tr>
-              <td>{{ item[0] }}</td>
-              <!-- eslint-disable vue/no-v-html -->
-              <td v-html="formatCodes(item[1])" />
-              <!-- eslint-enable vue/no-v-html -->
-            </tr>
-          </template>
+        <template #item="{ item }">
+          <tr>
+            <td>{{ item[0] }}</td>
+            <!-- eslint-disable vue/no-v-html -->
+            <td v-html="formatCodes(item[1])" />
+            <!-- eslint-enable vue/no-v-html -->
+          </tr>
+        </template>
         <!-- </v-data-table> -->
       </v-card-text>
       <v-card-actions>

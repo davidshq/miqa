@@ -2,7 +2,6 @@ import Vue from 'vue';
 import App from './App.vue';
 import router from './router';
 import store from './store';
-import VueCompositionAPI from '@vue/composition-api';
 import vuetify from './plugins/vuetify';
 import { loadFonts } from './plugins/webfontloader';
 import 'polyfill-object.fromentries';
@@ -20,7 +19,6 @@ import promptService from './vue-utilities/prompt-service';
 import djangoRest, { oauthClient } from './django';
 import { setupHeartbeat } from './heartbeat';
 
-Vue.use(VueCompositionAPI);
 Vue.use(AsyncComputed);
 Vue.use(vMousetrap);
 

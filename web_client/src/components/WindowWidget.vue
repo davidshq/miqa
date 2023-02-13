@@ -1,8 +1,6 @@
 <script lang="ts">
 import store from '@/store';
-import {
-  defineComponent, computed, watch, ref, onMounted,
-} from '@vue/composition-api';
+import { defineComponent, computed, watch, ref, onMounted, } from 'vue';
 import { windowPresets } from '@/vtk/constants';
 import debounce from 'lodash/debounce';
 import CustomRangeSlider from './CustomRangeSlider.vue';
