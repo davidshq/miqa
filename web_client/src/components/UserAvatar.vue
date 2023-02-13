@@ -55,7 +55,7 @@ export default {
 <template>
   <v-tooltip
     v-if="targetUser"
-    bottom
+    location="bottom"
   >
     <template #activator="{ on, attrs }">
       <v-avatar
@@ -68,7 +68,7 @@ export default {
       >
         <span
           v-if="targetUser.first_name && targetUser.last_name"
-          class="white--text text--h5"
+          class="text-white text--h5"
         >
           {{ targetUser.first_name[0] }}{{ targetUser.last_name[0] }}
         </span>

@@ -113,7 +113,7 @@ export default defineComponent({
     persistent
   >
     <v-card>
-      <v-card-title class="text-h5 grey lighten-2">
+      <v-card-title class="text-h5 bg-grey-lighten-2">
         Warning
       </v-card-title>
 
@@ -140,14 +140,14 @@ export default defineComponent({
         <v-spacer />
         <v-btn
           color="primary"
-          text
+          variant="text"
           @click="continueSession"
         >
           Continue Session
         </v-btn>
         <v-btn
           color="secondary"
-          text
+          variant="text"
           @click="logout"
         >
           Logout

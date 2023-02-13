@@ -18,7 +18,7 @@ export default defineComponent({
   <v-btn
     v-if="user"
     icon
-    color="black lighten-1"
+    color="black-lighten-1"
     class="mx-4"
     @click="$emit('logout')"
   >
@@ -26,7 +26,7 @@ export default defineComponent({
   </v-btn>
   <v-btn
     v-else
-    text
+    variant="text"
     @click="$emit('login')"
   >
     Login

@@ -389,13 +389,13 @@ export default {
             { bind: keyboardBindings[1], handler: () => changeSlice(slice + 1)},
             { bind: keyboardBindings[0], handler: () => changeSlice(slice - 1) }
           ]"
-          :value="slice"
+          :model-value="slice"
           :min="sliceDomain.min"
           :max="sliceDomain.max"
           :step="sliceDomain.step"
           class="slice-slider mt-0 mx-4"
           hide-details
-          @input="changeSlice"
+          @update:model-value="changeSlice"
         />
         <div class="slice text-caption px-2">
           {{ roundSlice(slice) }} mm

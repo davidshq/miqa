@@ -91,7 +91,7 @@ export default {
           <v-col>
             <v-card
               flat
-              tile
+              rounded="0"
             >
               <v-img
                 :aspect-ratio="1"
@@ -129,14 +129,14 @@ export default {
           :download="`${filename}.${fileType}`"
           :href="output"
           color="primary"
-          text
+          variant="text"
         >
           Download
         </v-btn>
         <v-btn
           :disabled="!output"
           color="primary"
-          text
+          variant="text"
           @click="
             save();
             close();

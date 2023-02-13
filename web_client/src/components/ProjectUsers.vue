@@ -139,13 +139,13 @@ export default {
           Members
           <v-tooltip
             v-if="userCanEditProject"
-            bottom
+            location="bottom"
             style="display: inline; padding-left: 5px"
           >
             <template #activator="{ on, attrs }">
               <v-icon
                 v-bind="attrs"
-                color="blue darken-2"
+                color="blue-darken-2"
                 v-on="on"
                 @click="showAddMemberOverlay = true"
               >
@@ -175,13 +175,13 @@ export default {
           Collaborators <span class="gray-info">(Read only)</span>
           <v-tooltip
             v-if="userCanEditProject"
-            bottom
+            location="bottom"
             style="display: inline; padding-left: 5px"
           >
             <template #activator="{ on, attrs }">
               <v-icon
                 v-bind="attrs"
-                color="blue darken-2"
+                color="blue-darken-2"
                 v-on="on"
                 @click="showAddCollaboratorOverlay = true"
               >
@@ -207,14 +207,14 @@ export default {
         <v-col cols="12">
           Default email recipients
           <v-tooltip
-            bottom
+            location="bottom"
             style="display: inline; padding-left: 5px"
           >
             <template #activator="{ on, attrs }">
               <v-icon
                 v-bind="attrs"
-                color="blue darken-2"
-                small
+                color="blue-darken-2"
+                size="small"
                 v-on="on"
               >
                 info
@@ -237,7 +237,7 @@ export default {
             :rules="[allEmails]"
             multiple
             chips
-            deletable-chips
+            closable-chips
             hide-selected
             style="max-width:500px;"
           >
@@ -256,7 +256,7 @@ export default {
       </v-row>
 
       <v-overlay
-        :value="showAddMemberOverlay"
+        :model-value="showAddMemberOverlay"
         :dark="false"
       >
         <v-card
@@ -268,8 +268,8 @@ export default {
             @click="showAddMemberOverlay = false"
           >
             <v-icon
-              large
-              color="red darken-2"
+              size="large"
+              color="red-darken-2"
             >
               mdi-close
             </v-icon>
@@ -280,13 +280,13 @@ export default {
           <v-select
             v-model="selectedPermissionSet.tier_1_reviewer"
             :items="allUsers"
-            :item-text="userDisplayName"
+            :item-title="userDisplayName"
             item-value="username"
             label="Select Tier 1 Reviewers"
             multiple
             clearable
             chips
-            deletable-chips
+            closable-chips
             hint="Select Users by username"
             persistent-hint
             append-icon="mdi-account-search"
@@ -295,13 +295,13 @@ export default {
           <v-select
             v-model="selectedPermissionSet.tier_2_reviewer"
             :items="allUsers"
-            :item-text="userDisplayName"
+            :item-title="userDisplayName"
             item-value="username"
             label="Select Tier 2 Reviewers"
             multiple
             clearable
             chips
-            deletable-chips
+            closable-chips
             hint="Select Users by username"
             persistent-hint
             append-icon="mdi-account-search"
@@ -318,7 +318,7 @@ export default {
         </v-card>
       </v-overlay>
       <v-overlay
-        :value="showAddCollaboratorOverlay"
+        :model-value="showAddCollaboratorOverlay"
         :dark="false"
       >
         <v-card
@@ -330,8 +330,8 @@ export default {
             @click="showAddCollaboratorOverlay = false"
           >
             <v-icon
-              large
-              color="red darken-2"
+              size="large"
+              color="red-darken-2"
             >
               mdi-close
             </v-icon>
@@ -342,13 +342,13 @@ export default {
           <v-select
             v-model="selectedPermissionSet.collaborator"
             :items="allUsers"
-            :item-text="userDisplayName"
+            :item-title="userDisplayName"
             item-value="username"
             label="Select Collaborators"
             multiple
             clearable
             chips
-            deletable-chips
+            closable-chips
             hint="Select Users by username"
             persistent-hint
             append-icon="mdi-account-search"
