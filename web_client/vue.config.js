@@ -16,9 +16,6 @@ module.exports = {
   },
   lintOnSave: false,
   publicPath: process.env.VUE_APP_STATIC_PATH,
-  transpileDependencies: [
-    'vuetify'
-  ],
   configureWebpack: (config) => {
     if (process.env.NODE_ENV === 'development') {
       config.devtool = 'eval-source-map';
@@ -82,8 +79,7 @@ module.exports = {
   },
   chainWebpack: (config) => {
     vtkChainWebpack(config);
-    config.resolve.alias.set('vue', '@vue/compat')
-
+    config.resolve.alias.set('vue', '@vue/compat');
     config.module
       .rule('vue')
       .use('vue-loader')

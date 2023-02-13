@@ -5,7 +5,6 @@ import store from './store';
 import { createVuetify } from 'vuetify';
 import * as components from 'vuetify/components';
 import * as directives from 'vuetify/directives';
-import { loadFonts } from './plugins/webfontloader';
 import 'polyfill-object.fromentries';
 
 import AsyncComputed from 'vue-async-computed';
@@ -31,6 +30,7 @@ const vuetify = createVuetify({
 
 Vue.use(vuetify);
 
+Vue.use(store);
 Vue.use(snackbarService(vuetify));
 Vue.use(promptService(vuetify));
 
@@ -38,7 +38,6 @@ config.itkModulesPath = STATIC_PATH + config.itkModulesPath;
 
 Vue.config.productionTip = true;
 
-loadFonts();
 (async () => {
   // If user closes the tab, we want them to be logged out if they return to the page
   await setupHeartbeat('miqa_logout_heartbeat', async () => { oauthClient.logout(); });
@@ -50,9 +49,9 @@ loadFonts();
   ]);
 
   new Vue({
-    router,
-    store: store.original,
     vuetify,
+    router,
+    store,
     provide: {
       user: store.state.me,
       MIQAConfig: store.state.MIQAConfig,

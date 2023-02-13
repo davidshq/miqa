@@ -5,14 +5,12 @@ module.exports = {
   },
   extends: [
     'plugin:vue/recommended',
-    'plugin:vuetify/recommended',
+    'plugin:vuetify/base',
+    '@vue/airbnb',
     '@vue/typescript/recommended',
   ],
-  parser: 'vue-eslint-parser',
   parserOptions: {
-    parser: {
-      ts: '@typescript-eslint/parser',
-    },
+    ecmaVersion: 2020,
   },
   rules: {
     'no-console': 'off',
