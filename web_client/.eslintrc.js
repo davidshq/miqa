@@ -6,12 +6,10 @@ module.exports = {
   extends: [
     'plugin:vue/recommended',
     'plugin:vuetify/recommended',
-    '@vue/airbnb',
   ],
   parser: 'vue-eslint-parser',
   parserOptions: {
     parser: {
-      js: 'babel-eslint',
       ts: '@typescript-eslint/parser',
     },
   },
