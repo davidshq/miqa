@@ -59,7 +59,7 @@ export default {
         :target-user="decision.creator"
       />
       <div :class="convertDecisionToColor(decision.decision)">
-        <v-tooltip bottom>
+        <v-tooltip location="bottom">
           <template #activator="{ on, attrs }">
             <span
               v-bind="attrs"
@@ -71,7 +71,7 @@ export default {
           <span>{{ decisionOptions[decision.decision] }}</span>
         </v-tooltip>
       </div>
-      <v-tooltip bottom>
+      <v-tooltip location="bottom">
         <template #activator="{ on, attrs }">
           <v-icon
             v-if="Object.values(decision.location).length > 0"
@@ -98,7 +98,7 @@ export default {
         v-for="chip in artifactChips"
         :key="'chip_'+ chip.value"
         :v-bind="chip.code"
-        bottom
+        location="bottom"
       >
         <template #activator="{ on, attrs }">
           <v-chip
@@ -113,7 +113,7 @@ export default {
       </v-tooltip>
     </v-col>
     <div
-      class="grey--text"
+      class="text-grey"
       style="text-align: right"
     >
       {{ decision.created }}

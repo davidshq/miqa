@@ -39,7 +39,7 @@ export default defineComponent({
 
 <template>
   <v-combobox
-    :value="value"
+    :model-value="value"
     :items="candidates"
     :label="label"
     :rules="[
@@ -48,19 +48,19 @@ export default defineComponent({
         !!v.length || (required ? `at least one recipient is required` : true)
     ]"
     multiple
-    deletable-chips
+    closable-chips
     small-chips
     hide-selected
-    @input="$emit('input', $event)"
+    @update:model-value="$emit('input', $event)"
   >
     <template #selection="{ item, parent, selected }">
       <v-chip
         :key="JSON.stringify(item)"
         :color="isValid(item) ? '' : 'error'"
-        :input-value="selected"
+        :model-value="selected"
         small
-        close
-        @input="parent.selectItem(item)"
+        closable
+        @update:model-value="parent.selectItem(item)"
         @click:close="parent.selectItem(item)"
       >
         {{ item }}

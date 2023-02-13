@@ -1017,7 +1017,7 @@ export const store = createStore({
         commit('SET_CURRENT_FRAME_ID', frame.id);
         commit('SET_LOADING_FRAME', false);
       }
-
+      // @ts-ignore
       await this.updateLock();
     },
     async loadFrame({

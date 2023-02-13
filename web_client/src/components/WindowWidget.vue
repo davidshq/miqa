@@ -153,11 +153,11 @@ export default defineComponent({
   >
     <div class="d-flex justify-space-between gapped align-center flex-wrap">
       Window
-      <v-tooltip bottom>
+      <v-tooltip location="bottom">
         <template #activator="{ on, attrs }">
           <v-icon
             v-bind="attrs"
-            small
+            size="small"
             v-on="on"
           >
             info
@@ -180,18 +180,18 @@ export default defineComponent({
       >
         <template #prepend>
           <v-text-field
-            :value="currentRange[0]"
+            :model-value="currentRange[0]"
             class="mt-0 pt-0"
             hide-details
             single-line
             type="number"
             style="width: 60px"
-            @input="(value) => currentRange = [value, currentRange[1]]"
+            @update:model-value="(value) => currentRange = [value, currentRange[1]]"
           />
         </template>
         <template #append>
           <v-text-field
-            :value="currentRange[1]"
+            :model-value="currentRange[1]"
             class="mt-0 pt-0"
             hide-details
             single-line
@@ -238,7 +238,7 @@ export default defineComponent({
             style="flex-direction: column; align-items: flex-start; gap: 5px;"
           >
             <v-btn
-              small
+              size="small"
               @click="() => setWindowLock(true, 'scan', currentView.scanId)"
             >
               <v-img
@@ -251,7 +251,7 @@ export default defineComponent({
               Maintain lock for Scan
             </v-btn>
             <v-btn
-              small
+              size="small"
               @click="() => setWindowLock(true, 'experiment', currentView.experimentId)"
             >
               <v-img
@@ -264,7 +264,7 @@ export default defineComponent({
               Maintain lock for Experiment
             </v-btn>
             <v-btn
-              small
+              size="small"
               @click="() => setWindowLock(true, 'project', currentView.projectId)"
             >
               <v-img
@@ -289,7 +289,7 @@ export default defineComponent({
         placeholder="Select a preset"
         hide-details
         class="pa-0"
-        @change="applyPreset"
+        @update:model-value="applyPreset"
       />
     </div>
   </div>

@@ -1,6 +1,6 @@
 <script lang="ts">
 import {
-  mapActions, mapState
+  mapActions, mapState,
 } from 'vuex';
 
 import Navbar from '@/components/Navbar.vue';

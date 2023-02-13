@@ -10,6 +10,7 @@ export default {
   },
   computed: {
     orderedResults() {
+      // @ts-ignore
       return Object.entries(this.results).sort((first, second) => first[1] < second[1]);
     },
   },
@@ -40,7 +41,7 @@ export default {
 
 <template>
   <v-tooltip
-    left
+    location="left"
     color="rgba(0,0,0,0)"
   >
     <template #activator="{ on, attrs }">
