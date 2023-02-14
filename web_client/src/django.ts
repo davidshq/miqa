@@ -25,7 +25,7 @@ class ErrorResponseDetail extends Error {
 const apiClient = axios.create({ baseURL: API_URL });
 let s3ffClient;
 
-const oauthClient = new OAuthClient(OAUTH_API_ROOT, OAUTH_CLIENT_ID);
+const oauthClient = new OAuthClient(new URL(OAUTH_API_ROOT), OAUTH_CLIENT_ID);
 const djangoClient = {
   // TODO importing the actual AppStore type results in a dependency cycle
   async restoreLogin(store: any) {
