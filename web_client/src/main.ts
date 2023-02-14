@@ -1,12 +1,10 @@
 import Vue from 'vue';
-import VueCompositionAPI from '@vue/composition-api';
 import 'vuetify/styles';
 import { createVuetify } from 'vuetify';
 import * as components from 'vuetify/components';
 import * as directives from 'vuetify/directives';
 import 'polyfill-object.fromentries';
 
-import AsyncComputed from 'vue-async-computed';
 import config from 'itk/itkConfig';
 import App from './App.vue';
 import router from './router';
@@ -31,8 +29,6 @@ Vue.use(vuetify);
 
 Vue.use(store);
 
-Vue.use(VueCompositionAPI);
-Vue.use(AsyncComputed);
 Vue.use(vMousetrap);
 
 Vue.use(snackbarService(vuetify));
