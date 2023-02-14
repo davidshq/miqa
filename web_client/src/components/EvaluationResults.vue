@@ -10,6 +10,7 @@ export default {
   },
   computed: {
     orderedResults() {
+      // @ts-ignore - TODO: Fix this
       return Object.entries(this.results).sort((first, second) => first[1] < second[1]);
     },
   },
