@@ -12,16 +12,16 @@ const stat = util.promisify(fs.stat);
 module.exports = {
   devServer: {
     port: 8081,
-    host: "127.0.0.1",
+    host: '127.0.0.1',
   },
   lintOnSave: false,
   publicPath: process.env.VUE_APP_STATIC_PATH,
   configureWebpack: (config) => {
     if (process.env.NODE_ENV === 'development') {
       config.devtool = 'eval-source-map';
-      config.output.devtoolModuleFilenameTemplate = (info) => info.resourcePath.match(/\.vue$/) && !info.identifier.match(/type=script/)
+      config.output.devtoolModuleFilenameTemplate = (info) => (info.resourcePath.match(/\.vue$/) && !info.identifier.match(/type=script/)
         ? `webpack-generated:///${info.resourcePath}?${info.hash}`
-        : `webpack-miqa:///${info.resourcePath}`;
+        : `webpack-miqa:///${info.resourcePath}`);
 
       config.output.devtoolFallbackModuleFilenameTemplate = 'webpack:///[resource-path]?[hash]';
     }
