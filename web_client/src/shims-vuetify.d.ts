@@ -1,5 +1,6 @@
-declare module 'vuetify/lib/framework' {
+/**declare module 'vuetify/lib/framework' {
   import Vuetify from 'vuetify';
 
   export default vuetify;
 }
+*/
