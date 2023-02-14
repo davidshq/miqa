@@ -10,6 +10,7 @@
   "dependencies": {
     "@girder/oauth-client": "^0.7.7",
     "@mdi/font": "^6.5.95",
+    "@vue/compat": "^3.2.47",
     "@vue/composition-api": "^1.1.4",
     "axios": "^0.24.0",
     "direct-vuex": "^0.12.1",
