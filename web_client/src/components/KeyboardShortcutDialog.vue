@@ -63,14 +63,14 @@ export default defineComponent({
           disable-pagination
         >
         -->
-          <template #item="{ item }">
-            <tr>
-              <td>{{ item[0] }}</td>
-              <!-- eslint-disable vue/no-v-html -->
-              <td v-html="formatCodes(item[1])" />
-              <!-- eslint-enable vue/no-v-html -->
-            </tr>
-          </template>
+        <template #item="{ item }">
+          <tr>
+            <td>{{ item[0] }}</td>
+            <!-- eslint-disable vue/no-v-html -->
+            <td v-html="formatCodes(item[1])" />
+            <!-- eslint-enable vue/no-v-html -->
+          </tr>
+        </template>
         <!--
         </v-data-table> -->
       </v-card-text>

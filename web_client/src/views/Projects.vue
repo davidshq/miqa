@@ -250,8 +250,8 @@ export default defineComponent({
             <v-list-item
               v-for="project in projects"
               :key="project.id"
-              @click="selectProject(project)"
               value="selectedProjectIndex"
+              @click="selectProject(project)"
             >
               <v-tooltip
                 v-if="project.status"

@@ -194,7 +194,7 @@ export default {
           v-model="selectedScan3"
           label="Select Scan"
           :items="childScans"
-          item-text="name"
+          item-title="name"
           item-value="id"
           return-object
         />

@@ -11,7 +11,7 @@ module.exports = {
   parser: 'vue-eslint-parser',
   parserOptions: {
     parser: {
-      js: 'babel-eslint',
+      js: '@babel/eslint-parser',
       ts: '@typescript-eslint/parser',
     },
   },

@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import VueCompositionAPI from '@vue/composition-api';
 import 'vuetify/styles';
-import { createVuetify } from "vuetify";
+import { createVuetify } from 'vuetify';
 import * as components from 'vuetify/components';
 import * as directives from 'vuetify/directives';
 import 'polyfill-object.fromentries';
@@ -47,9 +47,9 @@ Vue.config.productionTip = true;
   await setupHeartbeat('miqa_logout_heartbeat', async () => { oauthClient.logout(); });
   await djangoRest.restoreLogin(store);
   await Promise.all([
-    store.dispatch("reset"),
-    store.dispatch("loadMe"),
-    store.dispatch("loadConfiguration"),
+    store.dispatch('reset'),
+    store.dispatch('loadMe'),
+    store.dispatch('loadConfiguration'),
   ]);
 
   new Vue({

@@ -1,10 +1,11 @@
 <script lang="ts">
-import store from '@/store';
 import {
   defineComponent, computed, watch, ref, onMounted,
-} from '@vue/composition-api';
-import { windowPresets } from '@/vtk/constants';
+} from 'vue';
 import debounce from 'lodash/debounce';
+import store from '@/store';
+import { windowPresets } from '@/vtk/constants';
+
 import CustomRangeSlider from './CustomRangeSlider.vue';
 
 export default defineComponent({
@@ -197,7 +198,7 @@ export default defineComponent({
             single-line
             type="number"
             style="width: 60px"
-            @input="(value) => currentRange = [currentRange[0], value]"
+            @update:model-value="(value) => currentRange = [currentRange[0], value]"
           />
         </template>
       </custom-range-slider>

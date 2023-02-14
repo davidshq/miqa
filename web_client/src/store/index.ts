@@ -9,11 +9,11 @@ import '../utils/registerReaders';
 import readImageArrayBuffer from 'itk/readImageArrayBuffer';
 import WorkerPool from 'itk/WorkerPool';
 import ITKHelper from 'vtk.js/Sources/Common/DataModel/ITKHelper';
+import axios from 'axios';
 import djangoRest, { apiClient } from '@/django';
 import {
   Project, ProjectTaskOverview, User, ProjectSettings, Scan,
 } from '@/types';
-import axios from 'axios';
 import ReaderFactory from '../utils/ReaderFactory';
 
 import { proxy } from '../vtk';
@@ -1021,7 +1021,7 @@ export const store = createStore({
       await this.updateLock();
     },
     async loadFrame({
-      state, dispatch, getters, commit
+      state, dispatch, getters, commit,
     }, { frame, onDownloadProgress = null, loadAll = true, whichProxy = 0 }) {
       console.log('Running loadFrame');
       console.log('loadFrame - frame', frame);
@@ -1095,7 +1095,7 @@ export const store = createStore({
         state.vtkViews[whichProxy] = state.proxyManager[whichProxy].getViews();
       }
     },
-    async getFrameData({ state, dispatch, getters, commit, }, { frame, onDownloadProgress = null }) {
+    async getFrameData({ state, dispatch, getters, commit }, { frame, onDownloadProgress = null }) {
       console.log('Running getFrameData');
       let frameData = null;
       // load from cache if possible

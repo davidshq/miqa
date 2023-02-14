@@ -305,7 +305,7 @@ export default {
             multiple
             clearable
             chips
-            deletable-chips
+            closable-chips
             hint="Select Users by username"
             persistent-hint
             append-icon="mdi-account-search"
