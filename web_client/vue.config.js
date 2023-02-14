@@ -67,9 +67,7 @@ module.exports = {
         ],
       }),
       new webpack.DefinePlugin({
-        'process.env': {
-          VERSION: JSON.stringify(packageJson.version),
-        },
+        'process.env.NODE_VERSION': JSON.stringify(packageJson.version),
       }),
     ];
     config.performance = {
