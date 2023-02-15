@@ -27,6 +27,7 @@ export default {
     resized: false,
     fullscreen: false,
     screenshotContainer: document.createElement('div'),
+    crosshairSet: [],
   }),
   computed: {
     ...mapState([
@@ -99,13 +100,13 @@ export default {
       }
     },
     iIndexSlice() {
-      this.updateCrosshairs();
+      this.updateCrosshairs(this.proxyNum);
     },
     jIndexSlice() {
-      this.updateCrosshairs();
+      this.updateCrosshairs(this.proxyNum);
     },
     kIndexSlice() {
-      this.updateCrosshairs();
+      this.updateCrosshairs(this.proxyNum);
     },
     view(view, oldView) {
       this.cleanup();
@@ -122,7 +123,7 @@ export default {
       this.initializeCamera();
     },
     showCrosshairs() {
-      this.updateCrosshairs();
+      this.updateCrosshairs(this.proxyNum);
     },
   },
   mounted() {
@@ -141,9 +142,9 @@ export default {
       this.initializeView();
       this.initializeSlice();
       this.initializeCamera();
-      this.updateCrosshairs();
+      this.updateCrosshairs(this.proxyNum);
       this.renderSubscription = this.view.getInteractor().onRenderEvent(() => {
-        this.updateCrosshairs();
+        this.updateCrosshairs(this.proxyNum);
       });
       this.resizeObserver = new window.ResizeObserver((entries) => {
         if (entries.length === 1 && this.$refs.viewer && this.$refs.crosshairsCanvas) {
@@ -154,7 +155,7 @@ export default {
           this.$refs.crosshairsCanvas.style.width = `${width}px`;
           this.$refs.crosshairsCanvas.style.height = `${height}px`;
           this.initializeCamera();
-          this.updateCrosshairs();
+          this.updateCrosshairs(this.proxyNum);
         }
       });
       this.resizeObserver.observe(this.$refs.viewer);
@@ -267,17 +268,22 @@ export default {
       ctx.lineTo(...displayLine.end);
       ctx.stroke();
     },
-    updateCrosshairs() {
+    updateCrosshairs(proxyNum) {
       const myCanvas: HTMLCanvasElement = document.getElementById(`crosshairs-${this.name}`) as HTMLCanvasElement;
       if (myCanvas && myCanvas.getContext) {
         const ctx = myCanvas.getContext('2d');
         ctx.clearRect(0, 0, myCanvas.width, myCanvas.height);
 
         if (this.showCrosshairs) {
-          const crosshairSet = new CrosshairSet(
-            this.name, this.ijkName,
-            this.representation, this.view, myCanvas,
-            this.iIndexSlice, this.jIndexSlice, this.kIndexSlice,
+          this.crosshairSet[proxyNum] = new CrosshairSet(
+            this.name,
+            this.ijkName,
+            this.representation,
+            this.view,
+            myCanvas,
+            this.iIndexSlice,
+            this.jIndexSlice,
+            this.kIndexSlice,
           );
           const originalColors = {
             x: '#fdd835',
@@ -287,8 +293,9 @@ export default {
           const trueColors = Object.fromEntries(
             Object.entries(originalColors).map(([axisName, hex]) => [this.trueAxis(axisName), hex]),
           );
-          const [displayLine1, displayLine2] = crosshairSet.getCrosshairsForAxis(
-            this.trueAxis(this.name), trueColors,
+          const [displayLine1, displayLine2] = this.crosshairSet[proxyNum].getCrosshairsForAxis(
+            this.trueAxis(this.name),
+            trueColors,
           );
           this.drawLine(ctx, displayLine1);
           this.drawLine(ctx, displayLine2);
@@ -296,12 +303,17 @@ export default {
       }
     },
     placeCrosshairs(clickEvent) {
-      const crosshairSet = new CrosshairSet(
-        this.name, this.ijkName,
-        this.representation, this.view, null,
-        this.iIndexSlice, this.jIndexSlice, this.kIndexSlice,
+      this.crosshairSet[this.proxyNum] = new CrosshairSet(
+        this.name,
+        this.ijkName,
+        this.representation,
+        this.view,
+        null,
+        this.iIndexSlice,
+        this.jIndexSlice,
+        this.kIndexSlice,
       );
-      const location = crosshairSet.locationOfClick(clickEvent);
+      const location = this.crosshairSet[this.proxyNum].locationOfClick(clickEvent);
       this.SET_SLICE_LOCATION(location);
     },
     cleanup() {
@@ -330,8 +342,8 @@ export default {
       <v-row class="align-center ma-0">
         <v-slider
           v-mousetrap="[
-            { bind: keyboardBindings[1], handler: () => changeSlice(slice + 1)},
-            { bind: keyboardBindings[0], handler: () => changeSlice(slice - 1) }
+            { bind: keyboardBindings[1], handler: () => changeSlice(slice + 1) },
+            { bind: keyboardBindings[0], handler: () => changeSlice(slice - 1) },
           ]"
           :value="slice"
           :min="sliceDomain.min"
@@ -354,7 +366,7 @@ export default {
         :style="{ visibility: resized ? 'unset' : 'hidden' }"
       />
       <canvas
-        :id="'crosshairs-'+name"
+        :id="'crosshairs-' + name"
         ref="crosshairsCanvas"
         class="crosshairs"
       />
