@@ -38,9 +38,6 @@ export default {
       'scanFrames',
       'vtkViews',
     ]),
-    currentFrame() {
-      return this.frames[this.currentFrameId];
-    },
   },
   watch: {
     /** Watch for changes to available projects */
