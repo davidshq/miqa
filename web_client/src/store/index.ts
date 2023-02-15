@@ -288,7 +288,7 @@ function startReaderWorkerPool() {
 }
 
 /** Queues scan for download Will load all frames for a target scan if the scan has not already been loaded. */
-function queueLoadScan(scan, loadNext: number = 0) {
+function queueLoadScan(scan, loadNext: 0) {
   console.log('Running queueLoadScan');
   console.log('queueLoadScan - scan', scan);
   console.log('queueLoadScan - loadNext', loadNext);

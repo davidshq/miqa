@@ -15,7 +15,7 @@ export default {
       required: true,
       type: Object,
     },
-    proxyNum: {
+    'proxy-num': {
       default: 0,
       required: false,
       type: Number,

@@ -201,13 +201,12 @@ export default {
       <div class="vtk1">
         <template
           v-if="vtkView1Loaded"
-          id="vtkView1"
         >
           <div>
             <VtkViewer
               id="vtk1"
               :view="vtkViews[1][1]"
-              :proxyNum="1"
+              :proxy-num="1"
             />
           </div>
         </template>
@@ -215,13 +214,12 @@ export default {
       <div class="vtk2">
         <template
           v-if="vtkView2Loaded"
-          id="vtkView2"
         >
           <div>
             <VtkViewer
               id="vtk2"
               :view="vtkViews[2][0]"
-              :proxyNum="2"
+              :proxy-num="2"
             />
           </div>
         </template>
@@ -229,13 +227,12 @@ export default {
       <div class="vtk3">
         <template
           v-if="vtkView3Loaded"
-          id="vtkView3"
         >
           <div>
             <VtkViewer
               id="vtk3"
               :view="vtkViews[3][1]"
-              :proxyNum="3"
+              :proxy-num="3"
             />
           </div>
         </template>
