@@ -7,11 +7,13 @@ const vtkChainWebpack = require('vtk.js/Utilities/config/chainWebpack');
 const packageJson = require('./package.json');
 
 const stat = util.promisify(fs.stat);
+console.log(process.env.PUBLIC_ADDRESS);
 
 module.exports = {
   devServer: {
     port: 8081,
-    public: process.env.PUBLIC_ADDRESS,
+    // TODO: Why isn't process.env.PUBLIC_ADDRESS working?
+    host: '127.0.0.1',
   },
   lintOnSave: false,
   publicPath: process.env.VUE_APP_STATIC_PATH,
