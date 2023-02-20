@@ -143,6 +143,15 @@ export default {
         console.log('vtkView3', this.vtkView3Loaded);
       }
     },
+    openWindow(proxyNum) {
+      console.log('Running openWindow');
+      console.log('proxyNum', proxyNum);
+      const project = this.selectedProject;
+      const scan = this[`selectedScan${ proxyNum}`];
+      console.log('project', this.selectedProject);
+      console.log('scan', this[`selectedScan${ proxyNum}`].id);
+      window.open(`/#/${project}/${scan.id}`, '_blank');
+    }
   },
 };
 </script>
@@ -199,6 +208,26 @@ export default {
           item-value="id"
           return-object
         />
+      </div>
+    </div>
+    <div class="OpenButtonsContainer">
+      <div class="OpenButton1">
+        <v-btn
+          elevation="2"
+          @click="openWindow(1)"
+        >Select Scan Left</v-btn>
+      </div>
+      <div class="OpenButton2">
+        <v-btn
+          elevation="2"
+          @click="openWindow(2)"
+        >Select Scan Middle</v-btn>
+      </div>
+      <div class="OpenButton3">
+        <v-btn
+          elevation="2"
+          @click="openWindow(3)"
+          >Select Scan Right</v-btn>
       </div>
     </div>
     <div class="vtkViewsContainer">
@@ -266,6 +295,19 @@ export default {
   grid-template-rows: 1fr;
   gap: 10px 10px;
   grid-template-areas: "SelectScan1 SelectScan2 SelectScan3";
+}
+
+.selectScan1 { grid-area: selectScan1; }
+.selectScan2 { grid-area: selectScan2; }
+.selectScan3 { grid-area: selectScan3; }
+
+.OpenButtonsContainer {
+  display: grid;
+  grid-auto-columns: 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr;
+  gap: 10px 10px;
+  grid-template-areas: "OpenButton1 OpenButton2 OpenButton3";
 }
 
 .selectScan1 { grid-area: selectScan1; }
