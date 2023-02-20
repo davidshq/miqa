@@ -38,9 +38,6 @@ export default {
       'scanFrames',
       'vtkViews',
     ]),
-    currentFrame() {
-      return this.frames[this.currentFrameId];
-    },
   },
   watch: {
     /** Watch for changes to available projects */
@@ -73,14 +70,18 @@ export default {
     },
     async selectedScan1() {
       console.log('selectedScan1');
+      // Avoid error when loading a different image using same VtkViewer
+      this.vtkView1Loaded = false;
       await this.loadImage(this.selectedScan1, 1);
     },
     async selectedScan2() {
       console.log('selectedScan2');
+      this.vtkView2Loaded = false;
       await this.loadImage(this.selectedScan2, 2);
     },
     async selectedScan3() {
       console.log('selectedScan3');
+      this.vtkView3Loaded = false;
       await this.loadImage(this.selectedScan3, 3);
     },
     vtkView1Loaded(vtkView1Loaded) {
@@ -142,6 +143,12 @@ export default {
         console.log('vtkView3', this.vtkView3Loaded);
       }
     },
+    openWindow(proxyNum) {
+      console.log('Running openWindow');
+      const project = this.selectedProject;
+      const scan = this[`selectedScan${ proxyNum}`];
+      window.open(`/#/${project}/${scan.id}`, '_blank');
+    }
   },
 };
 </script>
@@ -200,17 +207,36 @@ export default {
         />
       </div>
     </div>
+    <div class="OpenButtonsContainer">
+      <div class="OpenButton1">
+        <v-btn
+          elevation="2"
+          @click="openWindow(1)"
+        >Select Scan Left</v-btn>
+      </div>
+      <div class="OpenButton2">
+        <v-btn
+          elevation="2"
+          @click="openWindow(2)"
+        >Select Scan Middle</v-btn>
+      </div>
+      <div class="OpenButton3">
+        <v-btn
+          elevation="2"
+          @click="openWindow(3)"
+          >Select Scan Right</v-btn>
+      </div>
+    </div>
     <div class="vtkViewsContainer">
       <div class="vtk1">
         <template
           v-if="vtkView1Loaded"
-          id="vtkView1"
         >
           <div>
             <VtkViewer
               id="vtk1"
               :view="vtkViews[1][1]"
-              :proxyNum="1"
+              :proxy-num="1"
             />
           </div>
         </template>
@@ -218,13 +244,12 @@ export default {
       <div class="vtk2">
         <template
           v-if="vtkView2Loaded"
-          id="vtkView2"
         >
           <div>
             <VtkViewer
               id="vtk2"
               :view="vtkViews[2][0]"
-              :proxyNum="2"
+              :proxy-num="2"
             />
           </div>
         </template>
@@ -232,13 +257,12 @@ export default {
       <div class="vtk3">
         <template
           v-if="vtkView3Loaded"
-          id="vtkView3"
         >
           <div>
             <VtkViewer
               id="vtk3"
               :view="vtkViews[3][1]"
-              :proxyNum="3"
+              :proxy-num="3"
             />
           </div>
         </template>
@@ -268,6 +292,19 @@ export default {
   grid-template-rows: 1fr;
   gap: 10px 10px;
   grid-template-areas: "SelectScan1 SelectScan2 SelectScan3";
+}
+
+.selectScan1 { grid-area: selectScan1; }
+.selectScan2 { grid-area: selectScan2; }
+.selectScan3 { grid-area: selectScan3; }
+
+.OpenButtonsContainer {
+  display: grid;
+  grid-auto-columns: 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr;
+  gap: 10px 10px;
+  grid-template-areas: "OpenButton1 OpenButton2 OpenButton3";
 }
 
 .selectScan1 { grid-area: selectScan1; }

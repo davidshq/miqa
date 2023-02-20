@@ -1,5 +1,5 @@
 <script lang="ts">
-/**The ExperimentsView appears on the Projects View once a project has been selected.
+/** The ExperimentsView appears on the Projects View once a project has been selected.
  * It also appears on Scan.vue inside a collapsible sidebar. */
 import _ from 'lodash';
 import {
@@ -222,11 +222,14 @@ export default {
             this.currentProject.id, this.experimentNameForUpload,
           );
           // Get the experiments' new id, can't find id b/c ResponseData doesn't have it
+          // @ts-ignore - TODO: Fix this
           experimentId = newExperiment.id;
         } else { // If uploading to existing experiment
           // Find the experiment's id that matches the experiment selected
           experimentId = Object.values(this.experiments).find(
+            // @ts-ignore - TODO: Fix this
             (experiment) => experiment.name === this.experimentNameForUpload,
+            // @ts-ignore - TODO: Fix this
           ).id;
         }
         await djangoRest.uploadToExperiment(experimentId, this.fileSetForUpload);

@@ -1,10 +1,18 @@
+/**
+ * Sets the crosshairs on the vtkViewer
+ */
 import vtkCellPicker from 'vtk.js/Sources/Rendering/Core/CellPicker';
 
 class CrosshairSet {
   constructor(
-    xyzName, ijkName,
-    imageRepresentation, imageView, imageCanvas,
-    iSlice, jSlice, kSlice,
+    xyzName,
+    ijkName,
+    imageRepresentation,
+    imageView,
+    imageCanvas,
+    iSlice,
+    jSlice,
+    kSlice,
   ) {
     console.log('Running CrosshairSet constructor');
     this.xyzName = xyzName;

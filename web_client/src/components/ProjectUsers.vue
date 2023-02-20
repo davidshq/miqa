@@ -66,6 +66,7 @@ export default {
     ...mapMutations(['setCurrentProject']),
     getGroup(user) {
       return Object.entries(this.permissions).filter(
+        // @ts-ignore - TODO: Fix this
         ([, value]) => value.includes(user),
       )[0][0].replace(/_/g, ' ');
     },
@@ -90,6 +91,7 @@ export default {
       const newSettings = { ...this.currentProject.settings };
       newSettings.permissions = Object.fromEntries(
         Object.entries(this.selectedPermissionSet).map(
+          // @ts-ignore - TODO: Fix this
           ([group, list]) => [group, list.map((user) => user.username || user)],
         ),
       );
@@ -98,6 +100,7 @@ export default {
         this.showAddMemberOverlay = false;
         this.showAddCollaboratorOverlay = false;
         const changedProject = { ...this.currentProject };
+        // @ts-ignore - TODO: Fix this
         changedProject.settings.permissions = resp.permissions;
         this.setCurrentProject(changedProject);
       } catch (e) {
@@ -114,6 +117,7 @@ export default {
       try {
         const resp = await djangoRest.setProjectSettings(this.currentProject.id, newSettings);
         const changedProject = { ...this.currentProject };
+        // @ts-ignore - TODO: Fix this
         changedProject.settings.default_email_recipients = resp.default_email_recipients;
         this.setCurrentProject(changedProject);
       } catch (e) {

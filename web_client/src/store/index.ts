@@ -112,8 +112,10 @@ function getImageData(frameId, file, webWorker = null) {
   return new Promise((resolve, reject) => {
     // Load image from frame cache if available, this resolves promise
     if (frameCache.has(frameId)) {
+      console.log("getImageData - pulling from cache");
       resolve({ frameData: frameCache.get(frameId), webWorker });
     } else {
+      console.log("getImageData - pulling file, not in cache");
       const fileName = file.name;
       const io = new FileReader();
 
@@ -288,7 +290,7 @@ function startReaderWorkerPool() {
 }
 
 /** Queues scan for download Will load all frames for a target scan if the scan has not already been loaded. */
-function queueLoadScan(scan, loadNext: number = 0) {
+function queueLoadScan(scan, loadNext: 0) {
   console.log('Running queueLoadScan');
   console.log('queueLoadScan - scan', scan);
   console.log('queueLoadScan - loadNext', loadNext);
@@ -339,6 +341,7 @@ function queueLoadScan(scan, loadNext: number = 0) {
         newIndex += 1;
       }
     }
+    // @ts-ignore - TODO: Fix this
     if (nextScan) queueLoadScan(nextScan, loadNext - 1);
     startReaderWorkerPool();
   }
@@ -993,6 +996,7 @@ const {
         // Queue the new scan to be loaded
         if (newScan !== oldScan && newScan) {
           queueLoadScan(
+            // @ts-ignore - TODO: fix this
             newScan, 3,
           );
         }
@@ -1013,7 +1017,7 @@ const {
 
       try {
         // Gets the data we need to display
-        let frameData = await dispatch('getFrameData', { frame });
+        const frameData = await dispatch('getFrameData', { frame });
 
         // Handles configuring the sourceProxy and getting the views
         await dispatch('setupSourceProxy', { frame, frameData });
@@ -1032,35 +1036,51 @@ const {
     },
     async loadFrame({
       state, dispatch, getters, commit
-    }, { frame, onDownloadProgress = null, loadAll = true, whichProxy = 0 }) {
+    }, { frame, onDownloadProgress = null, whichProxy = 0 }) {
+      // Guard clauses
+      if (!frame) {
+        throw new Error("frame id doesn't exist");
+      }
+
       console.log('Running loadFrame');
       console.log('loadFrame - frame', frame);
       console.log('loadFrame - whichProxy', whichProxy);
+
       commit('SET_LOADING_FRAME', true);
       commit('SET_ERROR_LOADING_FRAME', false);
 
       const newScan = state.scans[frame.scan];
 
+      console.log('loadFrame: Call queueLoadScan');
       queueLoadScan(newScan, 0);
-      console.log('loadFrame - after queueLoadScan');
+
       let newProxyManager = false;
-      console.log('newProxyManager', newProxyManager);
+
+      console.log('loadFrame: Next check if we have a proxyManager');
       if (state.proxyManager[whichProxy]) {
-        console.log('Shrinking proxyManager');
+        console.log('loadFrame: We have a proxyManager, shrink it');
         shrinkProxyManager(state.proxyManager[whichProxy]);
         newProxyManager = true;
       }
-      console.log('before setupProxyManager');
-      await dispatch('setupProxyManager', { newProxyManager, whichProxy });
-      console.log('after setupProxyManager');
-      let frameData = await dispatch('getFrameData', { frame });
-      console.log('after frameData');
-      console.log('before dispatch setupSourceProxy');
-      await dispatch('setupSourceProxy', { frame, frameData, whichProxy });
-      console.log('after dispatch setupSourceProxy');
 
-      commit('SET_CURRENT_FRAME_ID', frame.id);
-      commit('SET_LOADING_FRAME', false);
+      console.log('loadFrame: Calling setupProxyManager');
+      await dispatch('setupProxyManager', { newProxyManager, whichProxy });
+
+      console.log('loadFrame: Calling getFrameData')
+      const frameData = await dispatch('getFrameData', { frame });
+
+      console.log('loadFrame: Calling setupSourceProxy');
+      try {
+        await dispatch('setupSourceProxy', { frame, frameData, whichProxy });
+      } catch (err) {
+        console.log('Caught exception loading frame');
+        console.log(err);
+        state.vtkViews[whichProxy] = [];
+      } finally {
+        commit('SET_CURRENT_FRAME_ID', frame.id);
+        commit('SET_LOADING_FRAME', false);
+      }
+
       console.log('View0', state.vtkViews[0]);
       console.log('View1', state.vtkViews[1]);
       // await this.updateLock();

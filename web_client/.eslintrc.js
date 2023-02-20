@@ -7,11 +7,14 @@ module.exports = {
     'plugin:vue/recommended',
     'plugin:vuetify/recommended',
     '@vue/airbnb',
+    '@vue/typescript/recommended',
+    'prettier',
   ],
+  plugins: ['@typescript-eslint', 'prettier'],
   parser: 'vue-eslint-parser',
   parserOptions: {
     parser: {
-      js: 'babel-eslint',
+      js: '@babel/eslint-parser',
       ts: '@typescript-eslint/parser',
     },
   },
@@ -37,4 +40,9 @@ module.exports = {
       },
     },
   ],
+  settings: {
+    'import/resolver': {
+      "typescript": {},
+      }
+    }
 };
