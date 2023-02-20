@@ -145,11 +145,8 @@ export default {
     },
     openWindow(proxyNum) {
       console.log('Running openWindow');
-      console.log('proxyNum', proxyNum);
       const project = this.selectedProject;
       const scan = this[`selectedScan${ proxyNum}`];
-      console.log('project', this.selectedProject);
-      console.log('scan', this[`selectedScan${ proxyNum}`].id);
       window.open(`/#/${project}/${scan.id}`, '_blank');
     }
   },
