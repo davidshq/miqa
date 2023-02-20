@@ -112,8 +112,10 @@ function getImageData(frameId, file, webWorker = null) {
   return new Promise((resolve, reject) => {
     // Load image from frame cache if available, this resolves promise
     if (frameCache.has(frameId)) {
+      console.log("getImageData - pulling from cache");
       resolve({ frameData: frameCache.get(frameId), webWorker });
     } else {
+      console.log("getImageData - pulling file, not in cache");
       const fileName = file.name;
       const io = new FileReader();
 

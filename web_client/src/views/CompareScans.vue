@@ -70,14 +70,18 @@ export default {
     },
     async selectedScan1() {
       console.log('selectedScan1');
+      // Avoid error when loading a different image using same VtkViewer
+      this.vtkView1Loaded = false;
       await this.loadImage(this.selectedScan1, 1);
     },
     async selectedScan2() {
       console.log('selectedScan2');
+      this.vtkView2Loaded = false;
       await this.loadImage(this.selectedScan2, 2);
     },
     async selectedScan3() {
       console.log('selectedScan3');
+      this.vtkView3Loaded = false;
       await this.loadImage(this.selectedScan3, 3);
     },
     vtkView1Loaded(vtkView1Loaded) {

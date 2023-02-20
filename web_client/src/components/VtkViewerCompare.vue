@@ -12,6 +12,7 @@ export default {
   components: {},
   props: {
     view: {
+      default: () => ({}),
       required: true,
       type: Object,
     },
@@ -177,7 +178,7 @@ export default {
       representationProperty.setColorLevel(this.currentWindowLevel);
     },
     initializeSlice() {
-      console.log("Initialize Slice: this.name", this.name);
+      console.log("Initialize Slice: this.name (x, y, or z)", this.name);
       if (this.name !== 'default') {
         console.log('this.name', this.name);
         this.slice = this.representation.getSlice();
