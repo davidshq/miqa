@@ -34,11 +34,13 @@ class CrosshairSet {
   }
 
   getOrientation() {
+    console.log('Running getOrientation');
     if (!this.imageRepresentation.getInputDataSet()) return undefined;
     return this.imageRepresentation.getInputDataSet().getDirection();
   }
 
   getSliceLines() {
+    console.log('Running getSliceLines');
     if (!this.imageData) return undefined;
     const [iMax, jMax, kMax] = this.imageData.getDimensions();
 
@@ -81,6 +83,7 @@ class CrosshairSet {
 
   // Used in VtkViewer
   getCrosshairsForAxis(axis, colors) {
+    console.log('Running getCrosshairsForAxis');
     const sliceLines = this.getSliceLines();
     let horizontalLine = null;
     let verticalLine = null;
@@ -99,6 +102,7 @@ class CrosshairSet {
   }
 
   trueAxis(axisName) {
+    console.log('Running trueAxis');
     const xyzAxisOrdering = ['x', 'y', 'z'];
     const ijkAxisOrdering = ['i', 'j', 'k'];
     let axisOrdering = xyzAxisOrdering;
@@ -122,6 +126,7 @@ class CrosshairSet {
   }
 
   getPicker() {
+    console.log('Running getPicker');
     const picker = vtkCellPicker.newInstance();
     picker.setPickFromList(1);
     picker.setTolerance(0);
@@ -132,6 +137,7 @@ class CrosshairSet {
 
   // Used in VtkViewer
   locationOfClick(clickEvent) {
+    console.log('Running locationOfClick');
     const picker = this.getPicker();
     picker.pick([clickEvent.position.x, clickEvent.position.y, 0], this.renderer);
     if (picker.getActors().length === 0) return { i: undefined, j: undefined, k: undefined };
