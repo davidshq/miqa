@@ -68,11 +68,15 @@ function prepareProxyManager(proxyManager: vtkProxyManager) {
       // viewManager.getView
       const view = getView(proxyManager, type);
       console.log('View', view);
+      // @ts-ignore
       view.setOrientationAxesVisibility(false);
+      // @ts-ignore
       view.getRepresentations().forEach((representation) => {
         representation.setInterpolationType(InterpolationType.NEAREST);
         representation.onModified(macro.debounce(() => {
+          // @ts-ignore
           if (view.getRepresentations()) {
+            // @ts-ignore
             view.render(true);
           }
         }, 0));
