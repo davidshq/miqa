@@ -423,7 +423,11 @@ const initState = {
   MIQAConfig: {
     version: '',
   },
-  me: null,
+  me: {
+    username: null,
+    id: null,
+    is_superuser: false,
+  },
   allUsers: [],
   reviewMode: true,
   globalSettings: undefined as ProjectSettings,
