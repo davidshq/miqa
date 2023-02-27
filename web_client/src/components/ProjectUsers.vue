@@ -16,7 +16,10 @@ export default {
     emailList: [],
   }),
   computed: {
-    ...mapState(['currentProject', 'allUsers']),
+    ...mapState([
+      'currentProject',
+      'allUsers'
+    ]),
     permissions() {
       return this.currentProject.settings.permissions;
     },
@@ -62,8 +65,12 @@ export default {
     this.emailList = this.currentProject.settings.default_email_recipients;
   },
   methods: {
-    ...mapActions(['loadAllUsers']),
-    ...mapMutations(['setCurrentProject']),
+    ...mapActions([
+      'loadAllUsers'
+    ]),
+    ...mapMutations([
+      'SET_CURRENT_PROJECT'
+    ]),
     getGroup(user) {
       return Object.entries(this.permissions).filter(
         // @ts-ignore - TODO: Fix this
@@ -102,7 +109,7 @@ export default {
         const changedProject = { ...this.currentProject };
         // @ts-ignore - TODO: Fix this
         changedProject.settings.permissions = resp.permissions;
-        this.setCurrentProject(changedProject);
+        this.SET_CURRENT_PROJECT(changedProject);
       } catch (e) {
         this.$snackbar({
           text: 'Failed to save permissions.',
@@ -119,7 +126,7 @@ export default {
         const changedProject = { ...this.currentProject };
         // @ts-ignore - TODO: Fix this
         changedProject.settings.default_email_recipients = resp.default_email_recipients;
-        this.setCurrentProject(changedProject);
+        this.SET_CURRENT_PROJECT(changedProject);
       } catch (e) {
         this.$snackbar({
           text: 'Failed to save email list.',

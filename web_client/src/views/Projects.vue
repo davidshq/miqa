@@ -26,10 +26,10 @@ export default defineComponent({
   },
   inject: ['user', 'MIQAConfig'],
   setup() {
-    const { SET_REVIEW_MODE } = store.commit;
+    const SET_REVIEW_MODE = store.commit('SET_REVIEW_MODE');
     // We are loading projects
     const loadingProjects = ref(true);
-    store.dispatch.loadProjects().then(() => {
+    store.dispatch('loadProjects').then(() => {
       // Project loading complete
       loadingProjects.value = false;
     });
@@ -46,7 +46,7 @@ export default defineComponent({
     ));
     // Loads global settings
     const selectGlobal = () => {
-      store.dispatch.loadGlobal();
+      store.dispatch('loadGlobal');
     };
 
     // Starts as an empty array
@@ -88,7 +88,7 @@ export default defineComponent({
         const taskOverview = await djangoRest.projectTaskOverview(currentProject.value.id);
         // If the store / API values differ, update store to API
         if (JSON.stringify(store.state.currentTaskOverview) !== JSON.stringify(taskOverview)) {
-          store.commit.SET_TASK_OVERVIEW(taskOverview);
+          store.commit('SET_TASK_OVERVIEW', taskOverview);
         }
       }
     }
@@ -100,7 +100,7 @@ export default defineComponent({
           // Get the latest projectTaskOverview for each project from the API
           const taskOverview = await djangoRest.projectTaskOverview(project.id);
           // Update store with API values, this occurs even if same
-          store.commit.SET_TASK_OVERVIEW(taskOverview);
+          store.commit('SET_TASK_OVERVIEW', taskOverview);
         },
       );
     }
@@ -111,7 +111,7 @@ export default defineComponent({
           (project) => project.id === window.location.hash.split('/')[1],
         );
         const targetProject = projects.value[targetProjectIndex];
-        if (targetProject) store.commit.setCurrentProject(targetProject);
+        if (targetProject) store.commit('SET_CURRENT_PROJECT', targetProject);
         selectedProjectIndex.value = targetProjectIndex;
       }
     }
@@ -171,21 +171,24 @@ export default defineComponent({
   },
   methods: {
     // TODO: Is below using both Options API and above Composition API?
-    ...mapMutations(['setProjects', 'setCurrentProject']),
+    ...mapMutations([
+      'SET_PROJECTS',
+      'SET_CURRENT_PROJECT'
+    ]),
     selectProject(project: Project) {
       if (this.complete) {
         this.complete = false;
       }
-      store.dispatch.loadProject(project);
+      store.dispatch('loadProject', project);
     },
     async createProject() {
       if (this.creating && this.newName.length > 0) {
         try {
           // Create project
           const newProject = await djangoRest.createProject(this.newName);
-          this.setProjects(this.projects.concat([newProject]));
+          this.SET_PROJECTS(this.projects.concat([newProject]));
           // Load project
-          store.dispatch.loadProject(newProject);
+          await store.dispatch('loadProject', newProject);
           this.creating = false;
           this.newName = '';
 
@@ -202,7 +205,7 @@ export default defineComponent({
     },
     async proceedToNext() {
       const nextProject = this.projects[this.selectedProjectIndex + 1];
-      store.dispatch.loadProject(nextProject);
+      await store.dispatch('loadProject', nextProject);
       this.selectedProjectIndex += 1;
       await djangoRest.projectTaskOverview(nextProject.id).then(
         (taskOverview) => {

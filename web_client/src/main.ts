@@ -45,9 +45,9 @@ Sentry.init({
   await setupHeartbeat('miqa_logout_heartbeat', async () => { oauthClient.logout(); });
   await djangoRest.restoreLogin(store);
   await Promise.all([
-    store.dispatch.reset(),
-    store.dispatch.loadMe(),
-    store.dispatch.loadConfiguration(),
+    store.dispatch('reset'),
+    store.dispatch('loadMe'),
+    store.dispatch('loadConfiguration'),
   ]);
 
   new Vue({

@@ -62,7 +62,7 @@ export default defineComponent({
             export_path: exportPath.value.trim(),
             anatomy_orientation: anatomyOrientation.value,
           });
-          store.commit.SET_RENDER_ORIENTATION(anatomyOrientation.value);
+          store.commit('SET_RENDER_ORIENTATION', anatomyOrientation.value);
         }
         changed.value = false;
       } catch (e) {
@@ -100,12 +100,15 @@ export default defineComponent({
     showDeleteWarningOverlay: false,
   }),
   methods: {
-    ...mapMutations(['setProjects', 'setCurrentProject']),
+    ...mapMutations([
+      'SET_PROJECTS',
+      'SET_CURRENT_PROJECT'
+    ]),
     async deleteProject() {
       try {
         await djangoRest.deleteProject(this.currentProject.id);
-        this.setProjects(this.projects.filter((proj) => proj.id !== this.currentProject.id));
-        this.setCurrentProject(undefined);
+        this.SET_PROJECTS(this.projects.filter((proj) => proj.id !== this.currentProject.id));
+        this.SET_CURRENT_PROJECT(undefined);
         this.showDeleteWarningOverlay = false;
 
         this.$snackbar({

@@ -9,7 +9,9 @@ export default {
     show: false,
   }),
   computed: {
-    ...mapState(['currentScreenshot']),
+    ...mapState([
+      'currentScreenshot'
+    ]),
     filename: {
       get() {
         return this.filename_ ? this.filename_ : this.currentScreenshot.name;
@@ -55,7 +57,10 @@ export default {
     },
   },
   methods: {
-    ...mapMutations(['SET_CURRENT_SCREENSHOT', 'ADD_SCREENSHOT']),
+    ...mapMutations([
+      'SET_CURRENT_SCREENSHOT',
+      'ADD_SCREENSHOT'
+    ]),
     save() {
       this.ADD_SCREENSHOT({
         dataURL: this.output,

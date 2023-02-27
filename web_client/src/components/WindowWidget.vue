@@ -116,7 +116,7 @@ export default defineComponent({
     ) {
       let associatedImage;
       if (duration) associatedImage = `${duration.charAt(0).toUpperCase()}.png`;
-      store.commit.SET_WINDOW_LOCKED({
+      store.commit('SET_WINDOW_LOCKED', {
         lockExperiment,
         duration,
         target,

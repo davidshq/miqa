@@ -1,5 +1,5 @@
 <script lang="ts">
-import { VRangeSlider } from 'vuetify/lib';
+import { VRangeSlider } from 'vuetify/lib'; // TODO: Can remove /lib?
 
 export default VRangeSlider.extend({
   methods: {

@@ -22,11 +22,11 @@ export default defineComponent({
   setup() {
     const screenshots = computed(() => store.state.screenshots);
     const currentView = computed(() => store.getters.currentView);
-    // TODO: Shouldn't we get currentProject, currentFrame, currentScan from currentView?
+    // TODO: Couldn't we get currentProject, currentFrame, currentScan from currentView?
     const currentProject = computed(() => store.state.currentProject);
     const currentFrame = computed(() => store.getters.currentFrame);
     const currentScan = computed(() => store.getters.currentScan);
-    const { REMOVE_SCREENSHOT } = store.commit;
+    const REMOVE_SCREENSHOT = store.commit('REMOVE_SCREENSHOT');
 
     const user = inject('user') as User;
 

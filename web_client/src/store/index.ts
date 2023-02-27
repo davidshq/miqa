@@ -1,6 +1,4 @@
 /* eslint-disable no-use-before-define */
-
-import { createDirectStore } from 'direct-vuex';
 import Vue from 'vue';
 import Vuex from 'vuex';
 import vtkProxyManager from 'vtk.js/Sources/Proxy/Core/ProxyManager';
@@ -260,7 +258,7 @@ function poolFunction(webWorker, taskInfo) {
 function progressHandler(completed, total) {
   console.log('Running progressHandler');
   const percentComplete = completed / total;
-  store.commit.SET_SCAN_CACHED_PERCENTAGE(percentComplete);
+  store.commit('SET_SCAN_CACHED_PERCENTAGE', percentComplete);
 }
 
 /** Creates array of tasks to run then runs tasks in parallel. Only called by queueLoadScan */
@@ -462,13 +460,7 @@ const initState = {
   renderOrientation: 'LPS',
 };
 
-const {
-  store,
-  rootActionContext,
-  moduleActionContext,
-  rootGetterContext,
-  moduleGetterContext,
-} = createDirectStore({
+const store = new Vuex.Store({
   state: {
     ...initState,
     workerPool: new WorkerPool(poolSize, poolFunction),
@@ -670,7 +662,7 @@ const {
           // If the scan exists and has been reviewed
           if (taskOverview.scan_states[scan.id] && taskOverview.scan_states[scan.id] !== 'unreviewed') {
             // Reload the scan
-            store.dispatch.reloadScan(scan.id);
+            store.dispatch('reloadScan', scan.id);
           }
         });
       }
@@ -1032,7 +1024,7 @@ const {
         commit('SET_LOADING_FRAME', false);
       }
 
-      await this.updateLock();
+      await dispatch('updateLock');
     },
     async loadFrame({
       state, dispatch, getters, commit
@@ -1192,16 +1184,4 @@ const {
   },
 });
 
-// Export the direct-store instead of the classic Vuex store.
 export default store;
-
-// The following exports will be used to enable types in the
-// implementation of actions and getters.
-export {
-  rootActionContext,
-  moduleActionContext,
-  rootGetterContext,
-  moduleGetterContext,
-};
-
-export type AppStore = typeof store;

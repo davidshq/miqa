@@ -37,7 +37,7 @@ export default {
   },
   computed: {
     ...mapState([
-      'currentView', // TODO: Why both as state and getters?
+      'currentView', // TODO: Remove this, it is a getter
       'currentProject',
       'proxyManager',
       'vtkViews',
@@ -176,6 +176,7 @@ export default {
   },
   methods: {
     ...mapMutations([
+      'ADD_SCAN_DECISION',
       'UPDATE_EXPERIMENT',
       'SET_FRAME_EVALUATION',
     ]),
@@ -275,7 +276,7 @@ export default {
         const taskOverview = await djangoRest.projectTaskOverview(this.currentProject.id);
         // If API has different data, update taskOverview
         if (JSON.stringify(store.state.currentTaskOverview) !== JSON.stringify(taskOverview)) {
-          store.commit.SET_TASK_OVERVIEW(taskOverview);
+          store.commit('SET_TASK_OVERVIEW', taskOverview);
         }
       }
     },
@@ -296,7 +297,6 @@ export default {
             present: this.confirmedPresent,
             absent: this.confirmedAbsent,
           };
-          const { ADD_SCAN_DECISION } = store.commit;
           const zxyLocation = this.vtkViews[0].map(
             (view) => this.proxyManager[0].getRepresentation(null, view).getSlice(),
           );
@@ -313,7 +313,7 @@ export default {
             } : {}),
           );
           // Update Vuex store with scan decision
-          ADD_SCAN_DECISION({
+          this.ADD_SCAN_DECISION({
             currentScanId: this.currentView.scanId,
             newScanDecision: savedObj,
           });

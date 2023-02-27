@@ -1,6 +1,5 @@
 <script lang="ts">
 import { mapGetters, mapMutations, mapState } from 'vuex';
-import store from '@/store';
 import djangoRest from '@/django';
 import UserAvatar from './UserAvatar.vue';
 
@@ -25,6 +24,7 @@ export default {
     ...mapMutations([
       'SET_SHOW_CROSSHAIRS',
       'SET_STORE_CROSSHAIRS',
+      'UPDATE_EXPERIMENT',
     ]),
     /**
      * After every keystroke into experiment notes, this updates the local component state.
@@ -42,7 +42,6 @@ export default {
       if (this.newExperimentNote.length > 0) {
         try {
           // TODO: This shouldn't be necessary?
-          const { UPDATE_EXPERIMENT } = store.commit;
           // Save note using API
           const newExpData = await djangoRest.setExperimentNote(
             this.currentView.experimentId, this.newExperimentNote,
@@ -53,9 +52,7 @@ export default {
           });
           // TODO: What happens to the old experiment notes?
           this.newExperimentNote = '';
-          // TODO: This is where we actually commit the data...but this is already
-          //  happening via bind?
-          UPDATE_EXPERIMENT(newExpData);
+          this.UPDATE_EXPERIMENT(newExpData);
         } catch (err) {
           this.$snackbar({
             text: `Save failed: ${err.response.data.detail || 'Server error'}`,

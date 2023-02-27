@@ -33,11 +33,9 @@ export default {
       'proxyManager',
       'loadingFrame',
       'showCrosshairs',
-      'sliceLocation', // Used?
       'iIndexSlice',
       'jIndexSlice',
       'kIndexSlice',
-      'windowLocked', // Used?
       'currentWindowWidth',
       'currentWindowLevel',
       'renderOrientation',
@@ -135,7 +133,6 @@ export default {
   },
   methods: {
     ...mapMutations([
-      'saveSlice',
       'SET_CURRENT_SCREENSHOT',
       'SET_CURRENT_VTK_INDEX_SLICES',
       'SET_SLICE_LOCATION',

@@ -44,7 +44,10 @@ export default {
       'currentTaskOverview',
       'currentProject',
     ]),
-    ...mapGetters(['currentScan', 'currentExperiment']),
+    ...mapGetters([
+      'currentScan',
+      'currentExperiment'
+    ]),
     // Gets the experiments based on the experiment ids
     // TODO: Why do we need this rather than directly accessing experiments?
     orderedExperiments() {
@@ -123,14 +126,7 @@ export default {
       }
       return str;
     },
-    /**
-     * Get the URL of the first frame in the current scan
-     *
-     * TODO: MIQA-Annotations
-     *
-     * @param scanId
-     * @returns {string}
-     */
+    /** Get the URL of the first frame in the current scan */
     getURLForScan(scanId) {
       return `/${this.currentProject.id}/${scanId}`;
     },
@@ -171,11 +167,7 @@ export default {
       }
       return scanTaskState || 'unreviewed';
     },
-    /**
-     * Adds a class to a scan representative of the scan's task state.
-     *
-     * TODO: Could add typing to parameters, e.g. scan could be changed to scan: Scan
-     */
+    /** Adds a class to a scan representative of the scan's task state. */
     scanStateClass(scan) {
       let classes = `body-1 state-${this.scanState(scan).replace(/ /g, '-')}`;
       if (scan === this.currentScan) {
@@ -206,11 +198,7 @@ export default {
     addDropFiles(e) {
       this.fileSetForUpload = [...e.dataTransfer.files];
     },
-    /**
-     * Uploads images to experiment
-     *
-     * @returns {Promise<void>}
-     */
+    /** Uploads images to experiment */
     async uploadToExperiment() {
       let experimentId;
       this.uploading = true;
@@ -233,7 +221,7 @@ export default {
           ).id;
         }
         await djangoRest.uploadToExperiment(experimentId, this.fileSetForUpload);
-        this.loadProject(this.currentProject);
+        await this.loadProject(this.currentProject);
         this.showUploadModal = false;
       } catch (ex) {
         const text = ex || 'Upload failed due to server error.';
