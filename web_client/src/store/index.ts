@@ -604,7 +604,6 @@ const store = new Vuex.Store({
       state.scanFrames = {};
       state.frames = {};
     },
-    /** Sets the currentFrameId to a specified frameId */
     [SET_CURRENT_FRAME_ID] (state, frameId) {
       console.log('Running SET_CURRENT_FRAME_ID');
       state.currentFrameId = frameId;
@@ -626,7 +625,7 @@ const store = new Vuex.Store({
       console.log('Running SET_RENDER_ORIENTATION');
       state.renderOrientation = anatomy;
     },
-    /** Sets state.currentProject. Also sets state.renderOrientation and state.currentProjectPermissions */
+    /** Also sets state.renderOrientation and state.currentProjectPermissions */
     [SET_CURRENT_PROJECT] (state, project: Project | null) {
       console.log('Running SET_CURRENT_PROJECT');
       state.currentProject = project;
@@ -740,7 +739,6 @@ const store = new Vuex.Store({
       console.log('Running SET_WINDOW_LOCKED');
       state.windowLocked = lockState;
     },
-    /** Set state.scanCachedPercentage equal to passed in percentage */
     [SET_SCAN_CACHED_PERCENTAGE] (state, percentComplete) {
       console.log('Running SET_SCAN_CACHED_PERCENTAGE');
       state.scanCachedPercentage = percentComplete;
@@ -963,8 +961,6 @@ const store = new Vuex.Store({
      * onDownloadProgress passes local download state from Frame view
      *
      * Frame is the object
-     *
-     * Only used by Scan.vue
      */
     async swapToFrame({
       state, dispatch, getters, commit,
