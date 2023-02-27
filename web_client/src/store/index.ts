@@ -191,14 +191,13 @@ function downloadFile(frame, onDownloadProgress) {
   return { frameId: frame.id, cachedFile: promise };
 }
 
-/** Gets the data from the selected image file using a webWorker. Only called by swapToFrame */
+/** Gets the data from the selected image file using a webWorker. */
 async function loadFileAndGetData(frame, { onDownloadProgress = null } = {}) {
   console.log('Running loadFileAndGetData');
   console.log('loadFileAndGetData - frame', frame);
   const loadResult = loadFile(frame, { onDownloadProgress });
   console.log('loadFileAndGetData - loadResult', loadResult);
   // Once the file has been cached and is available, call getImageData
-  // Who is `savedWorker`?
   return loadResult.cachedFile
     .then((file) => getImageData(frame.id, file, savedWorker))
     .then(({ webWorker, frameData }) => {
@@ -287,7 +286,7 @@ function startReaderWorkerPool() {
     });
 }
 
-/** Queues scan for download Will load all frames for a target scan if the scan has not already been loaded. */
+/** Queues scan for download, will load all frames for a target scan if the scan has not already been loaded. */
 function queueLoadScan(scan, loadNext: 0) {
   console.log('Running queueLoadScan');
   console.log('queueLoadScan - scan', scan);
@@ -630,7 +629,7 @@ const store = new Vuex.Store({
     /** Sets state.currentProject. Also sets state.renderOrientation and state.currentProjectPermissions */
     [SET_CURRENT_PROJECT] (state, project: Project | null) {
       console.log('Running SET_CURRENT_PROJECT');
-      state.currentProject = project; // We pass the entire Project Object here, not just its Id?
+      state.currentProject = project;
       if (project) {
         state.renderOrientation = project.settings.anatomy_orientation;
         state.currentProjectPermissions = project.settings.permissions;
@@ -640,6 +639,7 @@ const store = new Vuex.Store({
       console.log('Running SET_GLOBAL_SETTINGS');
       state.globalSettings = settings;
     },
+    /** TODO: Does too much, should be action w/mutations */
     [SET_TASK_OVERVIEW] (state, taskOverview: ProjectTaskOverview) {
       console.log('Running SET_TASK_OVERVIEW');
       if (!taskOverview) return;
@@ -955,7 +955,7 @@ const store = new Vuex.Store({
     },
     async setCurrentFrame({ commit }, frameId) {
       console.log('Running setCurrentFrame');
-      commit('setCurrentFrameId', frameId);
+      commit('SET_CURRENT_FRAME_ID', frameId);
     },
     /**
      * Handles the process of changing frames in Scan.vue
