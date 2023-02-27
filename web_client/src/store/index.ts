@@ -1005,7 +1005,7 @@ const store = new Vuex.Store({
 
       try {
         // Gets the data we need to display
-        const frameData = await dispatch('getFrameData', { frame });
+        const frameData = await dispatch('getFrameData', { frame, onDownloadProgress });
 
         // Handles configuring the sourceProxy and getting the views
         await dispatch('setupSourceProxy', { frame, frameData });
@@ -1055,7 +1055,7 @@ const store = new Vuex.Store({
       await dispatch('setupProxyManager', { newProxyManager, whichProxy });
 
       console.log('loadFrame: Calling getFrameData')
-      const frameData = await dispatch('getFrameData', { frame });
+      const frameData = await dispatch('getFrameData', { frame, onDownloadProgress });
 
       console.log('loadFrame: Calling setupSourceProxy');
       try {
