@@ -53,7 +53,7 @@ Sentry.init({
   new Vue({
     vuetify,
     router,
-    store: store,
+    store,
     provide: {
       user: store.state.me,
       MIQAConfig: store.state.MIQAConfig,
