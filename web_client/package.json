@@ -58,7 +58,6 @@
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-vue": "^9.9.0",
     "eslint-plugin-vuetify": "^1.1.0",
-    "flatted": "^3.2.7",
     "jest": "^27.0.5",
     "jest-transform-stub": "^2.0.0",
     "postcss-loader": "^3.0.0",
