@@ -458,7 +458,7 @@ const initState = {
   renderOrientation: 'LPS',
 };
 
-const store = new Vuex.Store({
+export const storeConfig = {
   state: {
     ...initState,
     workerPool: new WorkerPool(poolSize, poolFunction),
@@ -1185,6 +1185,8 @@ const store = new Vuex.Store({
       });
     }
   },
-});
+};
+
+const store = new Vuex.Store(storeConfig);
 
 export default store;
