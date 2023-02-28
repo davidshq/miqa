@@ -51,15 +51,6 @@ let taskRunId = -1;
 // Reuse workers for performance
 let savedWorker = null;
 
-/** Delete existing VTK.js proxyManager views */
-function shrinkProxyManager(proxyManager: vtkProxyManager) {
-  console.log('Running shrinkProxyManager');
-  proxyManager.getViews().forEach((view) => {
-    view.setContainer(null);
-    proxyManager.deleteProxy(view);
-  });
-}
-
 /** Renders each view. Also disables Axes visibility and sets InterpolationType to nearest */
 function prepareProxyManager(proxyManager: vtkProxyManager) {
   console.log('Running prepareProxyManager');
@@ -1004,7 +995,7 @@ const store = new Vuex.Store({
           // This may be due to the extents changing between scans,
           // the extents do not change from one timestep to another
           // in a single scan.
-          shrinkProxyManager(state.proxyManager[whichProxy]);
+          dispatch('shrinkProxyManager', state.proxyManager[whichProxy]);
           newProxyManager = true;
         }
         // Handles shrinking and/or instantiating a new proxyManager instance
@@ -1055,7 +1046,7 @@ const store = new Vuex.Store({
       console.log('loadFrame: Next check if we have a proxyManager');
       if (state.proxyManager[whichProxy]) {
         console.log('loadFrame: We have a proxyManager, shrink it');
-        shrinkProxyManager(state.proxyManager[whichProxy]);
+        dispatch('shrinkProxyManager', state.proxyManager[whichProxy]);
         newProxyManager = true;
       }
 
@@ -1185,6 +1176,14 @@ const store = new Vuex.Store({
         );
       }
     },
+    /** Delete existing VTK.js proxyManager views */
+    shrinkProxyManager({ state }, proxyManager: vtkProxyManager) {
+      console.log('Running shrinkProxyManager');
+      proxyManager.getViews().forEach((view) => {
+        view.setContainer(null);
+        proxyManager.deleteProxy(view);
+      });
+    }
   },
 });
 
