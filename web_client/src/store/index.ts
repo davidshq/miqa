@@ -453,9 +453,9 @@ const initState = {
   showCrosshairs: true,
   storeCrosshairs: true,
   sliceLocation: {},
-  iIndexSlice: 0,
-  jIndexSlice: 0,
-  kIndexSlice: 0,
+  iIndexSlice: { 0:0, 1:0, 2:0, 3:0 },
+  jIndexSlice: { 0:0, 1:0, 2:0, 3:0 },
+  kIndexSlice: { 0:0, 1:0, 2:0, 3:0 },
   currentWindowWidth: 256,
   currentWindowLevel: 150,
   windowLocked: {
@@ -764,9 +764,9 @@ export const storeConfig = {
         );
       }
     },
-    [SET_CURRENT_VTK_INDEX_SLICES] (state, { indexAxis, value }) {
+    [SET_CURRENT_VTK_INDEX_SLICES] (state, { indexAxis, value, whichProxy = 0 }) {
       console.log('Running SET_CURRENT_VTK_INDEX_SLICES');
-      state[`${indexAxis}IndexSlice`] = value;
+      state[`${indexAxis}IndexSlice`][whichProxy] = value;
       state.sliceLocation = undefined;
     },
     [SET_SHOW_CROSSHAIRS] (state, show: boolean) {
