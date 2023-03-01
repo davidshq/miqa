@@ -98,6 +98,7 @@ export default {
         this.SET_CURRENT_VTK_INDEX_SLICES({
           indexAxis: ijkMapping[this.trueAxis(this.name)],
           value: this.representation.getSliceIndex(),
+          whichProxy: this.proxyNum,
         });
       }
     },
