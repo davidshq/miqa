@@ -224,7 +224,7 @@ async function loadFileAndGetData(frame, { onDownloadProgress = null } = {}) {
 
 /**
  * Use a worker to download image files. Only used by WorkerPool
- * @param taskInfo  Object  Contains experimentId, scanId, and a frame object
+ * taskInfo  Object  Contains experimentId, scanId, and a frame object
  */
 function poolFunction(webWorker, taskInfo) {
   console.log('Running poolFunction');
