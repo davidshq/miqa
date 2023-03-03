@@ -349,9 +349,14 @@ export default {
 
         if (this.showCrosshairs) {
           const crosshairSet = new CrosshairSet(
-            this.name, this.ijkName,
-            this.representation, this.view, myCanvas,
-            this.iIndexSlice[this.proxyNum], this.jIndexSlice[this.proxyNum], this.kIndexSlice[this.proxyNum],
+            this.name,
+            this.ijkName,
+            this.representation,
+            this.view,
+            myCanvas,
+            this.iIndexSlice[this.proxyNum],
+            this.jIndexSlice[this.proxyNum],
+            this.kIndexSlice[this.proxyNum],
           );
           const originalColors = {
             x: '#fdd835',
@@ -371,9 +376,14 @@ export default {
     },
     placeCrosshairs(clickEvent) {
       const crosshairSet = new CrosshairSet(
-        this.name, this.ijkName,
-        this.representation, this.view, null,
-        this.iIndexSlice, this.jIndexSlice, this.kIndexSlice,
+        this.name,
+        this.ijkName,
+        this.representation,
+        this.view,
+        null,
+        this.iIndexSlice,
+        this.jIndexSlice,
+        this.kIndexSlice,
       );
       const location = crosshairSet.locationOfClick(clickEvent);
       this.SET_SLICE_LOCATION(location);
