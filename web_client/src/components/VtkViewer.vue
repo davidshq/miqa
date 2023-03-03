@@ -294,9 +294,14 @@ export default {
 
       if (this.showCrosshairs) {
         const crosshairSet = new CrosshairSet(
-          this.name, this.ijkName,
-          this.representation, this.view, canvas,
-          this.iIndexSlice, this.jIndexSlice, this.kIndexSlice,
+          this.name,
+          this.ijkName,
+          this.representation,
+          this.view,
+          canvas,
+          this.iIndexSlice,
+          this.jIndexSlice,
+          this.kIndexSlice,
         );
         const originalColors = {
           x: '#fdd835',
@@ -358,6 +363,7 @@ export default {
             this.jIndexSlice[this.proxyNum],
             this.kIndexSlice[this.proxyNum],
           );
+          console.log(`VtkViewer - updateCrosshairs - this.crosshairSet`, this.crosshairSet)
           const originalColors = {
             x: '#fdd835',
             y: '#4caf50',
@@ -367,13 +373,20 @@ export default {
             Object.entries(originalColors).map(([axisName, hex]) => [this.trueAxis(axisName), hex]),
           );
           const [displayLine1, displayLine2] = crosshairSet.getCrosshairsForAxis(
-            this.trueAxis(this.name), trueColors,
+            this.trueAxis(this.name),
+            trueColors,
           );
+          console.log('VtkViewer - updateCrosshairs - displayLine1, displayLine2', displayLine1, displayLine2);
           this.drawLine(ctx, displayLine1);
           this.drawLine(ctx, displayLine2);
         }
       }
     },
+    /**
+     * Place crosshairs at the location of a click event
+     *
+     * @param clickEvent
+     */
     placeCrosshairs(clickEvent) {
       const crosshairSet = new CrosshairSet(
         this.name,
@@ -385,6 +398,7 @@ export default {
         this.jIndexSlice,
         this.kIndexSlice,
       );
+      console.log('VtkViewer - placeCrosshairs - this.crosshairSet', crosshairSet)
       const location = crosshairSet.locationOfClick(clickEvent);
       this.SET_SLICE_LOCATION(location);
     },
@@ -415,8 +429,8 @@ export default {
       <v-row class="align-center ma-0">
         <v-slider
           v-mousetrap="[
-            { bind: keyboardBindings[1], handler: () => changeSlice(slice + 1)},
-            { bind: keyboardBindings[0], handler: () => changeSlice(slice - 1) }
+            { bind: keyboardBindings[1], handler: () => changeSlice(slice + 1) },
+            { bind: keyboardBindings[0], handler: () => changeSlice(slice - 1) },
           ]"
           :value="slice"
           :min="sliceDomain.min"
@@ -439,7 +453,7 @@ export default {
         :style="{ visibility: resized ? 'unset' : 'hidden' }"
       />
       <canvas
-        :id="'crosshairs-'+name"
+        :id="'crosshairs-' + name"
         ref="crosshairsCanvas"
         class="crosshairs"
       />
