@@ -770,7 +770,7 @@ export const storeConfig = {
       const currentAxis = `${indexAxis}IndexSlice`;
       console.log(`${currentAxis} with Proxy: `, state[currentAxis][whichProxy.toString()]);
       console.log(`${currentAxis} w/out Proxy: `, state[currentAxis]);
-      state[currentAxis] = value;
+      state[currentAxis][whichProxy] = value;
       state.sliceLocation = undefined;
       console.log('Vuex - i:', state.iIndexSlice[0], 'j:', state.jIndexSlice[0], 'k:', state.kIndexSlice[0]);
     },
