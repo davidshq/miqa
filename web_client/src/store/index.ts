@@ -996,6 +996,7 @@ export const storeConfig = {
 
         // Queue the new scan to be loaded
         if (newScan !== oldScan && newScan) {
+          console.log('Vuex - swapToFrame: Call queueLoadScan');
           queueLoadScan(
             // @ts-ignore - TODO: fix this
             newScan, 3,
@@ -1003,23 +1004,28 @@ export const storeConfig = {
         }
         let newProxyManager = false;
         // Create new proxyManager if scans are different, retain proxyManager otherwise
+        console.log('Vuex - loadFrame: Next check if we have a proxyManager');
         if (oldScan !== newScan && state.proxyManager[whichProxy]) {
           // If we don't shrink and reinitialize between scans
           // we sometimes end up with no frame slices displayed.
           // This may be due to the extents changing between scans,
           // the extents do not change from one timestep to another
           // in a single scan.
+          console.log('Vuex - loadFrame: We have a proxyManager, shrink it');
           shrinkProxyManager(state.proxyManager[whichProxy]);
           newProxyManager = true;
         }
+        console.log('Vuex - loadFrame: Calling setupProxyManager');
         // Handles shrinking and/or instantiating a new proxyManager instance
         await dispatch('setupProxyManager', newProxyManager);
       }
 
       try {
+        console.log('Vuex - loadFrame: Calling getFrameData')
         // Gets the data we need to display
         const frameData = await dispatch('getFrameData', { frame, onDownloadProgress });
 
+        console.log('Vuex - loadFrame: Calling setupSourceProxy');
         // Handles configuring the sourceProxy and getting the views
         await dispatch('setupSourceProxy', { frame, frameData });
       }
@@ -1038,14 +1044,14 @@ export const storeConfig = {
     async loadFrame({
       state, dispatch, getters, commit
     }, { frame, onDownloadProgress = null, whichProxy = 0 }) {
+      console.log('Vuex - loadFrame: Running loadFrame');
       // Guard clauses
       if (!frame) {
         throw new Error("frame id doesn't exist");
       }
 
-      console.log('Vuex - Running loadFrame');
-      console.log('Vuex - loadFrame - frame', frame);
-      console.log('Vuex - loadFrame - whichProxy', whichProxy);
+      console.log('Vuex - loadFrame: frame', frame);
+      console.log('Vuex - loadFrame: whichProxy', whichProxy);
 
       commit('SET_LOADING_FRAME', true);
       commit('SET_ERROR_LOADING_FRAME', false);
@@ -1064,19 +1070,17 @@ export const storeConfig = {
         newProxyManager = true;
       }
 
-      console.log('Vuex - loadFrame: Calling setupProxyManager');
       await dispatch('setupProxyManager', { newProxyManager, whichProxy });
 
-      console.log('Vuex - loadFrame: Calling getFrameData')
       const frameData = await dispatch('getFrameData', { frame, onDownloadProgress });
 
-      console.log('Vuex - loadFrame: Calling setupSourceProxy');
       try {
         await dispatch('setupSourceProxy', { frame, frameData, whichProxy });
       } catch (err) {
         console.log('Vuex - Caught exception loading frame');
         console.log(err);
         state.vtkViews[whichProxy] = [];
+        commit('SET_ERROR_LOADING_FRAME', true);
       } finally {
         commit('SET_CURRENT_FRAME_ID', frame.id);
         commit('SET_LOADING_FRAME', false);
@@ -1084,7 +1088,6 @@ export const storeConfig = {
 
       console.log('Vuex - View0', state.vtkViews[0]);
       console.log('Vuex - View1', state.vtkViews[1]);
-      // await this.updateLock();
     },
     async setupProxyManager({ state, dispatch, getters, commit }, { newProxyManager, whichProxy = 0 }) {
       // If it doesn't exist, create new instance of proxyManager
