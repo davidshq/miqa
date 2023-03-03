@@ -39,13 +39,6 @@ Vue.config.productionTip = true;
 Sentry.init({
   Vue,
   dsn: process.env.VUE_APP_SENTRY_DSN,
-  integrations: [
-    new BrowserTracing({
-      routingInstrumentation: Sentry.vueRouterInstrumentation(router),
-      // tracePropagationTargets: ["localhost", /^\//]
-    }),
-  ],
-  tracesSampleRate: 1.0,
 });
 
 (async () => {
