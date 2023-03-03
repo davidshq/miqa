@@ -47,6 +47,7 @@ export default {
     ]),
     // Returning representation from VTK
     representation() {
+      console.log('VtkViewer - Running representation');
       return (
         // force add dependency on currentFrame
         this.currentFrame
@@ -54,6 +55,7 @@ export default {
       );
     },
     sliceDomain() {
+      console.log('VtkViewer - Running sliceDomain');
       if (!this.representation) return null;
       return this.representation.getPropertyDomainByName('slice');
     },
@@ -90,6 +92,7 @@ export default {
   },
   watch: {
     slice(value) {
+      console.log('VtkViewer - Running slice');
       this.representation.setSlice(value);
       if (this.SET_CURRENT_VTK_INDEX_SLICES) {
         this.SET_CURRENT_VTK_INDEX_SLICES({
@@ -98,30 +101,49 @@ export default {
         });
       }
     },
-    iIndexSlice() {
-      this.updateCrosshairs();
+    iIndexSlice: {
+      deep: true,
+      immediate: true,
+      handler() {
+        console.log('VtkViewer - iIndexSlice changed', this.iIndexSlice[0]);
+        this.updateCrosshairs();
+      }
     },
-    jIndexSlice() {
-      this.updateCrosshairs();
+    jIndexSlice: {
+      deep: true,
+      immediate: true,
+      handler() {
+        console.log('VtkViewer - jIndexSlice changed', this.jIndexSlice[0]);
+        this.updateCrosshairs();
+      }
     },
-    kIndexSlice() {
-      this.updateCrosshairs();
+    kIndexSlice: {
+      deep: true,
+      immediate: true,
+      handler() {
+        console.log('VtkViewer - kIndexSlice changed', this.kIndexSlice[0]);
+        this.updateCrosshairs();
+      }
     },
     view(view, oldView) {
+      console.log('VtkViewer - Running view');
       this.cleanup();
       oldView.setContainer(null);
       this.initializeSlice();
       this.initializeView();
     },
     currentFrame() {
+      console.log('VtkViewer - Running currentFrame');
       this.prepareViewer();
       this.representation.setSlice(this.slice);
     },
     currentScan() {
+      console.log('VtkViewer - Running currentScan');
       this.initializeSlice();
       this.initializeCamera();
     },
     showCrosshairs() {
+      console.log('VtkViewer - Running showCrosshairs');
       this.updateCrosshairs();
     },
   },
@@ -329,7 +351,7 @@ export default {
           const crosshairSet = new CrosshairSet(
             this.name, this.ijkName,
             this.representation, this.view, myCanvas,
-            this.iIndexSlice, this.jIndexSlice, this.kIndexSlice,
+            this.iIndexSlice[this.proxyNum], this.jIndexSlice[this.proxyNum], this.kIndexSlice[this.proxyNum],
           );
           const originalColors = {
             x: '#fdd835',

@@ -9,7 +9,7 @@
  * @returns {`${string} B`|`${*}  ${string}B`}
  */
 export default function formatSize(size, { base = 1024, unit = 'B' } = {}) {
-  console.log('Running formatSize');
+  console.log('helper.js - Running formatSize');
   if (size < base) {
     return `${size} ${unit}`;
   }

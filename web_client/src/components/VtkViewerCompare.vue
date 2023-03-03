@@ -45,7 +45,6 @@ export default {
     ...mapGetters([
       'currentFrame',
       'currentScan',
-      'currentView',
     ]),
     // Returning representation from VTK
     representation() {
@@ -91,7 +90,6 @@ export default {
     },
   },
   watch: {
-    // TODO: Need to abstract for multiple proxyManagers
     slice(value) {
       this.representation.setSlice(value);
       if (this.SET_CURRENT_VTK_INDEX_SLICES) {
@@ -122,13 +120,11 @@ export default {
       this.initializeSlice();
       this.initializeView();
     },
-    // This may also be involved
     currentFrame() {
       console.log("VtkViewerCompare - currentFrame");
       this.prepareViewer();
       this.representation.setSlice(this.slice);
     },
-    // As may this
     currentScan() {
       console.log("VtkViewerCompare - currentScan");
       this.initializeSlice();

@@ -7,7 +7,6 @@ const vtkChainWebpack = require('vtk.js/Utilities/config/chainWebpack');
 const packageJson = require('./package.json');
 
 const stat = util.promisify(fs.stat);
-console.log(process.env.PUBLIC_ADDRESS);
 
 module.exports = {
   devServer: {
