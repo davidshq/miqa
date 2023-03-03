@@ -6,6 +6,7 @@ import 'polyfill-object.fromentries';
 import AsyncComputed from 'vue-async-computed';
 import config from 'itk/itkConfig';
 import * as Sentry from '@sentry/vue';
+import { BrowserTracing} from "@sentry/tracing";
 import App from './App.vue';
 import router from './router';
 
@@ -38,6 +39,13 @@ Vue.config.productionTip = true;
 Sentry.init({
   Vue,
   dsn: process.env.VUE_APP_SENTRY_DSN,
+  integrations: [
+    new BrowserTracing({
+      routingInstrumentation: Sentry.vueRouterInstrumentation(router),
+      // tracePropagationTargets: ["localhost", /^\//]
+    }),
+  ],
+  tracesSampleRate: 1.0,
 });
 
 (async () => {
