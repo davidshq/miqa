@@ -16,7 +16,7 @@ export default {
       required: true,
       type: Object,
     },
-    'proxyNum': {
+    proxyNum: {
       default: 0,
       required: false,
       type: Number,
@@ -48,13 +48,13 @@ export default {
     ]),
     // Returning representation from VTK
     representation() {
-      console.log('VtkViewerCompare: Executing representation');
+      console.log('VtkViewerCompare - Running representation');
       return (
         this.proxyManager[this.proxyNum].getRepresentation(null, this.view)
       );
     },
     sliceDomain() {
-      console.log('VtkViewerCompare: Executing sliceDomain');
+      console.log('VtkViewerCompare - Running sliceDomain');
       if (!this.representation) return null;
       return this.representation.getPropertyDomainByName('slice');
     },
@@ -91,6 +91,7 @@ export default {
   },
   watch: {
     slice(value) {
+      console.log('VtkViewerCompare - Running slice');
       this.representation.setSlice(value);
       if (this.SET_CURRENT_VTK_INDEX_SLICES) {
         this.SET_CURRENT_VTK_INDEX_SLICES({
@@ -100,38 +101,50 @@ export default {
         });
       }
     },
-    iIndexSlice() {
-      console.log("VtkViewerCompare - iIndexSlice");
-      this.updateCrosshairs(this.proxyNum);
+    iIndexSlice: {
+      deep: true,
+      immediate: true,
+      handler() {
+        console.log('VtkViewerCompare - iIndexSlice changed', this.iIndexSlice);
+        this.updateCrosshairs(this.proxyNum);
+      },
     },
-    jIndexSlice() {
-      console.log("VtkViewerCompare - jIndexSlice");
-      this.updateCrosshairs(this.proxyNum);
+    jIndexSlice: {
+      deep: true,
+      immediate: true,
+      handler() {
+        console.log('VtkViewerCompare - jIndexSlice changed', this.jIndexSlice);
+        this.updateCrosshairs(this.proxyNum);
+      },
     },
-    kIndexSlice() {
-      console.log("VtkViewerCompare - kIndexSlice");
-      this.updateCrosshairs(this.proxyNum);
+    kIndexSlice: {
+      deep: true,
+      immediate: true,
+      handler() {
+        console.log('VtkViewerCompare - kIndexSlice changed', this.kIndexSlice);
+        this.updateCrosshairs(this.proxyNum);
+      },
     },
     // This seems like what would cause the image to be cleaned up
     view(view, oldView) {
-      console.log("VtkViewerCompare - view");
+      console.log("VtkViewerCompare - Running view");
       this.cleanup();
       oldView.setContainer(null);
       this.initializeSlice();
       this.initializeView();
     },
     currentFrame() {
-      console.log("VtkViewerCompare - currentFrame");
+      console.log("VtkViewerCompare - Running currentFrame");
       this.prepareViewer();
       this.representation.setSlice(this.slice);
     },
     currentScan() {
-      console.log("VtkViewerCompare - currentScan");
+      console.log("VtkViewerCompare - Running currentScan");
       this.initializeSlice();
       this.initializeCamera();
     },
     showCrosshairs() {
-      console.log("VtkViewerCompare - showCrosshairs");
+      console.log("VtkViewerCompare - Running showCrosshairs");
       this.updateCrosshairs(this.proxyNum);
     },
   },
@@ -149,7 +162,7 @@ export default {
       'SET_SLICE_LOCATION',
     ]),
     prepareViewer() {
-      console.log("VtkViewerCompare - prepareViewer");
+      console.log("VtkViewerCompare - Running prepareViewer");
       this.initializeView();
       this.initializeSlice();
       this.initializeCamera();
@@ -175,14 +188,14 @@ export default {
       representationProperty.setColorLevel(this.currentWindowLevel);
     },
     initializeSlice() {
-      console.log("Initialize Slice: this.name (x, y, or z)", this.name);
+      console.log("Initializing Slice - this.name (x, y, or z)", this.name);
       if (this.name !== 'default') {
         console.log('this.name', this.name);
         this.slice = this.representation.getSlice();
       }
     },
     initializeView() {
-      console.log("VtkViewerCompare: Calling initializeView");
+      console.log("VtkViewerCompare - Running initializeView");
       this.view.setContainer(this.$refs.viewer);
       fill2DView(this.view);
       if (this.name !== 'default') {
@@ -207,7 +220,7 @@ export default {
       });
     },
     initializeCamera() {
-      console.log("VtkViewerCompare")
+      console.log("VtkViewerCompare - Running initializeCamera");
       const camera = this.view.getCamera();
       const orientation = this.representation.getInputDataSet().getDirection();
 
@@ -231,7 +244,7 @@ export default {
       fill2DView(this.view);
     },
     findClosestColumnToVector(inputVector, matrix) {
-      console.log("VtkViewerCompare - findClosestColumnToVector");
+      console.log("VtkViewerCompare - Running findClosestColumnToVector");
       let currClosest = null;
       let currMax = 0;
       const inputVectorAxis = inputVector.findIndex((value) => value !== 0);
@@ -253,7 +266,7 @@ export default {
       return currClosest;
     },
     trueAxis(axisName) {
-      console.log("VtkViewerCompare - trueAxis");
+      console.log("VtkViewerCompare - Running trueAxis");
       if (!this.representation.getInputDataSet()) return undefined;
       const orientation = this.representation.getInputDataSet().getDirection();
       const axisNumber = VIEW_ORIENTATIONS[this.renderOrientation][axisName].axis;
@@ -271,16 +284,16 @@ export default {
       return trueAxis;
     },
     changeSlice(newValue) {
-      console.log("VtkViewerCompare - changeSlice");
+      console.log("VtkViewerCompare - Running changeSlice");
       this.slice = newValue;
     },
     roundSlice(value) {
-      console.log("VtkViewerCompare - roundSlice");
+      console.log("VtkViewerCompare - Running roundSlice");
       if (!value) return '';
       return Math.round(value * 100) / 100;
     },
     drawLine(ctx, displayLine) {
-      console.log("VtkViewerCompare - drawLine");
+      console.log("VtkViewerCompare - Running drawLine");
       if (!displayLine) return;
       ctx.strokeStyle = displayLine.color;
       ctx.beginPath();
@@ -289,7 +302,7 @@ export default {
       ctx.stroke();
     },
     updateCrosshairs(proxyNum) {
-      console.log("VtkViewerCompare - updateCrosshairs");
+      console.log("VtkViewerCompare - Running updateCrosshairs");
       const myCanvas: HTMLCanvasElement = document.getElementById(`crosshairs-${this.name}`) as HTMLCanvasElement;
       if (myCanvas && myCanvas.getContext) {
         const ctx = myCanvas.getContext('2d');
@@ -302,9 +315,9 @@ export default {
             this.representation,
             this.view,
             myCanvas,
-            this.iIndexSlice,
-            this.jIndexSlice,
-            this.kIndexSlice,
+            this.iIndexSlice[this.proxyNum],
+            this.jIndexSlice[this.proxyNum],
+            this.kIndexSlice[this.proxyNum],
           );
           const originalColors = {
             x: '#fdd835',
@@ -324,7 +337,7 @@ export default {
       }
     },
     placeCrosshairs(clickEvent) {
-      console.log("VtkViewerCompare - placeCrosshairs");
+      console.log("VtkViewerCompare - Running placeCrosshairs");
       this.crosshairSet[this.proxyNum] = new CrosshairSet(
         this.name,
         this.ijkName,
@@ -340,7 +353,7 @@ export default {
       this.SET_SLICE_LOCATION(location);
     },
     cleanup() {
-      console.log("VtkViewerCompare - cleanup");
+      console.log("VtkViewerCompare - Running cleanup");
       if (this.renderSubscription) {
         this.renderSubscription.unsubscribe();
         this.resizeObserver.unobserve(this.$refs.viewer);
