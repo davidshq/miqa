@@ -347,6 +347,7 @@ export default {
       ctx.stroke();
     },
     updateCrosshairs() {
+      console.log('Running updateCrosshairs');
       const myCanvas: HTMLCanvasElement = document.getElementById(`crosshairs-${this.name}`) as HTMLCanvasElement;
       if (myCanvas && myCanvas.getContext) {
         const ctx = myCanvas.getContext('2d');

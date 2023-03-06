@@ -11,8 +11,8 @@
   "dependencies": {
     "@girder/oauth-client": "^0.7.7",
     "@mdi/font": "^6.5.95",
-    "@sentry/tracing": "^7.9.0",
-    "@sentry/vue": "^7.9.0",
+    "@sentry/tracing": "^7.41.0",
+    "@sentry/vue": "^7.41.0",
     "@vue/composition-api": "^1.1.4",
     "axios": "^0.24.0",
     "core-js": "^3.28.0",
