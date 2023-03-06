@@ -14,7 +14,7 @@ class CrosshairSet {
     jSlice,
     kSlice,
   ) {
-    console.log('Crosshairs.js - Running CrosshairSet constructor');
+    console.log('Crosshairs.js - CrosshairSet - constructor: Running');
     this.xyzName = xyzName;
     this.ijkName = ijkName;
     this.imageRepresentation = imageRepresentation;

@@ -2,7 +2,7 @@ const READER_MAPPING = {};
 
 const FETCH_DATA = {
   readAsArrayBuffer(axios, url, signal, { onDownloadProgress } = {}) {
-    console.log('ReaderFactory - Running FETCH_DATA - readAsArrayBuffer');
+    console.log('ReaderFactory - FETCH_DATA - readAsArrayBuffer: Running');
     return axios
       .get(url, {
         responseType: 'arraybuffer',
@@ -24,7 +24,7 @@ function registerReader({
   sourceType,
   binary,
 }) {
-  console.log('ReaderFactory - Running registerReader');
+  console.log('ReaderFactory - registerReader: Running');
   READER_MAPPING[extension] = {
     name,
     vtkReader,
@@ -43,7 +43,7 @@ function registerReader({
  * @returns {*}
  */
 function getReader({ fileName }) {
-  console.log('ReaderFactory - Running getReader');
+  console.log('ReaderFactory - getReader: Running');
   const lowerCaseName = fileName.toLowerCase();
   const extToUse = Object.keys(READER_MAPPING).find((ext) => lowerCaseName.endsWith(ext));
   return READER_MAPPING[extToUse];
@@ -61,7 +61,7 @@ function getReader({ fileName }) {
  * @returns {{promise: Promise<unknown>, abortController: AbortController}}
  */
 function downloadFrame(axios, fileName, url, { onDownloadProgress } = {}) {
-  console.log('ReaderFactory - Running downloadFrame');
+  console.log('ReaderFactory - downloadFrame: Running');
   const abortController = new AbortController();
 
   return {

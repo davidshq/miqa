@@ -1,6 +1,6 @@
 // Used in VtkViewer
 export default function fill2DView(view, w, h, resize = true) {
-  console.log('fill2DView.js - Running fill2DView');
+  console.log('fill2DView.js - fill2DView: Running');
   if (!view) return undefined;
   if (resize) view.resize();
   const viewName = view.getName();

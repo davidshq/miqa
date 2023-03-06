@@ -31,7 +31,7 @@ const { createProxyDefinition, activateOnCreate } = ConfigUtils;
  * @returns {*}
  */
 function createDefaultView(classFactory, ui, options, props) {
-  console.log('vtk/proxy.js - Running createDefaultView');
+  console.log('vtk/proxy.js - createDefaultView: Running');
   return activateOnCreate(
     createProxyDefinition(
       classFactory,

@@ -21,7 +21,7 @@ function comparator(a, b) {
 
 // register medical colormaps
 function registerPresets(presets) {
-  console.log('vtk/ColorMaps.js - Running registerPresets');
+  console.log('vtk/ColorMaps.js - registerPresets: Running');
   presets.forEach((preset) => {
     if (preset.Children) {
       registerPresets(preset.Children);
@@ -38,7 +38,7 @@ function registerPresets(presets) {
  * @returns {{Children: *, Name}}
  */
 function createGroup(name, childrenNames) {
-  console.log('vtk/ColorMaps.js - Running createGroup');
+  console.log('vtk/ColorMaps.js - createGroup: Running');
   const children = childrenNames.map((n) => vtkColorMaps.getPresetByName(n));
   children.sort(comparator);
   return {

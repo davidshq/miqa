@@ -10,7 +10,7 @@ import { VIEW_ORIENTATIONS } from './constants';
  * @returns {null}
  */
 function getView(proxyManager, viewType) {
-  console.log('vtk/viewManager - Running getView');
+  console.log('vtk/viewManager - getView: Running');
   const [type, name] = viewType.split(':');
   let view = null;
   const views = proxyManager.getViews();
