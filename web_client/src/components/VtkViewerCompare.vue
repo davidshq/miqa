@@ -126,7 +126,6 @@ export default {
         this.updateCrosshairs(this.proxyNum);
       },
     },
-    // This seems like what would cause the image to be cleaned up
     view(view, oldView) {
       console.log('VtkViewerCompare - view changed: new, old', view, oldView);
       this.cleanup();

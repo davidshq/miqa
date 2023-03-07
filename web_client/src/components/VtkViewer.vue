@@ -117,7 +117,7 @@ export default {
       handler() {
         console.log('VtkViewer - slice: jIndexSlice changed', this.jIndexSlice[0]);
         this.updateCrosshairs();
-      }
+      },
     },
     kIndexSlice: {
       deep: true,
@@ -222,7 +222,7 @@ export default {
       });
     },
     initializeCamera() {
-      console.log('VtkViewer - initializeCamera: Running')
+      console.log('VtkViewer - initializeCamera: Running');
       const camera = this.view.getCamera();
       const orientation = this.representation.getInputDataSet().getDirection();
 
@@ -347,7 +347,7 @@ export default {
       this.slice = newValue;
     },
     roundSlice(value) {
-      console.log('VtkViewer - roundSlice: Running')
+      console.log('VtkViewer - roundSlice: Running');
       if (!value) return '';
       return Math.round(value * 100) / 100;
     },
@@ -417,7 +417,7 @@ export default {
         this.jIndexSlice[this.proxyNum],
         this.kIndexSlice[this.proxyNum],
       );
-      console.log('VtkViewer - placeCrosshairs: this.crosshairSet', crosshairSet)
+      console.log('VtkViewer - placeCrosshairs: crosshairSet', crosshairSet)
       const location = crosshairSet.locationOfClick(clickEvent);
       this.SET_SLICE_LOCATION(location);
     },
