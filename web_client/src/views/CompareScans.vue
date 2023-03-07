@@ -109,7 +109,6 @@ export default {
     ...mapActions([
       'loadProjects',
       'loadProject',
-      'swapToFrame',
       'loadFrame',
     ]),
     /** Update the download progress */
@@ -133,7 +132,7 @@ export default {
           onDownloadProgress: this.onFrameDownloadProgress,
           whichProxy: proxyNum,
         });
-        console.log('CompareScans.vue - loadImage: After swapToFrame');
+        console.log('CompareScans.vue - loadImage: After loadFrame');
       }
       console.log('CompareScans.vue - loadImage: vtkViews', this.vtkViews);
       if (proxyNum === 1) {

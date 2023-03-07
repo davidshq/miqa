@@ -238,7 +238,7 @@ function poolFunction(webWorker, taskInfo) {
       filePromise = fileCache.get(frame.id);
     } else { // Download image file
       console.log('Vuex - poolFunction: Downloading file');
-      const download = downloadFile(frame, {});
+      let download = downloadFile(frame, {});
       pendingFrameDownloads.add(download); // Adds to Set of all pending downloads
       filePromise = download.cachedFile;
       filePromise // Delete from pending downloads once resolved/rejected
@@ -523,7 +523,7 @@ export const storeConfig = {
     },
     /** Gets the current frame when given a frameId */
     currentFrame(state) {
-      console.log('Vuex - Getter - currentFrame: Running')
+      console.log('Vuex - Getter - currentFrame: Running');
       return state.currentFrameId ? state.frames[state.currentFrameId] : null;
     },
     previousFrame(state, getters) {
@@ -954,14 +954,17 @@ export const storeConfig = {
       }
       // If currently loaded frameId does not match frameId to load
       if (!state.scans[scanId] && state.projects) {
+        console.log('Vuex - Action - loadScan: Loading projects');
         await dispatch('loadProjects');
         if (state.projects) {
           const targetProject = state.projects.filter((proj) => proj.id === projectId)[0];
+          console.log('Vuex - Action - loadScan: Loading project');
           await dispatch('loadProject', targetProject);
         } else {
           return undefined;
         }
       }
+      console.log('Vuex - Action - loadScan: Returning scan', state.scans[scanId]);
       return state.scans[scanId];
     },
     async setCurrentFrame({ commit }, frameId) {

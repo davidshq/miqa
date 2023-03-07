@@ -18,6 +18,7 @@ function createProxyDefinition(
   props = {},
 ) {
   console.log('vtk/configUtils.js - createProxyDefinition: Running');
+  // console.log('vtk/configUtils.js - createProxyDefinition: class, options, props', classFactory, { links, ui, ...definitionOptions }, props);
   return {
     class: classFactory,
     options: { links, ui, ...definitionOptions },
