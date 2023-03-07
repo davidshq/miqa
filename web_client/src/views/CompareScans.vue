@@ -42,10 +42,12 @@ export default {
   watch: {
     /** Watch for changes to available projects */
     async projects(projects) {
+      console.log('CompareScans.vue - projects: value changed');
       this.allProjects = projects;
     },
     /** Watch for project selection, load child experiments */
     async selectedProject(projectId) {
+      console.log('CompareScans.vue - selectedProject: value changed');
       // Pass the object, not an array with the object
       const thisProject = this.allProjects.filter((project) => project.id === projectId)[0];
       await this.loadProject(thisProject);
@@ -59,6 +61,7 @@ export default {
     },
     /** Watch for experiment selection, load child scans */
     async selectedExperiment(experiment) {
+      console.log('CompareScans.vue - selectedExperiment: value changed');
       this.selectedExperiment = experiment;
       this.childScans = [];
       const keys = Object.keys(this.scans);
@@ -69,36 +72,37 @@ export default {
       });
     },
     async selectedScan1() {
-      console.log('selectedScan1');
+      console.log('CompareScans.vue - selectedScan1: value changed');
       // Avoid error when loading a different image using same VtkViewer
       this.vtkView1Loaded = false;
       await this.loadImage(this.selectedScan1, 1);
     },
     async selectedScan2() {
-      console.log('selectedScan2');
+      console.log('CompareScans.vue - selectedScan2: value changed');
       this.vtkView2Loaded = false;
       await this.loadImage(this.selectedScan2, 2);
     },
     async selectedScan3() {
-      console.log('selectedScan3');
+      console.log('CompareScans.vue - selectedScan3: value changed');
       this.vtkView3Loaded = false;
       await this.loadImage(this.selectedScan3, 3);
     },
     vtkView1Loaded(vtkView1Loaded) {
-      console.log('vtkView1Loaded from watch', vtkView1Loaded);
+      console.log('CompareScans.vue - vtkView1Loaded from watch', vtkView1Loaded);
       return true;
     },
     vtkView2Loaded(vtkView2Loaded) {
-      console.log('vtkView2Loaded from watch', vtkView2Loaded);
+      console.log('CompareScans.vue - vtkView2Loaded from watch', vtkView2Loaded);
       return true;
     },
     vtkView3Loaded(vtkView3Loaded) {
-      console.log('vtkView3Loaded from watch', vtkView3Loaded);
+      console.log('CompareScans.vue - vtkView3Loaded from watch', vtkView3Loaded);
       return true;
     },
   },
   mounted() {
     /** Wait until the view is mounted before attempting to load projects. */
+    console.log('CompareScans.vue - mounted, now loadProjects')
     this.loadProjects();
   },
   methods: {
@@ -110,41 +114,43 @@ export default {
     ]),
     /** Update the download progress */
     onFrameDownloadProgress(e) {
+      console.log('CompareScans.vue - onFrameDownloadProgress: value changed', e);
       this.downloadLoaded = e.loaded;
       this.downloadTotal = e.total;
     },
     /** Get the specified image */
     async loadImage(scan, proxyNum) {
+      console.log('CompareScans.vue - Running loadImage');
       // Attempt to load one image to start
-      console.log(`loadImage: scan id: ${scan.id}`);
+      console.log(`CompareScans.vue - loadImage: scan id: ${scan.id}`);
       const frameId = this.scanFrames[scan.id][0];
-      console.log('loadImage: frameId', frameId);
+      console.log('CompareScans.vue - loadImage: frameId', frameId);
       const frame = this.frames[frameId];
-      console.log('loadImage: frame', frame);
+      console.log('CompareScans.vue - loadImage: frame', frame);
       if (frame) {
         await this.loadFrame({
           frame,
           onDownloadProgress: this.onFrameDownloadProgress,
           whichProxy: proxyNum,
         });
-        console.log('after swapToFrame');
+        console.log('CompareScans.vue - loadImage: After swapToFrame');
       }
-      console.log('vtkViews', this.vtkViews);
+      console.log('CompareScans.vue - loadImage: vtkViews', this.vtkViews);
       if (proxyNum === 1) {
         this.vtkView1Loaded = true;
-        console.log('vtkView1Loaded', this.vtkView1Loaded);
-        console.log('vtkView1', this.vtkViews[1]);
-        console.log('vtkView1', this.vtkViews[1][0]);
+        console.log('CompareScans.vue - loadImage: vtkView1Loaded', this.vtkView1Loaded);
+        console.log('CompareScans.vue - loadImage: vtkViews[1]', this.vtkViews[1]);
+        console.log('CompareScans.vue - loadImage: vtkView[1][0]', this.vtkViews[1][0]);
       } else if (proxyNum === 2) {
         this.vtkView2Loaded = true;
-        console.log('vtkView2', this.vtkView2Loaded);
+        console.log('CompareScans.vue - loadImage: vtkView2Loaded', this.vtkView2Loaded);
       } else if (proxyNum === 3) {
         this.vtkView3Loaded = true;
-        console.log('vtkView3', this.vtkView3Loaded);
+        console.log('CompareScans.vue - loadImage: vtkView3Loaded', this.vtkView3Loaded);
       }
     },
     openWindow(proxyNum) {
-      console.log('Running openWindow');
+      console.log('CompareScans.vue - openWindow: Running');
       const project = this.selectedProject;
       const scan = this[`selectedScan${ proxyNum}`];
       window.open(`/#/${project}/${scan.id}`, '_blank');

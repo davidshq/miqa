@@ -39,6 +39,7 @@ export default {
   },
   watch: {
     async currentFrameId(frameId) {
+      console.log('Scan.vue - currentFrameId: value changed');
       await this.swapToFrame({
         frame: this.frames[frameId],
         onDownloadProgress: this.onFrameDownloadProgress,
@@ -63,13 +64,15 @@ export default {
       'swapToFrame',
       'loadScan',
     ]),
-    // Update download percents for loading bar
+    /** Update the download progress */
     onFrameDownloadProgress(e) {
+      console.log('Scan.vue - onFrameDownloadProgress: value changed', e);
       this.downloadLoaded = e.loaded;
       this.downloadTotal = e.total;
     },
     // Loads a specific frame
     async swapToScan() {
+      console.log('Scan.vue - swapToScan: Running');
       // Get the project/frame id's from the URL
       const { projectId, scanId } = this.$route.params;
       const scan = await this.loadScan({ scanId, projectId });
