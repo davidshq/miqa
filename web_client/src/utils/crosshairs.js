@@ -16,16 +16,22 @@ class CrosshairSet {
   ) {
     console.log('Crosshairs.js - CrosshairSet - constructor: Running');
     this.xyzName = xyzName;
+    console.debug('Crosshairs.js - CrosshairSet - constructor: xyzName: ', xyzName);
     this.ijkName = ijkName;
+    console.debug('Crosshairs.js - CrosshairSet - constructor: ijkName: ', ijkName);
     this.imageRepresentation = imageRepresentation;
     this.imageData = this.imageRepresentation.getInputDataSet();
     this.imageView = imageView;
     this.renderer = this.imageView.getRenderer();
     this.renderWindow = this.imageView.getOpenglRenderWindow();
     this.imageCanvas = imageCanvas;
+    console.debug('Crosshairs.js - CrosshairSet - constructor: imageCanvas: ', imageCanvas);
     this.iSlice = iSlice;
+    console.debug('Crosshairs.js - CrosshairSet - constructor: iSlice: ', iSlice);
     this.jSlice = jSlice;
+    console.debug('Crosshairs.js - CrosshairSet - constructor: jSlice: ', jSlice);
     this.kSlice = kSlice;
+    console.debug('Crosshairs.js - CrosshairSet - constructor: kSlice: ', kSlice);
     this.ijkMapping = {
       x: 'i',
       y: 'j',

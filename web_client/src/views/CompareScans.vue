@@ -240,7 +240,7 @@ export default {
           <div>
             <VtkViewer
               id="vtk1"
-              :view="vtkViews[1][1]"
+              :view="vtkViews[1][0]"
               :proxy-num="1"
             />
           </div>
@@ -266,7 +266,7 @@ export default {
           <div>
             <VtkViewer
               id="vtk3"
-              :view="vtkViews[3][1]"
+              :view="vtkViews[3][0]"
               :proxy-num="3"
             />
           </div>

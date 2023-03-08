@@ -26,7 +26,6 @@ export default {
     slice: null,
     // helper to avoid size flickering
     resized: false,
-    fullscreen: false,
     screenshotContainer: document.createElement('div'),
     crosshairSet: [],
   }),

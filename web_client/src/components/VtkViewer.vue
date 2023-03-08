@@ -48,12 +48,14 @@ export default {
     // Returning representation from VTK
     representation() {
       console.log('VtkViewer - representation: Running');
+      console.log(this.proxyManager[this.proxyNum].getRepresentation(null, this.view));
       return (
         // force add dependency on currentFrame
         this.currentFrame
         && this.proxyManager[this.proxyNum].getRepresentation(null, this.view)
       );
     },
+    // Returns the range of valid values and their step for the slice property
     sliceDomain() {
       console.log('VtkViewer - sliceDomain: Running');
       if (!this.representation) return null;
@@ -92,9 +94,10 @@ export default {
     },
   },
   watch: {
-    slice(value) {
-      console.log('VtkViewer - slice: Value changed', value);
-      this.representation.setSlice(value);
+    slice(newValue, oldValue) {
+      console.log('newValue:', newValue);
+      console.log('oldValue:', oldValue);
+      this.representation.setSlice(newValue);
       if (this.SET_CURRENT_VTK_INDEX_SLICES) {
         console.log('VtkViewer - slice: whichProxy', this.proxyNum);
         this.SET_CURRENT_VTK_INDEX_SLICES({
@@ -105,24 +108,27 @@ export default {
     },
     iIndexSlice: {
       deep: true,
-      immediate: true,
-      handler() {
+      handler(newValue, oldValue) {
+        console.log('iIndexSlice: newValue:', newValue);
+        console.log('iIndexSlice: oldValue:', oldValue);
         console.log('VtkViewer - slice: iIndexSlice changed', this.iIndexSlice[0]);
         this.updateCrosshairs();
       }
     },
     jIndexSlice: {
       deep: true,
-      immediate: true,
-      handler() {
+      handler(newValue, oldValue) {
+        console.log('jIndexSlice: newValue:', newValue);
+        console.log('jIndexSlice: oldValue:', oldValue);
         console.log('VtkViewer - slice: jIndexSlice changed', this.jIndexSlice[0]);
         this.updateCrosshairs();
       },
     },
     kIndexSlice: {
       deep: true,
-      immediate: true,
-      handler() {
+      handler(newValue, oldValue) {
+        console.log('kIndexSlice: newValue:', newValue);
+        console.log('kIndexSlice: oldValue:', oldValue);
         console.log('VtkViewer - slice: kIndexSlice changed', this.kIndexSlice[0]);
         this.updateCrosshairs();
       }
@@ -174,6 +180,7 @@ export default {
       });
       this.resizeObserver = new window.ResizeObserver((entries) => {
         if (entries.length === 1 && this.$refs.viewer && this.$refs.crosshairsCanvas) {
+          // Getting the width of the viewer element.
           const width = this.$refs.viewer.clientWidth;
           const height = this.$refs.viewer.clientHeight;
           this.$refs.crosshairsCanvas.width = width;
@@ -364,7 +371,7 @@ export default {
     },
     updateCrosshairs() {
       console.log('VtkViewer - updateCrosshairs: Running');
-      console.log(`VtkViewerCompare - updateCrosshairs: proxyNum is ${this.proxyNum}`);
+      console.log(`VtkViewer - updateCrosshairs: proxyNum is ${this.proxyNum}`);
       const myCanvas: HTMLCanvasElement = document.getElementById(`crosshairs-${this.name}`) as HTMLCanvasElement;
       if (myCanvas && myCanvas.getContext) {
         const ctx = myCanvas.getContext('2d');
