@@ -41,9 +41,6 @@ export default {
       'currentWindowLevel',
       'renderOrientation',
     ]),
-    ...mapGetters([
-      'currentScan',
-    ]),
     // Returning representation from VTK
     representation() {
       console.log('VtkViewerCompare - representation: Running');
@@ -89,6 +86,7 @@ export default {
     },
   },
   watch: {
+    /** When a new slice is chosen, save to Vuex, update representation to selected slice */
     slice(value) {
       console.log('VtkViewerCompare - slice: Value changed', value);
       this.representation.setSlice(value);
@@ -100,22 +98,6 @@ export default {
           whichProxy: this.proxyNum,
         });
       }
-    },
-    iIndexSlice: {
-      deep: true,
-      immediate: true,
-      handler() {
-        console.log('VtkViewerCompare - slice: iIndexSlice changed', this.iIndexSlice[this.proxyNum]);
-        this.updateCrosshairs(this.proxyNum);
-      },
-    },
-    jIndexSlice: {
-      deep: true,
-      immediate: true,
-      handler() {
-        console.log('VtkViewerCompare - slice: jIndexSlice changed', this.jIndexSlice[this.proxyNum]);
-        this.updateCrosshairs(this.proxyNum);
-      },
     },
     kIndexSlice: {
       deep: true,
@@ -131,11 +113,6 @@ export default {
       oldView.setContainer(null);
       this.initializeSlice();
       this.initializeView();
-    },
-    currentScan() {
-      console.log('VtkViewerCompare - currentScan: value changed');
-      this.initializeSlice();
-      this.initializeCamera();
     },
     showCrosshairs() {
       console.log('VtkViewerCompare - showCrosshairs: value changed');
@@ -186,6 +163,7 @@ export default {
       if (this.name !== 'default') {
         console.log('VtkViewerCompare - initializeSlice: this.name', this.name);
         this.slice = this.representation.getSlice();
+        console.log('this.slice', this.slice);
       }
     },
     initializeView() {
