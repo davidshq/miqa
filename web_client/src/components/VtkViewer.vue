@@ -112,7 +112,7 @@ export default {
         console.log('iIndexSlice: newValue:', newValue);
         console.log('iIndexSlice: oldValue:', oldValue);
         console.log('VtkViewer - slice: iIndexSlice changed', this.iIndexSlice[0]);
-        this.updateCrosshairs();
+        // this.updateCrosshairs();
       }
     },
     jIndexSlice: {
@@ -121,7 +121,7 @@ export default {
         console.log('jIndexSlice: newValue:', newValue);
         console.log('jIndexSlice: oldValue:', oldValue);
         console.log('VtkViewer - slice: jIndexSlice changed', this.jIndexSlice[0]);
-        this.updateCrosshairs();
+        // this.updateCrosshairs();
       },
     },
     kIndexSlice: {
@@ -130,7 +130,7 @@ export default {
         console.log('kIndexSlice: newValue:', newValue);
         console.log('kIndexSlice: oldValue:', oldValue);
         console.log('VtkViewer - slice: kIndexSlice changed', this.kIndexSlice[0]);
-        this.updateCrosshairs();
+        // this.updateCrosshairs();
       }
     },
     view(view, oldView) {
@@ -159,6 +159,9 @@ export default {
     console.log('VtkViewer - mounted');
     this.prepareViewer();
   },
+  beforeMount() {
+    console.log('before mount');
+  },
   beforeUnmount() {
     console.log('VtkViewer - before unmount');
     this.cleanup();
@@ -174,15 +177,19 @@ export default {
       this.initializeView();
       this.initializeSlice();
       this.initializeCamera();
-      this.updateCrosshairs();
+      // this.updateCrosshairs();
       this.renderSubscription = this.view.getInteractor().onRenderEvent(() => {
+        console.debug('renderSubscription kicked off');
         this.updateCrosshairs();
       });
       this.resizeObserver = new window.ResizeObserver((entries) => {
+        console.debug('resizeObserver kicked off');
         if (entries.length === 1 && this.$refs.viewer && this.$refs.crosshairsCanvas) {
           // Getting the width of the viewer element.
           const width = this.$refs.viewer.clientWidth;
+          console.log('resizeObserver - width', width);
           const height = this.$refs.viewer.clientHeight;
+          console.log('resizeObserver - height', height)
           this.$refs.crosshairsCanvas.width = width;
           this.$refs.crosshairsCanvas.height = height;
           this.$refs.crosshairsCanvas.style.width = `${width}px`;
@@ -401,7 +408,7 @@ export default {
             this.trueAxis(this.name),
             trueColors,
           );
-          // console.log('VtkViewer - updateCrosshairs: displayLine1, displayLine2', displayLine1, displayLine2);
+          console.log('VtkViewer - updateCrosshairs: displayLine1, displayLine2', displayLine1, displayLine2);
           this.drawLine(ctx, displayLine1);
           this.drawLine(ctx, displayLine2);
         }
