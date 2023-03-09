@@ -62,12 +62,12 @@ function shrinkProxyManager(proxyManager: vtkProxyManager) {
 
 /** Renders each view. Also disables Axes visibility and sets InterpolationType to nearest */
 function prepareProxyManager(proxyManager: vtkProxyManager) {
-  console.log('Vuex - prepareProxyManager: Running');
+  console.group('Vuex - prepareProxyManager: Running');
   if (!proxyManager.getViews().length) {
     ['View2D_Z:z', 'View2D_X:x', 'View2D_Y:y'].forEach((type) => {
       // viewManager.getView
       const view = getView(proxyManager, type);
-      console.log('Vuex - prepareProxyManager: View', view);
+      console.debug('Vuex - prepareProxyManager: View', view);
       // @ts-ignore
       view.setOrientationAxesVisibility(false);
       // @ts-ignore
@@ -86,6 +86,7 @@ function prepareProxyManager(proxyManager: vtkProxyManager) {
       });
     });
   }
+  console.groupEnd();
 }
 
 /** Array name is file name minus last extension, e.g. image.nii.gz => image.nii */
@@ -110,14 +111,14 @@ function getArrayNameFromFilename(filename) {
  * @param webWorker
  */
 function getImageData(frameId, file, webWorker = null) {
-  console.log('Vuex - getImageData: Running');
+  console.group('Vuex - getImageData: Running');
   return new Promise((resolve, reject) => {
     // Load image from frame cache if available, this resolves promise
     if (frameCache.has(frameId)) {
-      console.log("Vuex - getImageData: Pulling from cache");
+      console.debug("Vuex - getImageData: Pulling from cache");
       resolve({ frameData: frameCache.get(frameId), webWorker });
     } else {
-      console.log("Vuex - getImageData: Not in cache, loading file");
+      console.debug("Vuex - getImageData: Not in cache, loading file");
       const fileName = file.name;
       const io = new FileReader();
 
@@ -146,34 +147,37 @@ function getImageData(frameId, file, webWorker = null) {
 
       io.readAsArrayBuffer(file);
     }
+    console.groupEnd();
   });
 }
 
 /** Load file, from cache if possible. Only called by loadFileAndGetData */
 function loadFile(frame, { onDownloadProgress = null } = {}) {
-  console.log('Vuex - loadFile: Running');
+  console.group('Vuex - loadFile: Running');
   if (fileCache.has(frame.id)) { // If frame is cached, return it
-    console.log('Vuex - loadFile: Pulled from cache');
-    console.log('Vuex - loadFile: returning: ', { frameId: frame.id, cachedFile: fileCache.get(frame.id) });
+    console.debug('Vuex - loadFile: Pulled from cache');
+    console.debug('Vuex - loadFile: returning: ', { frameId: frame.id, cachedFile: fileCache.get(frame.id) });
     return { frameId: frame.id, cachedFile: fileCache.get(frame.id) };
-  } else { // Otherwise download the frame
-    let client = apiClient;
-    let downloadURL = `/frames/${frame.id}/download`;
-    if (frame.download_url) {
-      client = axios.create();
-      downloadURL = frame.download_url;
-    }
-    const { promise } = ReaderFactory.downloadFrame(
-      client,
-      `image${frame.extension}`,
-      downloadURL,
-      { onDownloadProgress },
-    );
-    fileCache.set(frame.id, promise);
-    console.log('Vuex - loadFile: Downloaded');
-    console.log('Vuex - loadFile: returning: ', { frameId: frame.id, cachedFile : promise });
-    return { frameId: frame.id, cachedFile: promise };
   }
+
+  // Otherwise download the frame
+  let client = apiClient;
+  let downloadURL = `/frames/${frame.id}/download`;
+  if (frame.download_url) {
+    client = axios.create();
+    downloadURL = frame.download_url;
+  }
+  const { promise } = ReaderFactory.downloadFrame(
+    client,
+    `image${frame.extension}`,
+    downloadURL,
+    { onDownloadProgress },
+  );
+  fileCache.set(frame.id, promise);
+  console.debug('Vuex - loadFile: Downloaded');
+  console.debug('Vuex - loadFile: returning: ', { frameId: frame.id, cachedFile : promise });
+  console.groupEnd();
+  return { frameId: frame.id, cachedFile: promise };
 }
 
 /** Downloads an image file. */
@@ -197,16 +201,16 @@ function downloadFile(frame, onDownloadProgress) {
 
 /** Gets the data from the selected image file using a webWorker. */
 async function loadFileAndGetData(frame, { onDownloadProgress = null } = {}) {
-  console.log('Vuex - loadFileAndGetData: Running');
-  console.log('Vuex - loadFileAndGetData: frame', frame);
+  console.group('Vuex - loadFileAndGetData: Running');
+  console.debug('Vuex - loadFileAndGetData: frame', frame);
   const loadResult = loadFile(frame, { onDownloadProgress });
-  console.log('Vuex - loadFileAndGetData: loadResult', loadResult);
+  console.debug('Vuex - loadFileAndGetData: loadResult', loadResult);
   // Once the file has been cached and is available, call getImageData
   return loadResult.cachedFile
     .then((file) => getImageData(frame.id, file, savedWorker))
     .then(({ webWorker, frameData }) => {
       savedWorker = webWorker;
-      console.log('Vuex - loadFileAndGetData: Getting from cache');
+      console.debug('Vuex - loadFileAndGetData: Getting from cache');
       return Promise.resolve({ frameData });
     })
     .catch(() => {
@@ -218,6 +222,7 @@ async function loadFileAndGetData(frame, { onDownloadProgress = null } = {}) {
         savedWorker.terminate();
         savedWorker = null;
         // console.log('Vuex - loadFileAndGetData: Terminated worker');
+        console.groupEnd();
       }
     });
 }
@@ -227,17 +232,17 @@ async function loadFileAndGetData(frame, { onDownloadProgress = null } = {}) {
  * taskInfo  Object  Contains experimentId, scanId, and a frame object
  */
 function poolFunction(webWorker, taskInfo) {
-  console.log('Vuex - poolFunction: Running');
+  console.group('Vuex - poolFunction: Running');
   return new Promise((resolve, reject) => {
     const { frame } = taskInfo;
 
     let filePromise = null;
 
     if (fileCache.has(frame.id)) { // Load file from cache if available
-      console.log('Vuex - poolFunction: Pulling from cache');
+      console.debug('Vuex - poolFunction: Pulling from cache');
       filePromise = fileCache.get(frame.id);
     } else { // Download image file
-      console.log('Vuex - poolFunction: Downloading file');
+      console.debug('Vuex - poolFunction: Downloading file');
       let download = downloadFile(frame, {});
       pendingFrameDownloads.add(download); // Adds to Set of all pending downloads
       filePromise = download.cachedFile;
@@ -256,6 +261,7 @@ function poolFunction(webWorker, taskInfo) {
       .catch((err) => {
         reject(err);
       });
+    console.groupEnd();
   });
 }
 
@@ -294,17 +300,15 @@ function startReaderWorkerPool() {
 
 /** Queues scan for download, will load all frames for a target scan if the scan has not already been loaded. */
 function queueLoadScan(scan, loadNext: 0) {
-  console.log('Vuex - queueLoadScan: Running');
-  console.log('Vuex - queueLoadScan: scan', scan);
-  console.log('Vuex - queueLoadScan: loadNext', loadNext);
-  console.log('Vuex - queueLoadScan: scan.id', scan.id);
+  console.group('Vuex - queueLoadScan: Running');
+  console.debug('Vuex - queueLoadScan: scan, loadNext, scan.id', scan, loadNext, scan.id);
   // load all frames in target scan
   if (!loadedData.includes(scan.id)) {
-    console.log('Vuex - queueLoadScan: scan.id not found in loadedData');
+    console.debug('Vuex - queueLoadScan: scan.id not found in loadedData');
     // For each scan in scanFrames
     store.state.scanFrames[scan.id].forEach(
       (frameId) => {
-        console.log('Vuex - queueLoadScan: Adding to readDataQueue', frameId);
+        console.debug('Vuex - queueLoadScan: Adding to readDataQueue', frameId);
         // Add to readDataQueue a request to get the frames associated with that scan
         readDataQueue.push({
           experimentId: scan.experiment,
@@ -314,7 +318,7 @@ function queueLoadScan(scan, loadNext: 0) {
       },
     );
     // Once frame has been successfully added to queue:
-    console.log('Vuex - queueLoadScan: Adding scan to loadedData');
+    console.debug('Vuex - queueLoadScan: Adding scan to loadedData');
     loadedData.push(scan.id);
   }
 
@@ -348,6 +352,7 @@ function queueLoadScan(scan, loadNext: 0) {
     if (nextScan) queueLoadScan(nextScan, loadNext - 1);
     startReaderWorkerPool();
   }
+  console.groupEnd();
 }
 
 /**
@@ -765,14 +770,15 @@ export const storeConfig = {
       }
     },
     [SET_CURRENT_VTK_INDEX_SLICES] (state, { indexAxis, value, whichProxy = 0 }) {
-      console.log('Vuex - Mutation - SET_CURRENT_VTK_INDEX_SLICES: Running');
-      console.log('Vuex - Mutation - SET_CURRENT_VTK_INDEX_SLICES: whichProxy: ', whichProxy);
+      console.group('Vuex - Mutation - SET_CURRENT_VTK_INDEX_SLICES: Running');
+      console.debug('Vuex - Mutation - SET_CURRENT_VTK_INDEX_SLICES: whichProxy: ', whichProxy);
       const currentAxis = `${indexAxis}IndexSlice`;
-      console.log(`Vuex - Mutation - SET_CURRENT_VTK_INDEX_SLICES: ${currentAxis} with Proxy: `, state[currentAxis][whichProxy.toString()]);
-      console.log(`Vuex - Mutation - SET_CURRENT_VTK_INDEX_SLICES: ${currentAxis} w/out Proxy: `, state[currentAxis]);
+      console.debug(`Vuex - Mutation - SET_CURRENT_VTK_INDEX_SLICES: ${currentAxis} with Proxy: `, state[currentAxis][whichProxy.toString()]);
+      console.debug(`Vuex - Mutation - SET_CURRENT_VTK_INDEX_SLICES: ${currentAxis} w/out Proxy: `, state[currentAxis]);
       state[currentAxis][whichProxy] = value;
       state.sliceLocation = undefined;
-      console.log('Vuex - Mutation - SET_CURRENT_VTK_INDEX_SLICES - i:', state.iIndexSlice[whichProxy], 'j:', state.jIndexSlice[whichProxy], 'k:', state.kIndexSlice[whichProxy]);
+      console.debug('Vuex - Mutation - SET_CURRENT_VTK_INDEX_SLICES - i:', state.iIndexSlice[whichProxy], 'j:', state.jIndexSlice[whichProxy], 'k:', state.kIndexSlice[whichProxy]);
+      console.groupEnd();
     },
     [SET_SHOW_CROSSHAIRS] (state, show: boolean) {
       console.log('Vuex - Mutation - SET_SHOW_CROSSHAIRS: Running');
@@ -948,23 +954,24 @@ export const storeConfig = {
       });
     },
     async loadScan({ state, dispatch }, { scanId, projectId }) {
-      console.log('Vuex - Action - loadScan: Running');
+      console.group('Vuex - Action - loadScan: Running');
       if (!scanId || !state.projects) {
         return undefined;
       }
       // If currently loaded frameId does not match frameId to load
       if (!state.scans[scanId] && state.projects) {
-        console.log('Vuex - Action - loadScan: Loading projects');
+        console.debug('Vuex - Action - loadScan: Loading projects');
         await dispatch('loadProjects');
         if (state.projects) {
           const targetProject = state.projects.filter((proj) => proj.id === projectId)[0];
-          console.log('Vuex - Action - loadScan: Loading project');
+          console.debug('Vuex - Action - loadScan: Loading project');
           await dispatch('loadProject', targetProject);
         } else {
           return undefined;
         }
       }
-      console.log('Vuex - Action - loadScan: Returning scan', state.scans[scanId]);
+      console.debug('Vuex - Action - loadScan: Returning scan', state.scans[scanId]);
+      console.groupEnd()
       return state.scans[scanId];
     },
     async setCurrentFrame({ commit }, frameId) {
@@ -981,7 +988,7 @@ export const storeConfig = {
     async swapToFrame({
       state, dispatch, getters, commit,
     }, { frame, onDownloadProgress = null, loadAll = true, whichProxy = 0 }) {
-      console.log('Vuex - Action - swapToFrame: Running');
+      console.group('Vuex - Action - swapToFrame: Running');
       // Guard Clauses
       if (!frame) {
         throw new Error("Vuex - Action - swapToFrame: frame id doesn't exist");
@@ -1007,7 +1014,7 @@ export const storeConfig = {
         }
         let newProxyManager = false;
         // Create new proxyManager if scans are different, retain proxyManager otherwise
-        console.log('Vuex - Action - swapToFrame: Next check if we have a proxyManager');
+        console.debug('Vuex - Action - swapToFrame: Next check if we have a proxyManager');
         if (oldScan !== newScan && state.proxyManager[whichProxy]) {
           // If we don't shrink and reinitialize between scans
           // we sometimes end up with no frame slices displayed.
@@ -1018,23 +1025,22 @@ export const storeConfig = {
           shrinkProxyManager(state.proxyManager[whichProxy]);
           newProxyManager = true;
         }
-        console.log('Vuex - Action - swapToFrame: Calling setupProxyManager');
+        console.debug('Vuex - Action - swapToFrame: Calling setupProxyManager');
         // Handles shrinking and/or instantiating a new proxyManager instance
         await dispatch('setupProxyManager', newProxyManager);
       }
 
       try {
-        console.log('Vuex - Action - swapToFrame: Calling getFrameData')
+        console.debug('Vuex - Action - swapToFrame: Calling getFrameData')
         // Gets the data we need to display
         const frameData = await dispatch('getFrameData', { frame, onDownloadProgress });
 
-        console.log('Vuex - Action - swapToFrame: Calling setupSourceProxy');
+        console.debug('Vuex - Action - swapToFrame: Calling setupSourceProxy');
         // Handles configuring the sourceProxy and getting the views
         await dispatch('setupSourceProxy', { frame, frameData });
       }
       catch (err) {
-        console.log('Vuex - Action - swapToFrame: Caught exception loading next frame');
-        console.log(err);
+        console.error('Vuex - Action - swapToFrame: Caught exception loading next frame', err);
         state.vtkViews[whichProxy] = [];
         commit('SET_ERROR_LOADING_FRAME', true);
       } finally {
@@ -1043,48 +1049,46 @@ export const storeConfig = {
       }
 
       await dispatch('updateLock');
+      console.groupEnd();
     },
-    async loadFrame({
-      state, dispatch, getters, commit
-    }, { frame, onDownloadProgress = null, whichProxy = 0 }) {
-      console.log('Vuex - Action - loadFrame: Running');
+    async loadFrame({ state, dispatch, commit }, { frame, onDownloadProgress = null, whichProxy = 0 }) {
+      console.group('Vuex - Action - loadFrame: Running');
       // Guard clauses
       if (!frame) {
         throw new Error("Vuex - Action - loadFrame: frame id doesn't exist");
       }
 
-      console.log('Vuex - Action - loadFrame: frame', frame);
-      console.log('Vuex - Action - loadFrame: whichProxy', whichProxy);
+      console.debug('Vuex - Action - loadFrame: frame', frame);
+      console.debug('Vuex - Action - loadFrame: whichProxy', whichProxy);
 
       commit('SET_LOADING_FRAME', true);
       commit('SET_ERROR_LOADING_FRAME', false);
 
       const newScan = state.scans[frame.scan];
 
-      console.log('Vuex - Action - loadFrame: Call queueLoadScan');
+      console.debug('Vuex - Action - loadFrame: Call queueLoadScan');
       queueLoadScan(newScan, 0);
 
       let newProxyManager = false;
 
-      console.log('Vuex - Action - loadFrame: Next check if we have a proxyManager');
+      console.debug('Vuex - Action - loadFrame: Next check if we have a proxyManager');
       if (state.proxyManager[whichProxy]) {
-        console.log('Vuex - Action - loadFrame: We have a proxyManager, shrink it');
+        console.debug('Vuex - Action - loadFrame: We have a proxyManager, shrink it');
         shrinkProxyManager(state.proxyManager[whichProxy]);
         newProxyManager = true;
       }
 
-      console.log('Vuex - Action - loadFrame: Calling setupProxyManager');
+      console.debug('Vuex - Action - loadFrame: Calling setupProxyManager');
       await dispatch('setupProxyManager', { newProxyManager, whichProxy });
 
-      console.log('Vuex - Action - loadFrame: Calling getFrameData');
+      console.debug('Vuex - Action - loadFrame: Calling getFrameData');
       const frameData = await dispatch('getFrameData', { frame, onDownloadProgress });
 
       try {
-        console.log('Vuex - Action - loadFrame: Calling setupSourceProxy');
+        console.debug('Vuex - Action - loadFrame: Calling setupSourceProxy');
         await dispatch('setupSourceProxy', { frame, frameData, whichProxy });
       } catch (err) {
-        console.log('Vuex - Action - loadFrame: Caught exception loading frame');
-        console.log(err);
+        console.error('Vuex - Action - loadFrame: Caught exception loading frame', err);
         state.vtkViews[whichProxy] = [];
         commit('SET_ERROR_LOADING_FRAME', true);
       } finally {
@@ -1092,23 +1096,25 @@ export const storeConfig = {
         commit('SET_LOADING_FRAME', false);
       }
 
+      console.groupEnd();
       // console.log('Vuex - View0', state.vtkViews[0]);
       // console.log('Vuex - View1', state.vtkViews[1]);
     },
-    async setupProxyManager({ state, dispatch, getters, commit }, { newProxyManager, whichProxy = 0 }) {
+    async setupProxyManager({ state }, { newProxyManager, whichProxy = 0 }) {
       // If it doesn't exist, create new instance of proxyManager
       // Also, if it does exist but was used for a different scan, create a new one
-      console.log('Vuex - Action - setupProxyManager: Running');
+      console.group('Vuex - Action - setupProxyManager: Running');
       if (!state.proxyManager[whichProxy] || newProxyManager) {
         state.proxyManager[whichProxy] = vtkProxyManager.newInstance({
           proxyConfiguration: proxy,
         });
-        console.log('Vuex - Action - setupProxyManager: proxyManager', state.proxyManager[whichProxy]);
+        console.debug('Vuex - Action - setupProxyManager: proxyManager', state.proxyManager[whichProxy]);
         state.vtkViews[whichProxy] = [];
       }
+      console.groupEnd();
     },
-    async setupSourceProxy({ state, dispatch, getters, commit }, { frameData, whichProxy = 0 }) {
-      console.log('Vuex - Action - setupSourceProxy: Running');
+    async setupSourceProxy({ state }, { frameData, whichProxy = 0 }) {
+      console.group('Vuex - Action - setupSourceProxy: Running');
       // get the source from which we are loading the images
       let sourceProxy = state.proxyManager[whichProxy].getActiveSource();
       let needPrep = false;
@@ -1124,7 +1130,7 @@ export const storeConfig = {
       // This try catch and within logic are mainly for handling data doesn't exist issue
       // We set the source equal to the frameData we've loaded
       sourceProxy.setInputData(frameData);
-      console.log('Vuex - Action - setupSourceProxy - sourceProxy:', sourceProxy);
+      console.debug('Vuex - Action - setupSourceProxy - sourceProxy:', sourceProxy);
       // If sourceProxy doesn't have valid config or proxyManager has no views
       if (needPrep || !state.proxyManager[whichProxy].getViews().length) {
         prepareProxyManager(state.proxyManager[whichProxy]);
@@ -1134,24 +1140,26 @@ export const storeConfig = {
       if (!state.vtkViews[whichProxy].length) {
         state.vtkViews[whichProxy] = state.proxyManager[whichProxy].getViews();
       }
+      console.groupEnd();
     },
-    async getFrameData({ state, dispatch, getters, commit, }, { frame, onDownloadProgress = null }) {
-      console.log('Vuex - Action - getFrameData: Running');
+    async getFrameData( {}, { frame, onDownloadProgress = null }) {
+      console.group('Vuex - Action - getFrameData: Running');
       let frameData = null;
       // load from cache if possible
       if (frameCache.has(frame.id)) {
         frameData = await frameCache.get(frame.id).frameData;
-        console.log('Vuex - Action - getFrameData: from cache');
-        console.log('Vuex - Action - getFrameData: frameData', frameData);
+        console.debug('Vuex - Action - getFrameData: from cache');
+        console.debug('Vuex - Action - getFrameData: frameData', frameData);
       } else {
         // download from server if not cached
-        console.log('Vuex - Action - getFrameData: from server');
+        console.debug('Vuex - Action - getFrameData: from server');
         const result = await loadFileAndGetData(
           frame, { onDownloadProgress },
         );
         frameData = await result.frameData;
-        console.log('Vuex - Action - getFrameData: frameData', frameData);
+        console.debug('Vuex - Action - getFrameData: frameData', frameData);
       }
+      console.groupEnd();
       return frameData;
     },
     /** Determines what lock status should be and updates accordingly */
