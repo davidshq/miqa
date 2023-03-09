@@ -99,16 +99,18 @@ export default {
         });
       }
     },
+    /** Update crosshairs position when kIndexSlice value change detected */
     kIndexSlice: {
       deep: true,
       immediate: true,
       handler() {
-        console.log('VtkViewerCompare - slice: kIndexSlice changed', this.kIndexSlice[this.proxyNum]);
+        console.debug('VtkViewerCompare - slice: kIndexSlice changed', this.kIndexSlice[this.proxyNum]);
         this.updateCrosshairs(this.proxyNum);
       },
     },
     view(view, oldView) {
-      console.log('VtkViewerCompare - view changed: new, old', view, oldView);
+      console.debug('VtkViewerCompare - view changed: new, old', view, oldView);
+      debugger;
       this.cleanup();
       oldView.setContainer(null);
       this.initializeSlice();
@@ -120,11 +122,11 @@ export default {
     },
   },
   mounted() {
-    console.log('VtkViewerCompare - mounted');
+    // console.debug('VtkViewerCompare - mounted');
     this.prepareViewer();
   },
   beforeUnmount() {
-    console.log('VtkViewerCompare - before unmount');
+    // console.debug('VtkViewerCompare - before unmount');
     this.cleanup();
   },
   methods: {
@@ -159,16 +161,18 @@ export default {
       representationProperty.setColorLevel(this.currentWindowLevel);
     },
     initializeSlice() {
-      console.log('VtkViewerCompare - initializeSlice: Running');
+      console.group('VtkViewerCompare - initializeSlice: Running');
       if (this.name !== 'default') {
-        console.log('VtkViewerCompare - initializeSlice: this.name', this.name);
+        console.debug('VtkViewerCompare - initializeSlice: this.name', this.name);
         this.slice = this.representation.getSlice();
-        console.log('this.slice', this.slice);
+        console.debug('this.slice', this.slice);
       }
+      console.groupEnd();
     },
     initializeView() {
       console.log('VtkViewerCompare - initializeView: Running');
       this.view.setContainer(this.$refs.viewer);
+      // console.debug(this.$refs.viewer);
       fill2DView(this.view);
       if (this.name !== 'default') {
         this.modifiedSubscription = this.representation.onModified(() => {
@@ -259,29 +263,33 @@ export default {
       console.log('VtkViewerCompare - changeSlice: Running');
       this.slice = newValue;
     },
+    /** Round the slice value for display on the slider */
     roundSlice(value) {
       console.log('VtkViewerCompare - roundSlice: Running');
       if (!value) return '';
       return Math.round(value * 100) / 100;
     },
     drawLine(ctx, displayLine) {
-      console.log('VtkViewerCompare - drawLine: Running');
+      console.group('VtkViewerCompare - drawLine: Running');
       if (!displayLine) return;
       ctx.strokeStyle = displayLine.color;
       ctx.beginPath();
       ctx.moveTo(...displayLine.start);
-      console.log('VtkViewerCompare - drawLine: displayLine.start', displayLine.start);
+      console.debug('VtkViewerCompare - drawLine: displayLine.start', displayLine.start);
       ctx.lineTo(...displayLine.end);
-      console.log('VtkViewerCompare - drawLine: displayLine.end', displayLine.end);
+      console.debug('VtkViewerCompare - drawLine: displayLine.end', displayLine.end);
       ctx.stroke();
+      console.groupEnd();
     },
     updateCrosshairs(proxyNum) {
-      console.log('VtkViewerCompare - updateCrosshairs: Running');
-      console.log(`VtkViewerCompare - updateCrosshairs: proxyNum is ${proxyNum}`);
+      console.group('VtkViewerCompare - updateCrosshairs: Running');
+      // console.debug(`VtkViewerCompare - updateCrosshairs: proxyNum is ${proxyNum}`);
       const myCanvas: HTMLCanvasElement = document.getElementById(`crosshairs-${this.name}`) as HTMLCanvasElement;
+      console.debug('myCanvas', myCanvas);
       if (myCanvas && myCanvas.getContext) {
         const ctx = myCanvas.getContext('2d');
         ctx.clearRect(0, 0, myCanvas.width, myCanvas.height);
+        console.debug('myCanvas wxh', myCanvas.width, myCanvas.height);
 
         if (this.showCrosshairs) {
           this.crosshairSet[proxyNum] = new CrosshairSet(
@@ -312,6 +320,7 @@ export default {
           this.drawLine(ctx, displayLine2);
         }
       }
+      console.groupEnd();
     },
     /**
      * Place crosshairs at the location of a click event
@@ -319,7 +328,7 @@ export default {
      * @param clickEvent
      */
     placeCrosshairs(clickEvent) {
-      console.log('VtkViewerCompare - placeCrosshairs: Running');
+      console.group('VtkViewerCompare - placeCrosshairs: Running');
       this.crosshairSet[this.proxyNum] = new CrosshairSet(
         this.name,
         this.ijkName,
@@ -330,12 +339,13 @@ export default {
         this.jIndexSlice[this.proxyNum],
         this.kIndexSlice[this.proxyNum],
       );
-      console.log('VtkViewerCompare - placeCrosshairs: this.crosshairSet[this.proxyNum]', this.crosshairSet[this.proxyNum])
+      console.debug('VtkViewerCompare - placeCrosshairs: this.crosshairSet[this.proxyNum]', this.crosshairSet[this.proxyNum])
       const location = this.crosshairSet[this.proxyNum].locationOfClick(clickEvent);
       this.SET_SLICE_LOCATION(location, this.proxyNum);
+      console.groupEnd();
     },
     cleanup() {
-      console.log('VtkViewerCompare - cleanup: Running');
+      console.group('VtkViewerCompare - cleanup: Running');
       if (this.renderSubscription) {
         this.renderSubscription.unsubscribe();
         this.resizeObserver.unobserve(this.$refs.viewer);
@@ -343,6 +353,7 @@ export default {
       if (this.modifiedSubscription) {
         this.modifiedSubscription.unsubscribe();
       }
+      console.groupEnd();
     },
   },
 };

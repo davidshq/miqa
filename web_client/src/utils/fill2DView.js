@@ -12,6 +12,7 @@ export default function fill2DView(view, w, h, resize = true) {
     (bounds[3] - bounds[2]) / 2,
     (bounds[5] - bounds[4]) / 2,
   ];
+  console.debug('fill2DView - dim', dim);
   w = w || view.getContainer().clientWidth;
   h = h || view.getContainer().clientHeight;
   const r = w / h;

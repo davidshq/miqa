@@ -14,7 +14,7 @@ class CrosshairSet {
     jSlice,
     kSlice,
   ) {
-    console.log('Crosshairs.js - CrosshairSet - constructor: Running');
+    console.group('Crosshairs.js - CrosshairSet - constructor: Running');
     this.xyzName = xyzName;
     console.debug('Crosshairs.js - CrosshairSet - constructor: xyzName: ', xyzName);
     this.ijkName = ijkName;
@@ -37,6 +37,7 @@ class CrosshairSet {
       y: 'j',
       z: 'k',
     };
+    console.groupEnd()
   }
 
   getOrientation() {
@@ -46,7 +47,7 @@ class CrosshairSet {
   }
 
   getSliceLines() {
-    console.log('crosshairs.js - getSliceLines: Running');
+    console.group('crosshairs.js - getSliceLines: Running');
     if (!this.imageData) return undefined;
     const [iMax, jMax, kMax] = this.imageData.getDimensions();
     console.debug('iMax, jMax, kMax', iMax, jMax, kMax);
@@ -78,6 +79,7 @@ class CrosshairSet {
     console.debug('iPoints', iPoints);
     console.debug('jPoints', jPoints);
     console.debug('kPoints', kPoints);
+    console.groupEnd();
     return {
       i: {
         start: iPoints[0],

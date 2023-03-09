@@ -48,7 +48,7 @@ export default {
     // Returning representation from VTK
     representation() {
       console.log('VtkViewer - representation: Running');
-      console.log(this.proxyManager[this.proxyNum].getRepresentation(null, this.view));
+      console.debug('VtkViewer - representation: getRepresentation', this.proxyManager[this.proxyNum].getRepresentation(null, this.view));
       return (
         // force add dependency on currentFrame
         this.currentFrame
@@ -59,7 +59,7 @@ export default {
     sliceDomain() {
       console.log('VtkViewer - sliceDomain: Running');
       if (!this.representation) return null;
-      console.log('VtkViewer - sliceDomain: PropertyDomainByName', this.representation.getPropertyDomainByName('slice'));
+      console.debug('VtkViewer - sliceDomain: PropertyDomainByName', this.representation.getPropertyDomainByName('slice'));
       return this.representation.getPropertyDomainByName('slice');
     },
     name() : ('x' | 'y' | 'z') {
@@ -95,11 +95,10 @@ export default {
   },
   watch: {
     slice(newValue, oldValue) {
-      console.log('newValue:', newValue);
-      console.log('oldValue:', oldValue);
+      console.log('VtkViewer - slice: value changed, newValue, oldValue', newValue, oldValue);
       this.representation.setSlice(newValue);
       if (this.SET_CURRENT_VTK_INDEX_SLICES) {
-        console.log('VtkViewer - slice: whichProxy', this.proxyNum);
+        console.debug('VtkViewer - slice: whichProxy', this.proxyNum);
         this.SET_CURRENT_VTK_INDEX_SLICES({
           indexAxis: ijkMapping[this.trueAxis(this.name)],
           value: this.representation.getSliceIndex(),
@@ -109,30 +108,25 @@ export default {
     iIndexSlice: {
       deep: true,
       handler(newValue, oldValue) {
-        console.log('iIndexSlice: newValue:', newValue);
-        console.log('iIndexSlice: oldValue:', oldValue);
-        console.log('VtkViewer - slice: iIndexSlice changed', this.iIndexSlice[0]);
+        console.log('VtkViewer - iIndexSlice: value changed, newValue, oldValue', newValue, oldValue);
         // this.updateCrosshairs();
       }
     },
     jIndexSlice: {
       deep: true,
       handler(newValue, oldValue) {
-        console.log('jIndexSlice: newValue:', newValue);
-        console.log('jIndexSlice: oldValue:', oldValue);
-        console.log('VtkViewer - slice: jIndexSlice changed', this.jIndexSlice[0]);
+        console.log('VtkViewer - jIndexSlice: value changed, newValue, oldValue', newValue, oldValue);
         // this.updateCrosshairs();
       },
     },
     kIndexSlice: {
       deep: true,
       handler(newValue, oldValue) {
-        console.log('kIndexSlice: newValue:', newValue);
-        console.log('kIndexSlice: oldValue:', oldValue);
-        console.log('VtkViewer - slice: kIndexSlice changed', this.kIndexSlice[0]);
+        console.log('VtkViewer - kIndexSlice: value changed, newValue, oldValue', newValue, oldValue);
         // this.updateCrosshairs();
       }
     },
+    // Only run when changing scan
     view(view, oldView) {
       console.log('VtkViewer - view changed: new, old', view, oldView);
       this.cleanup();
@@ -140,11 +134,13 @@ export default {
       this.initializeSlice();
       this.initializeView();
     },
+    // Only run when changing scan
     currentFrame() {
       console.log('VtkViewer - currentFrame changed');
       this.prepareViewer();
       this.representation.setSlice(this.slice);
     },
+    // Only run when changing scan
     currentScan() {
       console.log('VtkViewer - currentScan: value changed');
       this.initializeSlice();
@@ -160,7 +156,7 @@ export default {
     this.prepareViewer();
   },
   beforeMount() {
-    console.log('before mount');
+    console.log('VtkViewer - before mount');
   },
   beforeUnmount() {
     console.log('VtkViewer - before unmount');
@@ -173,7 +169,7 @@ export default {
       'SET_SLICE_LOCATION',
     ]),
     prepareViewer() {
-      console.log('VtkViewer - prepareViewer: Running');
+      console.group('VtkViewer - prepareViewer: Running');
       this.initializeView();
       this.initializeSlice();
       this.initializeCamera();
@@ -187,9 +183,9 @@ export default {
         if (entries.length === 1 && this.$refs.viewer && this.$refs.crosshairsCanvas) {
           // Getting the width of the viewer element.
           const width = this.$refs.viewer.clientWidth;
-          console.log('resizeObserver - width', width);
+          console.debug('resizeObserver - width', width);
           const height = this.$refs.viewer.clientHeight;
-          console.log('resizeObserver - height', height)
+          console.debug('resizeObserver - height', height)
           this.$refs.crosshairsCanvas.width = width;
           this.$refs.crosshairsCanvas.height = height;
           this.$refs.crosshairsCanvas.style.width = `${width}px`;
@@ -200,19 +196,22 @@ export default {
       });
       this.resizeObserver.observe(this.$refs.viewer);
       const representationProperty = this.representation.getActors()[0].getProperty();
+      console.debug('VtkViewer - prepareViewer: representationProperty', representationProperty);
       representationProperty.setColorWindow(this.currentWindowWidth);
       representationProperty.setColorLevel(this.currentWindowLevel);
+      console.groupEnd();
     },
     initializeSlice() {
       console.log('VtkViewer - initializeSlice: Running');
       if (this.name !== 'default') {
-        console.log('VtkViewer - initializeSlice: this.name', this.name);
+        console.debug('VtkViewer - initializeSlice: this.name', this.name);
         this.slice = this.representation.getSlice();
       }
     },
     initializeView() {
       console.log('VtkViewer - initializeView: Running');
       this.view.setContainer(this.$refs.viewer);
+      console.debug('VtkViewer - initializeView: this.view', this.view);
       fill2DView(this.view);
       if (this.name !== 'default') {
         this.modifiedSubscription = this.representation.onModified(() => {
@@ -235,30 +234,40 @@ export default {
         this.resized = true;
       });
     },
+    // Runs 6x
     initializeCamera() {
-      console.log('VtkViewer - initializeCamera: Running');
+      console.group('VtkViewer - initializeCamera: Running');
       const camera = this.view.getCamera();
+      console.debug('VtkViewer - initializeCamera: camera', camera);
       const orientation = this.representation.getInputDataSet().getDirection();
+      console.debug('VtkViewer - initializeCamera: orientation', orientation);
 
       let newViewUp = VIEW_ORIENTATIONS[this.renderOrientation][this.name].viewUp.slice();
+      console.debug('VtkViewer - initializeCamera: newViewUp', newViewUp);
       let newDirectionOfProjection = VIEW_ORIENTATIONS[
         this.renderOrientation
-      ][this.name].directionOfProjection;
+      ][this.name].directionOfProjection
+      console.debug('VtkViewer - initializeCamera: newDirectionOfProjection', newDirectionOfProjection);
       newViewUp = this.findClosestColumnToVector(
         newViewUp,
         orientation,
       );
+      console.debug('VtkViewer - initializeCamera: newViewUp', newViewUp);
       newDirectionOfProjection = this.findClosestColumnToVector(
         newDirectionOfProjection,
         orientation,
       );
+      console.debug('VtkViewer - initializeCamera: newDirectionOfProjection', newDirectionOfProjection);
 
       camera.setDirectionOfProjection(...newDirectionOfProjection);
       camera.setViewUp(...newViewUp);
 
       this.view.resetCamera();
       fill2DView(this.view);
+      console.debug('VtkViewer - initializeCamera: this.view', this.view);
+      console.groupEnd();
     },
+    // Runs 12x
     findClosestColumnToVector(inputVector, matrix) {
       console.log('VtkViewer - findClosestColumnToVector: Running');
       let currClosest = null;
@@ -281,6 +290,7 @@ export default {
       }
       return currClosest;
     },
+    // Ran in infinite loop
     trueAxis(axisName) {
       console.log('VtkViewer - trueAxis: Running');
       if (!this.representation.getInputDataSet()) return undefined;
@@ -356,17 +366,19 @@ export default {
         this.$refs.viewer.style.width = `${this.$refs.viewer.clientWidth - 3}px`;
       }, 100);
     },
+    // 8x
     changeSlice(newValue) {
       console.log('VtkViewer - changeSlice: Running');
       this.slice = newValue;
     },
+    // 12x
     roundSlice(value) {
       console.log('VtkViewer - roundSlice: Running');
       if (!value) return '';
       return Math.round(value * 100) / 100;
     },
     drawLine(ctx, displayLine) {
-      console.log('VtkViewer - drawLine: Running');
+      console.group('VtkViewer - drawLine: Running');
       if (!displayLine) return;
       ctx.strokeStyle = displayLine.color;
       ctx.beginPath();
@@ -375,10 +387,11 @@ export default {
       ctx.lineTo(...displayLine.end);
       console.log('VtkViewer - drawLine: displayLine.end', displayLine.end);
       ctx.stroke();
+      console.groupEnd();
     },
     updateCrosshairs() {
-      console.log('VtkViewer - updateCrosshairs: Running');
-      console.log(`VtkViewer - updateCrosshairs: proxyNum is ${this.proxyNum}`);
+      console.group('VtkViewer - updateCrosshairs: Running');
+      console.debug(`VtkViewer - updateCrosshairs: proxyNum is ${this.proxyNum}`);
       const myCanvas: HTMLCanvasElement = document.getElementById(`crosshairs-${this.name}`) as HTMLCanvasElement;
       if (myCanvas && myCanvas.getContext) {
         const ctx = myCanvas.getContext('2d');
@@ -395,7 +408,7 @@ export default {
             this.jIndexSlice[this.proxyNum],
             this.kIndexSlice[this.proxyNum],
           );
-          console.log(`VtkViewer - updateCrosshairs: this.crosshairSet`, this.crosshairSet)
+          console.debug(`VtkViewer - updateCrosshairs: this.crosshairSet`, this.crosshairSet)
           const originalColors = {
             x: '#fdd835',
             y: '#4caf50',
@@ -408,19 +421,22 @@ export default {
             this.trueAxis(this.name),
             trueColors,
           );
-          console.log('VtkViewer - updateCrosshairs: displayLine1, displayLine2', displayLine1, displayLine2);
+          console.debug('VtkViewer - updateCrosshairs: displayLine1, displayLine2', displayLine1, displayLine2);
           this.drawLine(ctx, displayLine1);
           this.drawLine(ctx, displayLine2);
+          console.groupEnd();
         }
       }
     },
     /**
      * Place crosshairs at the location of a click event
      *
+     * Only executed on click
+     *
      * @param clickEvent
      */
     placeCrosshairs(clickEvent) {
-      console.log('VtkViewer - placeCrosshairs: Running');
+      console.group('VtkViewer - placeCrosshairs: Running');
       const crosshairSet = new CrosshairSet(
         this.name,
         this.ijkName,
@@ -431,9 +447,10 @@ export default {
         this.jIndexSlice[this.proxyNum],
         this.kIndexSlice[this.proxyNum],
       );
-      console.log('VtkViewer - placeCrosshairs: crosshairSet', crosshairSet)
+      console.debug('VtkViewer - placeCrosshairs: crosshairSet', crosshairSet)
       const location = crosshairSet.locationOfClick(clickEvent);
       this.SET_SLICE_LOCATION(location);
+      console.groupEnd();
     },
     cleanup() {
       console.log('VtkViewer - cleanup: Running');
