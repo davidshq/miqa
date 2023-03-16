@@ -13,7 +13,7 @@ import router from './router';
 import store from './store';
 import { STATIC_PATH } from './constants';
 
-import './vtk/ColorMaps';
+// import './vtk/ColorMaps'; // TODO: Why?
 import vMousetrap from './vue-utilities/v-mousetrap';
 import snackbarService from './vue-utilities/snackbar-service';
 import promptService from './vue-utilities/prompt-service';
