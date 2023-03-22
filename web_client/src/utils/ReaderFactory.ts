@@ -1,7 +1,33 @@
-const READER_MAPPING = {};
+type ReadAsArrayBufferOptions = Partial<{
+  onDownloadProgress: () => void;
+}>
+
+type ReaderConfig = {
+  name: string,
+  vtkReader: any,
+  readMethod: 'readAsArrayBuffer' | 'readAsText',
+  parseMethod: 'parseAsArrayBuffer' | 'parseAsText',
+  fileNameMethod?: string,
+  fileSeriesMethod?: string,
+  sourceType: any,
+}
+
+export type ReaderFactoryConfig = {
+  extension: string
+  name: string
+  vtkReader: any
+  readMethod?: "readAsArrayBuffer" | "readAsText"
+  parseMethod?: "parseAsArrayBuffer" | "parseAsText"
+  fileNameMethod: string | null | undefined
+  fileSeriesMethod?: string | null | undefined
+  sourceType?: any
+  binary: boolean
+}
+
+const READER_MAPPING:Record<string, ReaderConfig> = {};
 
 const FETCH_DATA = {
-  readAsArrayBuffer(axios, url, signal, { onDownloadProgress } = {}) {
+  readAsArrayBuffer(axios, url, signal, { onDownloadProgress }: ReadAsArrayBufferOptions = {}) {
     console.log('ReaderFactory - FETCH_DATA - readAsArrayBuffer: Running');
     return axios
       .get(url, {
@@ -23,7 +49,7 @@ function registerReader({
   fileSeriesMethod,
   sourceType,
   binary,
-}) {
+}: ReaderFactoryConfig) {
   console.log('ReaderFactory - registerReader: Running');
   READER_MAPPING[extension] = {
     name,
@@ -60,7 +86,7 @@ function getReader({ fileName }) {
  * @param onDownloadProgress  downloadLoaded and downloadTotal, see Scan.vue
  * @returns {{promise: Promise<unknown>, abortController: AbortController}}
  */
-function downloadFrame(axios, fileName, url, { onDownloadProgress } = {}) {
+function downloadFrame(axios, fileName, url, { onDownloadProgress }: ReadAsArrayBufferOptions = {}) {
   console.log('ReaderFactory - downloadFrame: Running');
   const abortController = new AbortController();
 
