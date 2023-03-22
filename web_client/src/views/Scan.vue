@@ -138,6 +138,9 @@ export default {
           >
             <VtkViewer :view="vtkView" />
           </div>
+          <!--<div class="view">
+            <VtkViewer :view="vtkViews[0][0]" />
+          </div> -->
         </div>
         <!-- Show Error Loading Frame -->
         <v-row

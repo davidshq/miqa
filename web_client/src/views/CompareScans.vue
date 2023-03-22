@@ -138,8 +138,6 @@ export default {
       if (proxyNum === 1) {
         this.vtkView1Loaded = true;
         console.log('CompareScans.vue - loadImage: vtkView1Loaded', this.vtkView1Loaded);
-        console.log('CompareScans.vue - loadImage: vtkViews[1]', this.vtkViews[1]);
-        console.log('CompareScans.vue - loadImage: vtkView[1][0]', this.vtkViews[1][0]);
       } else if (proxyNum === 2) {
         this.vtkView2Loaded = true;
         console.log('CompareScans.vue - loadImage: vtkView2Loaded', this.vtkView2Loaded);
@@ -327,101 +325,4 @@ export default {
 
 .selectProject { grid-area: selectProject; }
 .selectExperiment { grid-area: selectExperiment; }
-
-.my-layout {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  //display: flex;
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: 1fr;
-
-  .view {
-    position: relative;
-    //flex: 1 0 0;
-
-    border: 1.5px solid white;
-    border-top: none;
-    border-bottom: none;
-
-    &:first-child {
-      border-left: none;
-    }
-
-    &:last-child {
-      border-right: none;
-    }
-  }
-}
-
-.frame {
-  .scans-bar {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-
-    .scans-view {
-      overflow: auto;
-    }
-  }
-
-  .layout-container {
-    position: relative;
-  }
-
-  .v-btn.smaller {
-    height: 35px;
-    width: 35px;
-  }
-
-  .bottom {
-    > .container {
-      position: relative;
-    }
-
-    .buttons {
-      width: 100%;
-
-      .v-btn {
-        height: 36px;
-        opacity: 1;
-        flex: 1;
-      }
-    }
-  }
-}
-
-.theme--light.v-btn.v-btn--disabled:not(.v-btn--flat):not(.v-btn--text):not(.v-btn-outlined),
-.theme--light.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn-outlined),
-.v-btn::before {
-  background-color: transparent !important;
-}
-
-</style>
-
-<style lang="scss">
-.load-completion {
-  font-size: 1.1em;
-}
-
-.justifyRight {
-  text-align: right;
-}
-
-.frame {
-  .v-text-field.small .v-input__control {
-    min-height: 36px !important;
-  }
-
-  .note-field .v-input__control {
-    min-height: 36px !important;
-  }
-
-  .v-input--slider.frame-slider {
-    margin-top: 0;
-  }
-}
 </style>
