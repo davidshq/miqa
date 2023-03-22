@@ -30,8 +30,8 @@ interface ScanDecision {
   decision: string,
   note: string,
   user_identified_artifacts: {
-    present: String[],
-    absent: String[],
+    present: string[],
+    absent: string[],
   },
   location: {
     i: number,
@@ -70,7 +70,7 @@ interface ProjectSettings {
   import_path: string,
   export_path: string,
   anatomy_orientation?: string,
-  permissions?: Object,
+  permissions?: object,
   artifacts?: Array<string>[],
 }
 

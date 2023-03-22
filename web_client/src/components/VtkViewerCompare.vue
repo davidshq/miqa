@@ -1,7 +1,7 @@
 <script lang="ts">
 import { vec3 } from 'gl-matrix';
 
-import { mapState, mapGetters, mapMutations } from 'vuex';
+import { mapState, mapMutations } from 'vuex';
 
 import CrosshairSet from '../utils/crosshairs';
 import fill2DView from '../utils/fill2DView';
