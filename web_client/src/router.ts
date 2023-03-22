@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 
-import Projects from './views/Projects.vue';
+import ProjectsView from './views/Projects.vue';
 import Scan from './views/Scan.vue';
 import CompareScans from "./views/CompareScans.vue";
 import SoloScan from './views/SoloScan.vue';
@@ -13,7 +13,7 @@ export default new Router({
     {
       path: '/',
       name: 'projects',
-      component: Projects,
+      component: ProjectsView,
     },
     {
       path: '/comparescans',
@@ -29,7 +29,7 @@ export default new Router({
     {
       path: '/:projectId?/complete',
       name: 'projectComplete',
-      component: Projects,
+      component: ProjectsView,
     },
     {
       path: '/:projectId?/:scanId?',

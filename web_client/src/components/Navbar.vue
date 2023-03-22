@@ -11,7 +11,7 @@ import UserAvatar from '@/components/UserAvatar.vue';
 import djangoClient from '@/django';
 
 export default defineComponent({
-  name: 'Navbar',
+  name: 'NavbarView',
   components: {
     UserAvatar,
     UserButton,

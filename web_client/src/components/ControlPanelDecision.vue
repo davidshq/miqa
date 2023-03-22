@@ -52,19 +52,18 @@ export default {
     ]),
     // The list of artifacts generally should not change unless the project changes
     artifacts() {
-      // TODO: Verify else is properly triggered if no artifacts set for project
       if (this.currentProject.settings.artifacts !== 'undefined') {
         const currentArtifacts = this.currentProject.settings.artifacts;
         return currentArtifacts.map((name) => ({
           value: name,
           labelText: this.convertValueToLabel(name),
         }));
-      } else {
-        return this.MIQAConfig.artifact_options.map((name) => ({
-          value: name,
-          labelText: this.convertValueToLabel(name),
-        }));
       }
+
+      return this.MIQAConfig.artifact_options.map((name) => ({
+        value: name,
+        labelText: this.convertValueToLabel(name),
+      }));
     },
     // Returns an array containing the name of an artifact and it's current selection state
     chips() {

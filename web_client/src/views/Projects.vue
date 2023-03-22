@@ -10,17 +10,17 @@ import store from '@/store';
 import djangoRest from '@/django';
 import { Project, ScanState } from '@/types';
 import ExperimentsView from '@/components/ExperimentsView.vue';
-import Navbar from '@/components/Navbar.vue';
+import NavbarView from '@/components/Navbar.vue';
 import ProjectSettings from '@/components/ProjectSettings.vue';
 import ProjectUsers from '@/components/ProjectUsers.vue';
 
 Vue.use(Donut);
 
 export default defineComponent({
-  name: 'Projects',
+  name: 'ProjectsView',
   components: {
     ExperimentsView,
-    Navbar,
+    NavbarView,
     ProjectSettings,
     ProjectUsers,
   },
@@ -236,7 +236,7 @@ export default defineComponent({
 
 <template>
   <div v-if="user">
-    <Navbar />
+    <NavbarView />
     <div class="d-flex">
       <v-card class="project-list-container">
         <v-navigation-drawer permanent>
