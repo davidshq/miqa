@@ -48,7 +48,7 @@ export default {
     // Returning representation from VTK
     representation() {
       console.log('VtkViewer - representation: Running');
-      console.debug('VtkViewer - representation: getRepresentation', this.proxyManager[this.proxyNum].getRepresentation(null, this.view));
+      console.debug('representation: getRepresentation', this.proxyManager[this.proxyNum].getRepresentation(null, this.view));
       return (
         // force add dependency on currentFrame
         this.currentFrame
@@ -57,9 +57,10 @@ export default {
     },
     // Returns the range of valid values and their step for the slice property
     sliceDomain() {
-      console.log('VtkViewer - sliceDomain: Running');
+      console.group('sliceDomain: Running');
       if (!this.representation) return null;
-      console.debug('VtkViewer - sliceDomain: PropertyDomainByName', this.representation.getPropertyDomainByName('slice'));
+      console.debug('PropertyDomainByName', this.representation.getPropertyDomainByName('slice'));
+      console.groupEnd()
       return this.representation.getPropertyDomainByName('slice');
     },
     name() : ('x' | 'y' | 'z') {
@@ -193,7 +194,7 @@ export default {
       });
       this.resizeObserver.observe(this.$refs.viewer);
       const representationProperty = this.representation.getActors()[0].getProperty();
-      console.debug('VtkViewer - prepareViewer: representationProperty', representationProperty);
+      console.debug('representationProperty', representationProperty);
       representationProperty.setColorWindow(this.currentWindowWidth);
       representationProperty.setColorLevel(this.currentWindowLevel);
       console.groupEnd();
@@ -235,33 +236,33 @@ export default {
     initializeCamera() {
       console.group('VtkViewer - initializeCamera: Running');
       const camera = this.view.getCamera();
-      console.debug('VtkViewer - initializeCamera: camera', camera);
+      console.debug('camera', camera);
       const orientation = this.representation.getInputDataSet().getDirection();
-      console.debug('VtkViewer - initializeCamera: orientation', orientation);
+      console.debug('orientation', orientation);
 
       let newViewUp = VIEW_ORIENTATIONS[this.renderOrientation][this.name].viewUp.slice();
-      console.debug('VtkViewer - initializeCamera: newViewUp', newViewUp);
+      console.debug('newViewUp', newViewUp);
       let newDirectionOfProjection = VIEW_ORIENTATIONS[
         this.renderOrientation
       ][this.name].directionOfProjection
-      console.debug('VtkViewer - initializeCamera: newDirectionOfProjection', newDirectionOfProjection);
+      console.debug('newDirectionOfProjection', newDirectionOfProjection);
       newViewUp = this.findClosestColumnToVector(
         newViewUp,
         orientation,
       );
-      console.debug('VtkViewer - initializeCamera: newViewUp', newViewUp);
+      console.debug('newViewUp Updated', newViewUp);
       newDirectionOfProjection = this.findClosestColumnToVector(
         newDirectionOfProjection,
         orientation,
       );
-      console.debug('VtkViewer - initializeCamera: newDirectionOfProjection', newDirectionOfProjection);
+      console.debug('newDirectionOfProjection', newDirectionOfProjection);
 
       camera.setDirectionOfProjection(...newDirectionOfProjection);
       camera.setViewUp(...newViewUp);
 
       this.view.resetCamera();
       fill2DView(this.view);
-      console.debug('VtkViewer - initializeCamera: this.view', this.view);
+      console.debug('this.view', this.view);
       console.groupEnd();
     },
     // Runs 12x
@@ -378,17 +379,18 @@ export default {
       console.group('VtkViewer - drawLine: Running');
       if (!displayLine) return;
       ctx.strokeStyle = displayLine.color;
+      ctx.strokeStyle = displayLine.color;
       ctx.beginPath();
       ctx.moveTo(...displayLine.start);
-      console.log('VtkViewer - drawLine: displayLine.start', displayLine.start);
+      console.log('displayLine.start', displayLine.start);
       ctx.lineTo(...displayLine.end);
-      console.log('VtkViewer - drawLine: displayLine.end', displayLine.end);
+      console.log('displayLine.end', displayLine.end);
       ctx.stroke();
       console.groupEnd();
     },
     updateCrosshairs() {
       console.group('VtkViewer - updateCrosshairs: Running');
-      console.debug(`VtkViewer - updateCrosshairs: proxyNum is ${this.proxyNum}`);
+      console.debug('proxyNum', this.proxyNum);
       const myCanvas: HTMLCanvasElement = document.getElementById(`crosshairs-${this.name}`) as HTMLCanvasElement;
       if (myCanvas && myCanvas.getContext) {
         const ctx = myCanvas.getContext('2d');
@@ -405,7 +407,7 @@ export default {
             this.jIndexSlice[this.proxyNum],
             this.kIndexSlice[this.proxyNum],
           );
-          console.debug(`VtkViewer - updateCrosshairs: this.crosshairSet`, this.crosshairSet)
+          console.debug(`this.crosshairSet`, this.crosshairSet)
           const originalColors = {
             x: '#fdd835',
             y: '#4caf50',
@@ -418,7 +420,7 @@ export default {
             this.trueAxis(this.name),
             trueColors,
           );
-          console.debug('VtkViewer - updateCrosshairs: displayLine1, displayLine2', displayLine1, displayLine2);
+          console.debug('displayLine1, displayLine2', displayLine1, displayLine2);
           this.drawLine(ctx, displayLine1);
           this.drawLine(ctx, displayLine2);
           console.groupEnd();
@@ -444,7 +446,7 @@ export default {
         this.jIndexSlice[this.proxyNum],
         this.kIndexSlice[this.proxyNum],
       );
-      console.debug('VtkViewer - placeCrosshairs: crosshairSet', crosshairSet)
+      console.debug('crosshairSet', crosshairSet)
       const location = crosshairSet.locationOfClick(clickEvent);
       this.SET_SLICE_LOCATION(location);
       console.groupEnd();
