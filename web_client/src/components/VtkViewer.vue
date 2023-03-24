@@ -155,9 +155,6 @@ export default {
     console.log('VtkViewer - mounted');
     this.prepareViewer();
   },
-  beforeMount() {
-    console.log('VtkViewer - before mount');
-  },
   beforeUnmount() {
     console.log('VtkViewer - before unmount');
     this.cleanup();
