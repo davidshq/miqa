@@ -40,22 +40,25 @@ class CrosshairSet {
   ) {
     console.group('Crosshairs.js - CrosshairSet - constructor: Running');
     this.xyzName = xyzName;
-    console.debug('Crosshairs.js - CrosshairSet - constructor: xyzName: ', xyzName);
+    console.debug('constructor: xyzName: ', xyzName);
     this.ijkName = ijkName;
-    console.debug('Crosshairs.js - CrosshairSet - constructor: ijkName: ', ijkName);
+    console.debug('constructor: ijkName: ', ijkName);
     this.imageRepresentation = imageRepresentation;
-    this.imageData = this.imageRepresentation.getInputDataSet();
+    this.imageData = this.imageRepresentation.getImageData; // .getInputDataSet()
+    console.debug('constructor: imageRepresentation', imageRepresentation);
+    console.debug('constructor: imageData', this.imageData);
+    console.debug('className:', imageRepresentation.getClassName());
     this.imageView = imageView;
     this.renderer = this.imageView.getRenderer();
     this.renderWindow = this.imageView.getOpenglRenderWindow();
     this.imageCanvas = imageCanvas;
-    console.debug('Crosshairs.js - CrosshairSet - constructor: imageCanvas: ', imageCanvas);
+    console.debug('constructor: imageCanvas: ', imageCanvas);
     this.iSlice = iSlice;
-    console.debug('Crosshairs.js - CrosshairSet - constructor: iSlice: ', iSlice);
+    console.debug('constructor: iSlice: ', iSlice);
     this.jSlice = jSlice;
-    console.debug('Crosshairs.js - CrosshairSet - constructor: jSlice: ', jSlice);
+    console.debug('constructor: jSlice: ', jSlice);
     this.kSlice = kSlice;
-    console.debug('Crosshairs.js - CrosshairSet - constructor: kSlice: ', kSlice);
+    console.debug('constructor: kSlice: ', kSlice);
     this.ijkMapping = {
       x: 'i',
       y: 'j',
