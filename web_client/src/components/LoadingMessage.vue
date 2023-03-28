@@ -1,6 +1,6 @@
 <script lang="ts">
 import { mapState } from 'vuex';
-import formatSize from '@/utils/helper';
+import formatSize from '@/utils/calculateDownloadSize';
 
 export default {
   name: 'LoadingMessage',
