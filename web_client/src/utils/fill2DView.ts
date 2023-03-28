@@ -1,6 +1,6 @@
 // Used in VtkViewer
 export default function fill2DView(view, w?, h?, resize = true) {
-  console.log('fill2DView.js - fill2DView: Running');
+  console.debug('fill2DView: Running');
   if (!view) return undefined;
   if (resize) view.resize();
   const viewName = view.getName();
@@ -12,7 +12,7 @@ export default function fill2DView(view, w?, h?, resize = true) {
     (bounds[3] - bounds[2]) / 2,
     (bounds[5] - bounds[4]) / 2,
   ];
-  console.debug('fill2DView - dim', dim);
+  console.debug('dim', dim);
   w = w || view.getContainer().clientWidth;
   h = h || view.getContainer().clientHeight;
   const r = w / h;
@@ -36,5 +36,6 @@ export default function fill2DView(view, w?, h?, resize = true) {
     view.resize();
     view.getCamera().setParallelScale(scale);
   }
+  console.groupEnd();
   return scale;
 }
