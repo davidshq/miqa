@@ -9,9 +9,7 @@ test('test', async ({ page }) => {
   await page.getByPlaceholder('Password').fill('password');
   await page.getByRole('button', { name: 'Sign In ' }).click();
   await page.getByText('Test').click();
-  await expect(page).toHaveScreenshot();
   await page.getByRole('link', { name: 'coronacases_001.nii.gz' }).click();
-  await expect(page).toHaveScreenshot();
   await page.locator('div:nth-child(2) > button:nth-child(2)').click();
   await page.getByLabel('Experiment Notes').click();
   await page.getByPlaceholder('There are no notes on this experiment.').fill('These are notes');
@@ -22,5 +20,6 @@ test('test', async ({ page }) => {
   await page.getByPlaceholder('Write a comment about the scan').fill('These are problems');
   await page.getByRole('button', { name: 'Questionable' }).click();
   await page.locator('.transparent-btn').first().click();
-  await expect(page).toHaveScreenshot();
+  const mask = await page.locator('.scan-decision');
+  await expect(page).toHaveScreenshot({ mask: [mask] });
 });

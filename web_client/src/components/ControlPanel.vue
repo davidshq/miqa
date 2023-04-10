@@ -431,6 +431,7 @@ export default defineComponent({
                       >
                         <ScanDecision
                           v-for="decision in currentViewData.scanDecisions"
+                          class="scan-decision"
                           :key="decision.id"
                           :decision="decision"
                         />
