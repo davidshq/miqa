@@ -11,7 +11,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./.github/actions/tox
       - uses: ./.github/actions/npm
       - run: tox -e lint
@@ -40,7 +40,7 @@ jobs:
         ports:
           - 9000:9000
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./.github/actions/lfs
       - uses: ./.github/actions/tox
       - run: tox
@@ -51,7 +51,7 @@ jobs:
           DJANGO_MINIO_STORAGE_ACCESS_KEY: minioAccessKey
           DJANGO_MINIO_STORAGE_SECRET_KEY: minioSecretKey
           DJANGO_STORAGE_BUCKET_NAME: django-storage
-      - uses: codecov/codecov-action@v2
+      - uses: codecov/codecov-action@v3
         with:
           fail_ci_if_error: true
 
@@ -77,7 +77,7 @@ jobs:
         ports:
           - 9000:9000
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ./.github/actions/tox
       - uses: ./.github/actions/lfs
       - uses: ./.github/actions/npm
