@@ -293,7 +293,6 @@ def perform_import(import_dict):
                 new_scans.append(scan_object)
                 # Create Frames
                 for frame_number, frame_data in scan_data['frames'].items():
-
                     if frame_data['file_location']:
                         frame_object = Frame(
                             frame_number=frame_number,
