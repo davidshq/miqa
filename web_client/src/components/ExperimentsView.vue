@@ -1,6 +1,4 @@
 <script lang="ts">
-/** The ExperimentsView appears on the ProjectsView once a project has been selected.
- * It also appears on Scan.vue inside a collapsible sidebar. */
 import _ from 'lodash';
 import {
   mapState, mapGetters, mapMutations, mapActions,
@@ -46,20 +44,17 @@ export default {
     ]),
     ...mapGetters([
       'currentScan',
-      'currentExperiment'
+      'currentExperiment',
     ]),
     // Gets the experiments based on the experiment ids
-    // TODO: Why do we need this rather than directly accessing experiments?
     orderedExperiments() {
       return this.experimentIds.map((expId) => this.experiments[expId]);
     },
-    // Which loading icon to show
     loadingIcon() {
       return this.loadingExperiment
         ? 'mdi-progress-clock'
         : 'mdi-check-circle-outline';
     },
-    // What color the loading icon should be
     loadingIconColor() {
       return this.loadingExperiment ? 'red' : 'green';
     },
@@ -86,21 +81,12 @@ export default {
       'loadProject',
     ]),
     includeScan,
-    /**
-     * Gets all scans associated with the provided experiment id
-     *
-     * TODO: For unknown reason we seem to be running this function 3x+ (numOfScans)
-     *
-     * @param expId String  Experiment id
-     */
+    /** Gets all scans associated with the provided experimentId */
     scansForExperiment(expId) {
-      // Get the ids of all scans in specified experiment
-      // expId looks like: c06a53c8-3d1e-479e-9c13-731886a69b47
       const expScanIds = this.experimentScans[expId];
       return expScanIds.filter(
         (scanId) => Object.keys(this.scans).includes(scanId),
       ).map((scanId) => {
-        // scanId looks like: 1ec0847e-b324-4bf4-9b42-bf11215fdea4
         const scan = this.scans[scanId];
         return {
           ...scan,
@@ -108,15 +94,8 @@ export default {
         };
       });
     },
-    /**
-     * Receives a string like "NCANDA_E08710" (name of an image file),
-     * this is used as the experiment name
-     *
-     * TODO: This function is called ~4x times the number of experiments + scans in the project.
-     *
-     * @param str
-     * @returns {string|*}
-     */
+    /** Receives a string like "NCANDA_E08710" (name of an image file),
+     * this is used as the experiment name */
     ellipsisText(str) {
       if (!this.minimal) return str;
       if (str.length > 25) {
@@ -130,12 +109,7 @@ export default {
     getURLForScan(scanId) {
       return `/${this.currentProject.id}/${scanId}`;
     },
-    /**
-     * Assigns a color and character if a decision has been rendered on a given scan
-     *
-     * @param decisions Array of objects
-     * @returns {{decision: (*|string), color: string}|{}}
-     */
+    /** Assigns a color and character if a decision has been rendered on a given scan */
     decisionToRating(decisions) {
       // decisions are an array of objects
       if (decisions.length === 0) return {};
@@ -160,9 +134,7 @@ export default {
     },
     scanState(scan) {
       let scanTaskState;
-      // If we have a value for currentTaskOverview
       if (this.currentTaskOverview) {
-        // Get the task state for the current scan
         scanTaskState = this.currentTaskOverview.scan_states[scan.id];
       }
       return scanTaskState || 'unreviewed';
@@ -175,12 +147,10 @@ export default {
       }
       return classes;
     },
-    // TODO: Would be good to extract this into a separate component,
-    // This is only needed in Project view, not in Frame vue, delays for .5 seconds
     delayPrepareDropZone() {
       setTimeout(this.prepareDropZone, 500);
     },
-    // Listens for images being dragged into the dropzone
+    /** Listens for images being dragged into the dropzone */
     prepareDropZone() {
       const dropZone = document.getElementById('dropZone');
       if (dropZone) {
@@ -194,11 +164,10 @@ export default {
         });
       }
     },
-    // Gets files that are dropped
+    /** Gets files dropped into the dropzone */
     addDropFiles(e) {
       this.fileSetForUpload = [...e.dataTransfer.files];
     },
-    /** Uploads images to experiment */
     async uploadToExperiment() {
       let experimentId;
       this.uploading = true;
@@ -207,12 +176,13 @@ export default {
         if (!this.uploadToExisting) {
           // Create a new experiment, below returns instance of ResponseData
           const newExperiment = await djangoRest.createExperiment(
-            this.currentProject.id, this.experimentNameForUpload,
+            this.currentProject.id,
+            this.experimentNameForUpload,
           );
           // Get the experiments' new id, can't find id b/c ResponseData doesn't have it
           // @ts-ignore - TODO: Fix this
           experimentId = newExperiment.id;
-        } else { // If uploading to existing experiment
+        } else {
           // Find the experiment's id that matches the experiment selected
           experimentId = Object.values(this.experiments).find(
             // @ts-ignore - TODO: Fix this
@@ -305,7 +275,7 @@ export default {
                     <v-btn
                       icon
                       style="float:right"
-                      @click="showDeleteModal=false"
+                      @click="showDeleteModal = false"
                     >
                       <v-icon>mdi-close</v-icon>
                     </v-btn>
@@ -375,7 +345,7 @@ export default {
                     </v-btn>
                   </template>
                   <span>
-                    {{ scan.decision ? decisionOptions[scan.decision] +', ' : '' }}
+                    {{ scan.decision ? decisionOptions[scan.decision] + ', ' : '' }}
                     {{ scanState(scan) }}
                   </span>
                 </v-tooltip>
@@ -411,7 +381,7 @@ export default {
           >
             <v-btn
               class="green white--text"
-              @click="() => {experimentNameForUpload = ''}"
+              @click="() => { experimentNameForUpload = '' }"
             >
               + Add Scans...
             </v-btn>
@@ -422,7 +392,7 @@ export default {
           <v-btn
             icon
             style="float:right"
-            @click="showUploadModal=false"
+            @click="showUploadModal = false"
           >
             <v-icon>mdi-close</v-icon>
           </v-btn>
@@ -444,7 +414,7 @@ export default {
                 dense
                 style="display: inline-block; max-height: 40px; max-width: 60px;"
                 class="px-3 ma-0"
-                @change="(value) => {uploadToExisting = value; experimentNameForUpload = ''}"
+                @change="(value) => { uploadToExisting = value; experimentNameForUpload = '' }"
               />
               <span
                 :class="!(orderedExperiments && orderedExperiments.length) ? 'grey--text' : ''"
@@ -490,7 +460,7 @@ export default {
                   class="text-overline grey--text text--darken-3 mx-2"
                 >
                   +{{ fileSetForUpload.length - 2 }}
-                  file{{ fileSetForUpload.length - 2 > 1 ? 's' :'' }}
+                  file{{ fileSetForUpload.length - 2 > 1 ? 's' : '' }}
                 </span>
               </template>
             </v-file-input>
