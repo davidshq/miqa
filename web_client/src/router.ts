@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 
 import ProjectsView from './views/Projects.vue';
-import Scan from './views/Scan.vue';
+import ScanView from './views/Scan.vue';
 import CompareScans from "./views/CompareScans.vue";
 import SoloScan from './views/SoloScan.vue';
 
@@ -34,7 +34,7 @@ export default new Router({
     {
       path: '/:projectId?/:scanId?',
       name: 'scan',
-      component: Scan,
+      component: ScanView,
     },
     {
       path: '*',

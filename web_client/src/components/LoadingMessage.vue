@@ -5,8 +5,12 @@ import formatSize from '@/utils/calculateDownloadSize';
 export default {
   name: 'LoadingMessage',
   props: {
-    downloadLoaded: {},
-    downloadTotal: {},
+    downloadLoaded: {
+      default: 0,
+    },
+    downloadTotal: {
+      default: 0,
+    },
   },
   computed: {
     ...mapState([

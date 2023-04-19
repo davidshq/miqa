@@ -11,7 +11,7 @@ import VtkViewer from '@/components/VtkViewer.vue';
 import LoadingMessage from '@/components/LoadingMessage.vue';
 
 export default {
-  name: 'Scan',
+  name: 'ScanView',
   components: {
     LoadingMessage,
     Navbar,
