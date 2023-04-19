@@ -95,9 +95,9 @@ export default {
     },
   },
   watch: {
-    slice(newValue, oldValue) {
-      console.log('VtkViewer - slice: value changed, newValue, oldValue', newValue, oldValue);
-      this.representation.setSlice(newValue);
+    slice(newSlice) {
+      console.log('VtkViewer - slice: value changed, newSlice: ', newSlice);
+      this.representation.setSlice(newSlice);
       if (this.SET_CURRENT_VTK_INDEX_SLICES) {
         console.debug('VtkViewer - slice: whichProxy', this.proxyNum);
         this.SET_CURRENT_VTK_INDEX_SLICES({
@@ -171,7 +171,7 @@ export default {
       this.initializeView();
       this.initializeSlice();
       this.initializeCamera();
-      // this.updateCrosshairs();
+      this.updateCrosshairs();
       this.renderSubscription = this.view.getInteractor().onRenderEvent(() => {
         console.debug('renderSubscription kicked off');
         this.updateCrosshairs();
@@ -308,7 +308,7 @@ export default {
       const dataURL = await this.view.captureImage();
 
       const imageOutput = await (
-        async (file) : Promise<HTMLImageElement> => new Promise((resolve) => {
+        async (file) : Promise<HTMLImageElement> => new Promise<HTMLImageElement>((resolve) => {
           const img = new Image();
           img.onload = () => {
             resolve(img);
