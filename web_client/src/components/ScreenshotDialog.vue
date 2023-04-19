@@ -29,8 +29,9 @@ export default {
       if (this.fileType === 'png') {
         return this.currentScreenshot.dataURL;
       }
-      // @ts-ignore - TODO: fix this
-      const { image, width, height } = await (async (file) => new Promise((resolve) => {
+      const { image, width, height }: {
+        image: HTMLImageElement, width: number, height: number
+      } = await (async (file) => new Promise((resolve) => {
         const img = new Image();
         img.onload = () => {
           resolve({ image: img, width: img.width, height: img.height });

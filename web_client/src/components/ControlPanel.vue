@@ -36,7 +36,7 @@ export default {
     },
   },
   watch: {
-    // Update the experiment that is locked
+    // Update locked experiment when experiment changes
     experimentId(newValue, oldValue) {
       this.switchLock(newValue, oldValue);
       clearInterval(this.lockCycle);
@@ -51,8 +51,8 @@ export default {
       this.switchLock(this.currentViewData.experimentId);
       // Handles key presses
       window.addEventListener('keydown', (event) => {
-        // @ts-ignore - TODO: Fix this
-        if (['textarea', 'input'].includes(document.activeElement.type)) return;
+        const activeElement = document.activeElement as HTMLElement;
+        if (['textarea', 'input'].includes(activeElement.tagName.toLowerCase())) return;
         if (event.key === 'ArrowUp') {
           this.handleKeyPress('previous');
         } else if (event.key === 'ArrowDown') {
@@ -79,8 +79,6 @@ export default {
     ]),
     /**
      * Release lock on old experiment, set lock on new experiment
-     *
-     * Note: Lock is only set if the user has edit rights
      */
     async switchLock(newExperimentId, oldExperimentId = null, force = false) {
       if (!this.navigateToNextIfCurrentScanNull()) {
@@ -122,8 +120,6 @@ export default {
           .catch(this.handleNavigationError);
       }
     },
-    // Handles navigation key presses
-    // TODO: Does it make sense to rename `handleKeyPress` to `handleNavigationKeyPress`?
     handleKeyPress(direction) {
       this.direction = direction;
       if (this.direction === 'back') {

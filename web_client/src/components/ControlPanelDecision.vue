@@ -37,7 +37,6 @@ export default {
   },
   computed: {
     ...mapState([
-      'currentViewData', // TODO: Remove this, it is a getter
       'currentProject',
       'proxyManager',
       'vtkViews',
@@ -69,28 +68,18 @@ export default {
     chips() {
       return this.artifacts.map((artifact) => [artifact, this.getCurrentChipState(artifact)]);
     },
-    /**
-     * Determines which artifacts are suggested.
-     *
-     * Artifacts are suggested either:
-     *
-     * 1. By a prior user decision
-     * 2. By auto evaluation
+    /** Determines which artifacts are suggested.
+     * Artifacts are suggested either: 1. By a prior user decision or 2. By auto evaluation
      */
     suggestedArtifacts() {
-      // TODO: Should create reusable null check function
-      // See: https://deviq.com/design-patterns/guard-clause
       if (!this.currentViewData.scanDecisions) {
         return [];
       }
-      // TODO: Same here.
       if (this.currentViewData.scanDecisions.length > 0) {
-        // Get the most recent decision
         const lastDecision = _.sortBy(
           this.currentViewData.scanDecisions, (decision) => { Date.parse(decision.created); },
         )[0];
         // Gets the artifacts associated with the most recent decision
-        // TODO: Are these actually user identified or are they also auto evaluation?
         const lastDecisionArtifacts = lastDecision.user_identified_artifacts;
         // Of the artifacts chosen in the last scanDecision,
         // include only those marked as present.
@@ -114,7 +103,6 @@ export default {
     },
     // Displays the decision buttons based on user's roles
     options() {
-      // Basic option
       const myOptions = [
         {
           label: 'Usable',
@@ -182,10 +170,7 @@ export default {
     async pollForEvaluation() {
       // Get a frame from API
       const frameData = await djangoRest.frame(this.currentViewData.currentFrame.id);
-      // If there is a frame_evaluation
-      // @ts-ignore - TODO: Fix this
       if (frameData.frame_evaluation) {
-        // @ts-ignore - TODO: Fix this
         this.SET_FRAME_EVALUATION(frameData.frame_evaluation);
         clearInterval(this.pollInterval);
       }
@@ -212,8 +197,6 @@ export default {
      *
      * Four possible states are: confirmed present, confirmed absent,
      * suggested unconfirmed, unsuggested unconfirmed (default)
-     *
-     * @param artifact
      */
     getCurrentChipState(artifact) {
       const chipState = {
@@ -224,7 +207,6 @@ export default {
         textDecoration: 'none',
         textColor: 'default',
       };
-      // TODO: Switch statement?
       if (this.confirmedPresent.includes(artifact.value)) {
         // confirmed present
         chipState.state = 1;
@@ -244,12 +226,7 @@ export default {
       }
       return chipState;
     },
-    /**
-     * Changes the state of a chip when it has been clicked upon
-     *
-     * @param artifact
-     * @param chipState
-     */
+    /** Changes the state of a chip when it has been clicked upon */
     clickChip(artifact, chipState) {
       switch (chipState) {
         case 1:

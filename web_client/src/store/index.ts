@@ -21,14 +21,15 @@ import { proxy } from '../vtk';
 import { getView } from '../vtk/viewManager';
 import { ijkMapping } from '../vtk/constants';
 
-import { RESET_STATE, SET_MIQA_CONFIG, SET_ME, SET_ALL_USERS, RESET_PROJECT_STATE, SET_CURRENT_FRAME_ID,
-         SET_FRAME, SET_SCAN, SET_RENDER_ORIENTATION, SET_CURRENT_PROJECT, SET_GLOBAL_SETTINGS,
-         SET_TASK_OVERVIEW, SET_PROJECTS, ADD_SCAN_DECISION, SET_FRAME_EVALUATION, SET_CURRENT_SCREENSHOT,
-         ADD_SCREENSHOT, REMOVE_SCREENSHOT, UPDATE_LAST_API_REQUEST_TIME, SET_LOADING_FRAME,
-         SET_ERROR_LOADING_FRAME, ADD_SCAN_FRAMES, ADD_EXPERIMENT_SCANS, ADD_EXPERIMENT,
-         UPDATE_EXPERIMENT, SET_WINDOW_LOCKED, SET_SCAN_CACHED_PERCENTAGE, SET_SLICE_LOCATION,
-         SET_CURRENT_VTK_INDEX_SLICES, SET_SHOW_CROSSHAIRS, SET_STORE_CROSSHAIRS, SET_REVIEW_MODE
-       } from './mutation-types';
+import {
+  RESET_STATE, SET_MIQA_CONFIG, SET_ME, SET_ALL_USERS, RESET_PROJECT_STATE, SET_CURRENT_FRAME_ID,
+  SET_FRAME, SET_SCAN, SET_RENDER_ORIENTATION, SET_CURRENT_PROJECT, SET_GLOBAL_SETTINGS,
+  SET_TASK_OVERVIEW, SET_PROJECTS, ADD_SCAN_DECISION, SET_FRAME_EVALUATION, SET_CURRENT_SCREENSHOT,
+  ADD_SCREENSHOT, REMOVE_SCREENSHOT, UPDATE_LAST_API_REQUEST_TIME, SET_LOADING_FRAME,
+  SET_ERROR_LOADING_FRAME, ADD_SCAN_FRAMES, ADD_EXPERIMENT_SCANS, ADD_EXPERIMENT,
+  UPDATE_EXPERIMENT, SET_WINDOW_LOCKED, SET_SCAN_CACHED_PERCENTAGE, SET_SLICE_LOCATION,
+  SET_CURRENT_VTK_INDEX_SLICES, SET_SHOW_CROSSHAIRS, SET_STORE_CROSSHAIRS, SET_REVIEW_MODE,
+} from './mutation-types';
 
 const { convertItkToVtkImage } = ITKHelper;
 
@@ -282,8 +283,9 @@ function startReaderWorkerPool() {
     });
 }
 
-/** Queues scan for download, will load all frames for a target scan if the scan has not already been loaded. */
-function queueLoadScan(scan, loadNext: 0) {
+/** Queues scan for download, will load all frames for a target
+ * scan if the scan has not already been loaded. */
+function queueLoadScan(scan, loadNext = 0) {
   console.group('Vuex - queueLoadScan: Running');
   console.debug('scan, loadNext, scan.id: ', scan, loadNext, scan.id);
   // load all frames in target scan
@@ -626,7 +628,7 @@ export const storeConfig = {
     [SET_TASK_OVERVIEW](state, taskOverview: ProjectTaskOverview) {
       console.log('Vuex - Mutation - SET_TASK_OVERVIEW: Running');
       if (!taskOverview) return;
-      // Calculates total scans and scans that have been marked complete
+      // Calculates total scans in project and scans that have been marked complete
       if (taskOverview.scan_states) {
         state.projects.find(
           (project) => project.id === taskOverview.project_id,
@@ -691,7 +693,7 @@ export const storeConfig = {
       console.log('Vuex - Mutation - SET_ERROR_LOADING_FRAME: Running');
       state.errorLoadingFrame = isErrorLoading;
     },
-    /** Adds a scan ID, and it's corresponding Frame ID to state.scanFrames */
+    /** Adds a scanId and it's corresponding scanFrames state */
     [ADD_SCAN_FRAMES](state, { scanId, frameId }) {
       console.log('Vuex - Mutation - ADD_SCAN_FRAMES: Running');
       state.scanFrames[scanId].push(frameId);
@@ -956,7 +958,6 @@ export const storeConfig = {
       state, dispatch, getters, commit,
     }, { frame, onDownloadProgress = null, loadAll = true, whichProxy = 0 }) {
       console.group('Vuex - Action - swapToFrame: Running');
-      // Guard Clauses
       if (!frame) {
         throw new Error("Vuex - Action - swapToFrame: frame id doesn't exist");
       }
@@ -974,10 +975,7 @@ export const storeConfig = {
         // Queue the new scan to be loaded
         if (newScan !== oldScan && newScan) {
           console.debug('Calling queueLoadScan');
-          queueLoadScan(
-            // @ts-ignore - TODO: fix this
-            newScan, 3,
-          );
+          queueLoadScan(newScan, 3);
         }
         let newProxyManager = false;
         // Create new proxyManager if scans are different, retain proxyManager otherwise

@@ -187,11 +187,13 @@ export default defineComponent({
                 v-if="!showCC"
                 class="px-2"
                 @click="showCC = true"
+                @keydown="showCC = true"
               >cc</a>
               <a
                 v-if="!showBCC"
                 class="px-2"
                 @click="showBCC = true"
+                @keydown="showBCC = true"
               >bcc</a>
             </v-col>
           </v-row>
@@ -250,7 +252,7 @@ export default defineComponent({
                 <v-hover v-slot="{ hover }">
                   <v-card
                     :style="{
-                      borderColor: getBorder(screenshot)
+                      borderColor: getBorder(screenshot),
                     }"
                     class="screenshot"
                     @click="toggleScreenshotSelection(screenshot)"

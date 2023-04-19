@@ -10,8 +10,8 @@ export default {
   },
   computed: {
     orderedResults() {
-      // @ts-ignore - TODO: Fix this
-      return Object.entries(this.results).sort((first, second) => first[1] < second[1]);
+      return Object.entries(this.results)
+        .sort((first, second) => Number(first[1]) - Number(second[1]));
     },
   },
   methods: {
@@ -80,8 +80,8 @@ export default {
             class="pr-3"
           >
             <v-sheet
-              :color="convertValueToColor(results.overall_quality, text=false)"
-              :width="(results.overall_quality *100)+'%'"
+              :color="convertValueToColor(results.overall_quality, text = false)"
+              :width="(results.overall_quality * 100) + '%'"
               height="5"
               class="mt-2"
             />

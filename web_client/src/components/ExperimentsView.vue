@@ -99,9 +99,8 @@ export default {
     ellipsisText(str) {
       if (!this.minimal) return str;
       if (str.length > 25) {
-        return `${str.substr(0, 10)}...${str.substr(
-          str.length - 10, str.length,
-        )}`;
+        return `${str.substr(0, 10)}...${
+          str.substr(str.length - 10, str.length)}`;
       }
       return str;
     },
@@ -184,11 +183,9 @@ export default {
           experimentId = newExperiment.id;
         } else {
           // Find the experiment's id that matches the experiment selected
-          experimentId = Object.values(this.experiments).find(
-            // @ts-ignore - TODO: Fix this
-            (experiment) => experiment.name === this.experimentNameForUpload,
-            // @ts-ignore - TODO: Fix this
-          ).id;
+          experimentId = (Object.values(this.experiments).find(
+            (experiment: any) => experiment.name === this.experimentNameForUpload,
+          ) as { id: string, name: string }).id;
         }
         await djangoRest.uploadToExperiment(experimentId, this.fileSetForUpload);
         await this.loadProject(this.currentProject);
@@ -266,6 +263,7 @@ export default {
                       v-bind="attrs"
                       style="display: inline"
                       @click="showDeleteModal = experiment.id"
+                      @keydown="showDeleteModal = experiment.id"
                     >
                       <v-icon>mdi-delete</v-icon>
                     </div>
