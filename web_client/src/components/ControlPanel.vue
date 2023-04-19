@@ -67,7 +67,7 @@ export default {
   },
   beforeDestroy() {
     // Remove lock
-    this.setLock({ experimentId: this.currentViewData.experimentId, lockExperiment: false });
+    this.setLock({ experimentId: this.currentViewData.experimentId, lock: false });
     clearInterval(this.lockCycle);
   },
   methods: {
@@ -82,7 +82,7 @@ export default {
      *
      * Note: Lock is only set if the user has edit rights
      */
-    async switchLock(newExperimentId, oldExperimentId = null, forceToLock = false) {
+    async switchLock(newExperimentId, oldExperimentId = null, force = false) {
       if (!this.navigateToNextIfCurrentScanNull()) {
         // And the user has edit rights
         if (this.editRights) {
@@ -90,7 +90,7 @@ export default {
           // If there is an old experiment
           if (oldExperimentId) {
             try {
-              await this.setLock({ experimentId: oldExperimentId, lockExperiment: false, forceToLock });
+              await this.setLock({ experimentId: oldExperimentId, lock: false, force });
             } catch (err) {
               this.$snackbar({
                 text: 'Failed to release edit access on Experiment.',
@@ -98,11 +98,11 @@ export default {
               });
             }
           }
-          // Set the new lockExperiment
+          // Set the new lock
           try {
-            await this.setLock({ experimentId: newExperimentId, lockExperiment: true, forceToLock });
+            await this.setLock({ experimentId: newExperimentId, lock: true, force });
             this.lockCycle = setInterval(async (experimentId) => {
-              await this.setLock({ experimentId, lockExperiment: true });
+              await this.setLock({ experimentId, lock: true });
             }, 1000 * 60 * 5, this.currentViewData.experimentId);
           } catch (err) {
             this.$snackbar({

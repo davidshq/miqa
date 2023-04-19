@@ -36,7 +36,7 @@ Vue.use(Vuex);
 
 // Cache of downloaded files
 const fileCache = new Map();
-// Unclear how this differs from above
+// Cache of individual frames within a single scan
 const frameCache = new Map();
 // Queue of frames to be downloaded
 let readDataQueue = [];
@@ -65,18 +65,13 @@ function prepareProxyManager(proxyManager: vtkProxyManager) {
   console.group('Vuex - prepareProxyManager: Running');
   if (!proxyManager.getViews().length) {
     ['View2D_Z:z', 'View2D_X:x', 'View2D_Y:y'].forEach((type) => {
-      // viewManager.getView
       const view = getView(proxyManager, type);
       console.debug('View:', view);
-      // @ts-ignore
       view.setOrientationAxesVisibility(false);
-      // @ts-ignore
       view.getRepresentations().forEach((representation) => {
         representation.setInterpolationType(InterpolationType.NEAREST);
         representation.onModified(macro.debounce(() => {
-          // @ts-ignore
           if (view.getRepresentations()) {
-            // @ts-ignore
             view.render(true);
           }
         }, 0));
@@ -97,44 +92,34 @@ function getArrayNameFromFilename(filename) {
   return `Scalars ${name}`;
 }
 
-/**
- * Load image data from cache or file
- *
- * 1. Checks cache for copy
- * 2. Loads from cache or server
- * 3. Reads image using ITK
- * 4. Converts image from ITK to VTK
- * 5. ...
- *
- * @param frameId     String  Frame ID to load
- * @param file        Object  File to load
- * @param webWorker
- */
 function getImageData(frameId, file, webWorker = null) {
   console.group('Vuex - getImageData: Running');
   return new Promise((resolve, reject) => {
-    // Load image from frame cache if available, this resolves promise
+    // 1. Check cache for copy of image
     if (frameCache.has(frameId)) {
+      // 2a. Load image from cache
       console.debug("Pulling from cache");
       resolve({ frameData: frameCache.get(frameId), webWorker });
     } else {
+      // 2b. Download image
       console.debug("Not in cache, loading file");
       const fileName = file.name;
       const io = new FileReader();
 
-      // This won't run until io indicates it has loaded the file.
+      // 4. Wait until the file has been loaded
       io.onload = function onLoad() {
-        // Read image with ITK
+        // 5. Read image using ITK
         readImageArrayBuffer(webWorker, io.result, fileName)
+          // 6. Convert image from ITK to VTK
           .then(({ webWorker, image }) => { // eslint-disable-line no-shadow
             const frameData = convertItkToVtkImage(image, {
               scalarArrayName: getArrayNameFromFilename(fileName),
             });
+            // 7. Get metadata about image
             const dataRange = frameData
               .getPointData() // From the image file
               .getArray(0) // Values in the file
               .getRange(); // Range of values in the file, e.g. [0, 3819]
-            // Add frame to frameCache
             frameCache.set(frameId, { frameData });
             // eslint-disable-next-line no-use-before-define
             expandScanRange(frameId, dataRange); // Example dataRange: [0, 3819]
@@ -145,13 +130,14 @@ function getImageData(frameId, file, webWorker = null) {
           });
       };
 
+      // 3. Load image file
       io.readAsArrayBuffer(file);
     }
     console.groupEnd();
   });
 }
 
-/** Load file, from cache if possible. Only called by loadFileAndGetData */
+/** Load file, from cache if possible. */
 function loadFile(frame, { onDownloadProgress = null } = {}) {
   console.group('Vuex - loadFile: Running');
   if (fileCache.has(frame.id)) { // If frame is cached, return it
@@ -221,7 +207,6 @@ async function loadFileAndGetData(frame, { onDownloadProgress = null } = {}) {
       if (savedWorker) {
         savedWorker.terminate();
         savedWorker = null;
-        // console.log('Vuex - loadFileAndGetData: Terminated worker');
         console.groupEnd();
       }
     });
@@ -272,12 +257,11 @@ function progressHandler(completed, total) {
   store.commit('SET_SCAN_CACHED_PERCENTAGE', percentComplete);
 }
 
-/** Creates array of tasks to run then runs tasks in parallel. Only called by queueLoadScan */
+/** Creates array of tasks to run then runs tasks in parallel. */
 function startReaderWorkerPool() {
   console.log('Vuex - startReaderWorkerPool: Running');
   // Get the current array of tasks in readDataQueue
   const taskArgsArray = readDataQueue.map((taskInfo) => [taskInfo]);
-  // Reset the current array of tasks in readDataQueue
   readDataQueue = [];
 
   const { runId, promise } = store.state.workerPool.runTasks(
@@ -317,7 +301,6 @@ function queueLoadScan(scan, loadNext: 0) {
         });
       },
     );
-    // Once frame has been successfully added to queue:
     console.debug('Adding scan to loadedData');
     loadedData.push(scan.id);
   }
@@ -348,20 +331,13 @@ function queueLoadScan(scan, loadNext: 0) {
         newIndex += 1;
       }
     }
-    // @ts-ignore - TODO: Fix this
     if (nextScan) queueLoadScan(nextScan, loadNext - 1);
     startReaderWorkerPool();
   }
   console.groupEnd();
 }
 
-/**
- * Get next frame in specific experiment/scan
- *
- * @param experiments         Pass in all the experiments associated with the project
- * @param experimentIndex     The specific index of the experiment we are looking for
- * @param scanIndex           The specific index of the scan from the specified experiment
- */
+/** Get next frame in specific experiment/scan */
 function getNextFrame(experiments, experimentIndex, scanIndex) {
   console.log('Vuex - getNextFrame: Running');
   const experiment = experiments[experimentIndex];
@@ -375,7 +351,7 @@ function getNextFrame(experiments, experimentIndex, scanIndex) {
     }
     // get first scan in next experiment
     const nextExperiment = experiments[experimentIndex + 1];
-    const nextScan = nextExperiment.scans[0]; // Get the first scan in the nextExperiment
+    const nextScan = nextExperiment.scans[0]; // Get the first scan in the next experiment
     return nextScan.frames[0]; // Get the first frame in the nextScan
   }
   // get next scan in current experiment
@@ -388,12 +364,9 @@ function getNextFrame(experiments, experimentIndex, scanIndex) {
  *
  * If the range (e.g. [0, 3819] in a scan is <> the range read from data,
  * ensure that the ranges match
- *
- * Only called by `getImageData`
  */
 function expandScanRange(frameId, dataRange) {
   console.log('Vuex - expandScanRange: Running');
-  // If we have a frame
   if (frameId in store.state.frames) {
     // Get the scanId from the frame.
     const scanId = store.state.frames[frameId].scan;
@@ -480,9 +453,8 @@ export const storeConfig = {
     workerPool: new WorkerPool(poolSize, poolFunction),
     lastApiRequestTime: Date.now(),
   },
-  // Getters in Vuex always take in all the state as their first parameter.
   getters: {
-    /** Returns current view's project, experiments, scans, frames, and auto-evaluation. */
+    /** Returns current view's project, experiments, scans, frames, auto-evaluation, etc. */
     currentViewData(state) {
       console.log('Vuex - Getter - currentViewData: Running');
       const currentFrame = state.currentFrameId ? state.frames[state.currentFrameId] : null;
@@ -541,7 +513,7 @@ export const storeConfig = {
       console.log('Vuex - Getter - nextFrame: Running');
       return getters.currentFrame ? getters.currentFrame.nextFrame : null;
     },
-    /** Gets the current scan via the currentFrame */
+    /** Gets the current scan using the currentFrame */
     currentScan(state, getters) {
       console.log('Vuex - Getter - currentScan: Running');
       if (getters.currentFrame) {
@@ -550,7 +522,7 @@ export const storeConfig = {
       }
       return null;
     },
-    /** Gets the currentExperiment via the currentScan */
+    /** Gets the current experiment using the currentScan */
     currentExperiment(state, getters) {
       console.log('Vuex - Getter - currentExperiment: Running');
       if (getters.currentScan) {
@@ -589,26 +561,26 @@ export const storeConfig = {
     },
   },
   mutations: {
-    [RESET_STATE] (state) {
+    [RESET_STATE](state) {
       console.log('Vuex - Mutation - RESET_STATE: Running');
       Object.assign(state, { ...state, ...initState });
     },
-    [SET_MIQA_CONFIG] (state, configuration) {
+    [SET_MIQA_CONFIG](state, configuration) {
       console.log('Vuex - Mutation - SET_MIQA_CONFIG: Running');
       if (!configuration) configuration = {};
       if (!configuration.version) configuration.version = '';
       state.MIQAConfig = configuration;
     },
-    [SET_ME] (state, me) {
+    [SET_ME](state, me) {
       console.log('Vuex - Mutation - SET_ME: Running');
       state.me = me;
     },
-    [SET_ALL_USERS] (state, allUsers) {
+    [SET_ALL_USERS](state, allUsers) {
       console.log('Vuex - Mutation - SET_ALL_USERS: Running');
       state.allUsers = allUsers;
     },
     /** Resets project state when loading a new project */
-    [RESET_PROJECT_STATE] (state) {
+    [RESET_PROJECT_STATE](state) {
       console.log('Vuex - Mutation - RESET_PROJECT_STATE: Running');
       state.experimentIds = [];
       state.experiments = {};
@@ -617,29 +589,29 @@ export const storeConfig = {
       state.scanFrames = {};
       state.frames = {};
     },
-    [SET_CURRENT_FRAME_ID] (state, frameId) {
+    [SET_CURRENT_FRAME_ID](state, frameId) {
       console.log('Vuex - Mutation - SET_CURRENT_FRAME_ID: Running');
       state.currentFrameId = frameId;
     },
-    /** Sets a specific index within the frames array to a specified frame */
-    [SET_FRAME] (state, { frameId, frame }) {
+    /** Sets a specified frame at a specific index in the frames array */
+    [SET_FRAME](state, { frameId, frame }) {
       console.log('Vuex - Mutation - SET_FRAME: Running');
       // Replace with a new object to trigger a Vuex update
-      state.frames = { ...state.frames }; // Why do we pass in the frameId when we can access it from frame.id?
+      state.frames = { ...state.frames };
       state.frames[frameId] = frame;
     },
-    [SET_SCAN] (state, { scanId, scan }) {
+    [SET_SCAN](state, { scanId, scan }) {
       console.log('Vuex - Mutation - SET_SCAN: Running');
       // Replace with a new object to trigger a Vuex update
       state.scans = { ...state.scans };
       state.scans[scanId] = scan;
     },
-    [SET_RENDER_ORIENTATION] (state, anatomy) {
+    [SET_RENDER_ORIENTATION](state, anatomy) {
       console.log('Vuex - Mutation - SET_RENDER_ORIENTATION: Running');
       state.renderOrientation = anatomy;
     },
-    /** Also sets state.renderOrientation and state.currentProjectPermissions */
-    [SET_CURRENT_PROJECT] (state, project: Project | null) {
+    /** Also sets renderOrientation and currentProjectPermissions */
+    [SET_CURRENT_PROJECT](state, project: Project | null) {
       console.log('Vuex - Mutation - SET_CURRENT_PROJECT: Running');
       state.currentProject = project;
       if (project) {
@@ -647,12 +619,11 @@ export const storeConfig = {
         state.currentProjectPermissions = project.settings.permissions;
       }
     },
-    [SET_GLOBAL_SETTINGS] (state, settings) {
+    [SET_GLOBAL_SETTINGS](state, settings) {
       console.log('Vuex - Mutation - SET_GLOBAL_SETTINGS: Running');
       state.globalSettings = settings;
     },
-    /** TODO: Does too much, should be action w/mutations */
-    [SET_TASK_OVERVIEW] (state, taskOverview: ProjectTaskOverview) {
+    [SET_TASK_OVERVIEW](state, taskOverview: ProjectTaskOverview) {
       console.log('Vuex - Mutation - SET_TASK_OVERVIEW: Running');
       if (!taskOverview) return;
       // Calculates total scans and scans that have been marked complete
@@ -666,7 +637,8 @@ export const storeConfig = {
           ).length,
         };
       }
-      // If we have a value in state.currentProject, and it's id is equal to taskOverview's project_id then:
+      // If we have a value in state.currentProject, and it's id is equal to taskOverview's
+      // project_id then:
       if (state.currentProject && taskOverview.project_id === state.currentProject.id) {
         state.currentTaskOverview = taskOverview;
         // Iterate over allScans
@@ -679,61 +651,61 @@ export const storeConfig = {
         });
       }
     },
-    [SET_PROJECTS] (state, projects: Project[]) {
+    [SET_PROJECTS](state, projects: Project[]) {
       console.log('Vuex - Mutation - SET_PROJECTS: Running');
       state.projects = projects;
     },
-    [ADD_SCAN_DECISION] (state, { currentScanId, newScanDecision }) {
+    [ADD_SCAN_DECISION](state, { currentScanId, newScanDecision }) {
       console.log('Vuex - Mutation - ADD_SCAN_DECISION: Running');
       state.scans[currentScanId].decisions.push(newScanDecision);
     },
     /** Note: We don't pass the frame, only the frame_evaluation, we then append the value to `currentFrame` */
-    [SET_FRAME_EVALUATION] (state, frame_evaluation) {
+    [SET_FRAME_EVALUATION](state, frame_evaluation) {
       console.log('Vuex - Mutation - SET_FRAME_EVALUATION: Running');
       const currentFrame = state.currentFrameId ? state.frames[state.currentFrameId] : null;
       if (currentFrame) {
         currentFrame.frame_evaluation = frame_evaluation;
       }
     },
-    [SET_CURRENT_SCREENSHOT] (state, screenshot) {
+    [SET_CURRENT_SCREENSHOT](state, screenshot) {
       console.log('Vuex - Mutation - SET_CURRENT_SCREENSHOT: Running');
       state.currentScreenshot = screenshot;
     },
-    [ADD_SCREENSHOT] (state, screenshot) {
+    [ADD_SCREENSHOT](state, screenshot) {
       console.log('Vuex - Mutation - ADD_SCREENSHOT: Running');
       state.screenshots.push(screenshot);
     },
-    [REMOVE_SCREENSHOT] (state, screenshot) {
+    [REMOVE_SCREENSHOT](state, screenshot) {
       console.log('Vuex - Mutation - REMOVE_SCREENSHOT: Running');
       state.screenshots.splice(state.screenshots.indexOf(screenshot), 1);
     },
-    [UPDATE_LAST_API_REQUEST_TIME] (state) {
+    [UPDATE_LAST_API_REQUEST_TIME](state) {
       console.log('Vuex - Mutation - UPDATE_LAST_API_REQUEST_TIME: Running');
       state.lastApiRequestTime = Date.now();
     },
-    [SET_LOADING_FRAME] (state, isLoading: boolean) {
+    [SET_LOADING_FRAME](state, isLoading: boolean) {
       console.log('Vuex - Mutation - SET_LOADING_FRAME: Running');
       state.loadingFrame = isLoading;
     },
-    [SET_ERROR_LOADING_FRAME] (state, isErrorLoading: boolean) {
+    [SET_ERROR_LOADING_FRAME](state, isErrorLoading: boolean) {
       console.log('Vuex - Mutation - SET_ERROR_LOADING_FRAME: Running');
       state.errorLoadingFrame = isErrorLoading;
     },
     /** Adds a scan ID, and it's corresponding Frame ID to state.scanFrames */
-    [ADD_SCAN_FRAMES] (state, { scanId, frameId }) { // TODO: Should this be addScanFrame or addScanToScanFrames?
+    [ADD_SCAN_FRAMES](state, { scanId, frameId }) {
       console.log('Vuex - Mutation - ADD_SCAN_FRAMES: Running');
       state.scanFrames[scanId].push(frameId);
     },
-    [ADD_EXPERIMENT_SCANS] (state, { experimentId, scanId }) {
+    [ADD_EXPERIMENT_SCANS](state, { experimentId, scanId }) {
       console.log('Vuex - Mutation - ADD_EXPERIMENT_SCANS: Running');
       state.scanFrames[scanId] = []; // Why?
       state.experimentScans[experimentId].push(scanId);
     },
     /**
-     * Add an experiment to state.experiments, it's id to state.experimentIds, and set
-     * state.experimentScans to an empty array
+     * Add an experiment to experiments state, it's id to experimentIds state, and
+     * set experimentScans state to an empty array
      */
-    [ADD_EXPERIMENT] (state, { experimentId, experiment }) {
+    [ADD_EXPERIMENT](state, { experimentId, experiment }) {
       console.log('Vuex - Mutation - ADD_EXPERIMENT: Running');
       state.experimentScans[experimentId] = [];
       if (!state.experimentIds.includes(experimentId)) {
@@ -741,23 +713,23 @@ export const storeConfig = {
       }
       state.experiments[experimentId] = experiment;
     },
-    [UPDATE_EXPERIMENT] (state, experiment) {
+    [UPDATE_EXPERIMENT](state, experiment) {
       console.log('Vuex - Mutation - UPDATE_EXPERIMENT: Running');
       // Necessary for reactivity
       state.experiments = { ...state.experiments };
       state.experiments[experiment.id] = experiment;
     },
     /** Ensures that a specific image is being reviewed by a single individual */
-    [SET_WINDOW_LOCKED] (state, lockState) {
+    [SET_WINDOW_LOCKED](state, lockState) {
       console.log('Vuex - Mutation - SET_WINDOW_LOCKED: Running');
       state.windowLocked = lockState;
     },
-    [SET_SCAN_CACHED_PERCENTAGE] (state, percentComplete) {
+    [SET_SCAN_CACHED_PERCENTAGE](state, percentComplete) {
       console.log('Vuex - Mutation - SET_SCAN_CACHED_PERCENTAGE: Running');
       state.scanCachedPercentage = percentComplete;
     },
     /** Saves the location of the cursor click related to a specific scan and decision */
-    [SET_SLICE_LOCATION] (state, ijkLocation, whichProxy = 0) {
+    [SET_SLICE_LOCATION](state, ijkLocation, whichProxy = 0) {
       console.log('Vuex - Mutation - SET_SLICE_LOCATION: Running');
       if (Object.values(ijkLocation).every((value) => value !== undefined)) {
         state.vtkViews[whichProxy].forEach(
@@ -769,7 +741,7 @@ export const storeConfig = {
         );
       }
     },
-    [SET_CURRENT_VTK_INDEX_SLICES] (state, { indexAxis, value, whichProxy = 0 }) {
+    [SET_CURRENT_VTK_INDEX_SLICES](state, { indexAxis, value, whichProxy = 0 }) {
       console.group('Vuex - Mutation - SET_CURRENT_VTK_INDEX_SLICES: Running');
       console.debug('whichProxy: ', whichProxy);
       const currentAxis = `${indexAxis}IndexSlice`;
@@ -780,21 +752,22 @@ export const storeConfig = {
       console.debug('i:', state.iIndexSlice[whichProxy], 'j:', state.jIndexSlice[whichProxy], 'k:', state.kIndexSlice[whichProxy]);
       console.groupEnd();
     },
-    [SET_SHOW_CROSSHAIRS] (state, show: boolean) {
+    [SET_SHOW_CROSSHAIRS](state, show: boolean) {
       console.log('Vuex - Mutation - SET_SHOW_CROSSHAIRS: Running');
       state.showCrosshairs = show;
     },
-    [SET_STORE_CROSSHAIRS] (state, value: boolean) {
+    [SET_STORE_CROSSHAIRS](state, value: boolean) {
       console.log('Vuex - Mutation - SET_STORE_CROSSHAIRS: Running');
       state.storeCrosshairs = value;
     },
-    [SET_REVIEW_MODE] (state, mode: boolean) {
+    [SET_REVIEW_MODE](state, mode: boolean) {
       console.log('Vuex - Mutation - SET_REVIEW_MODE: Running');
       state.reviewMode = mode || false;
     },
   },
   actions: {
-    /** Reset the Vuex state of MIQA, cancel any existing tasks in the workerPool, clear file and frame caches */
+    /** Reset the Vuex state of MIQA, cancel any existing tasks in the workerPool, clear file
+     * and frame caches */
     reset({ state, commit }) {
       console.log('Vuex - Action - reset: Running');
       if (taskRunId >= 0) {
@@ -882,7 +855,7 @@ export const storeConfig = {
 
           // TODO these requests *can* be run in parallel, or collapsed into one XHR
           // eslint-disable-next-line no-await-in-loop
-          const { frames } = scan; // Get the frames associated with a specific scan
+          const { frames } = scan;
 
           commit('SET_SCAN', {
             scanId: scan.id,
@@ -918,7 +891,7 @@ export const storeConfig = {
             });
           }
 
-          if (frames.length > 0) { // If a frame exists
+          if (frames.length > 0) {
             firstInPrev = frames[0].id;
           } else {
             console.error(
@@ -978,13 +951,7 @@ export const storeConfig = {
       console.log('Vuex - Action - setCurrentFrame: Running');
       commit('SET_CURRENT_FRAME_ID', frameId);
     },
-    /**
-     * Handles the process of changing frames in Scan.vue
-     *
-     * onDownloadProgress passes local download state from Frame view
-     *
-     * Frame is the object
-     */
+    /** Handles the process of changing frames */
     async swapToFrame({
       state, dispatch, getters, commit,
     }, { frame, onDownloadProgress = null, loadAll = true, whichProxy = 0 }) {
@@ -1192,12 +1159,12 @@ export const storeConfig = {
       }
     },
     /** Sets a lock on the current experiment */
-    async setLock({ commit }, { experimentId, lockExperiment, forceToLock }) {
+    async setLock({ commit }, { experimentId, lock, force }) {
       console.log('Vuex - Action - setLock: Running');
-      if (lockExperiment) {
+      if (lock) {
         commit(
           'UPDATE_EXPERIMENT',
-          await djangoRest.lockExperiment(experimentId, forceToLock),
+          await djangoRest.lockExperiment(experimentId, force),
         );
       } else {
         commit(

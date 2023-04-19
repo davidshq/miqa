@@ -110,14 +110,14 @@ export default defineComponent({
     });
 
     function setWindowLock(
-      lockExperiment: boolean,
+      lock: boolean,
       duration: string | undefined = undefined,
       target: string | undefined = undefined,
     ) {
       let associatedImage;
       if (duration) associatedImage = `${duration.charAt(0).toUpperCase()}.png`;
       store.commit('SET_WINDOW_LOCKED', {
-        lockExperiment,
+        lock,
         duration,
         target,
         associatedImage,
