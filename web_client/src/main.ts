@@ -1,12 +1,10 @@
 import Vue from 'vue';
-import VueCompositionAPI from '@vue/composition-api';
 import Vuetify from 'vuetify';
 import 'polyfill-object.fromentries';
 
 import AsyncComputed from 'vue-async-computed';
 import config from 'itk/itkConfig';
 import * as Sentry from '@sentry/vue';
-import { BrowserTracing} from "@sentry/tracing";
 import App from './App.vue';
 import router from './router';
 
@@ -22,7 +20,6 @@ import { setupHeartbeat } from './heartbeat';
 
 Vue.use(Vuetify);
 
-Vue.use(VueCompositionAPI);
 Vue.use(AsyncComputed);
 Vue.use(vMousetrap);
 
@@ -38,16 +35,6 @@ Vue.config.productionTip = true;
 Sentry.init({
   Vue,
   dsn: process.env.VUE_APP_SENTRY_DSN,
-  integrations: [
-    new BrowserTracing({
-      routingInstrumentation: Sentry.vueRouterInstrumentation(router),
-      tracePropagationTargets: ["localhost:8081", /^\//],
-    }),
-  ],
-  // Set tracesSampleRate to 1.0 to capture 100%
-  // of transactions for performance monitoring.
-  // We recommend adjusting this value in production
-  tracesSampleRate: 1.0,
 });
 
 (async () => {
