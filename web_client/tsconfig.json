@@ -32,12 +32,15 @@
     "src/**/*.tsx",
     "src/**/*.vue",
     "tests/**/*.ts",
-    "tests/**/*.tsx"
+    "tests/**/*.tsx",
   ],
   "exclude": [
     "node_modules"
   ],
   "vueCompilerOptions": {
-    "target": 2
+    "extensions": [
+      ".vue"
+    ],
+    "target": 2.7
   }
 }
