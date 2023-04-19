@@ -1,4 +1,3 @@
-/** MIQA Heartbeat - Times out login on 10 minutes of inactivity */
 // eslint-disable-next-line import/prefer-default-export
 export const setupHeartbeat = async (
   key: string,
