@@ -483,8 +483,8 @@ export const storeConfig = {
   // Getters in Vuex always take in all the state as their first parameter.
   getters: {
     /** Returns current view's project, experiments, scans, frames, and auto-evaluation. */
-    currentView(state) {
-      console.log('Vuex - Getter - currentView: Running');
+    currentViewData(state) {
+      console.log('Vuex - Getter - currentViewData: Running');
       const currentFrame = state.currentFrameId ? state.frames[state.currentFrameId] : null;
       const scan = currentFrame ? state.scans[currentFrame.scan] : undefined;
       if (!scan) {
@@ -585,7 +585,7 @@ export const storeConfig = {
     },
     experimentIsEditable(state, getters) {
       console.log('Vuex - Getter - experimentIsEditable: Running');
-      return getters.currentView.lockOwner && getters.currentView.lockOwner.id === state.me.id;
+      return getters.currentViewData.lockOwner && getters.currentViewData.lockOwner.id === state.me.id;
     },
   },
   mutations: {
@@ -1165,7 +1165,7 @@ export const storeConfig = {
       console.log('Vuex - Action - updateLock: Running');
       // check for window lock expiry
       if (state.windowLocked.lock) {
-        const { currentView } = getters;
+        const { currentViewData } = getters;
         // Handles unlocking if necessary
         const unlock = () => {
           commit('SET_WINDOW_LOCKED', {
@@ -1178,13 +1178,13 @@ export const storeConfig = {
         // Unlocks window if scan, experiment, or project has changed
         switch (state.windowLocked.duration) {
           case 'scan':
-            if (currentView.scanId !== state.windowLocked.target) unlock();
+            if (currentViewData.scanId !== state.windowLocked.target) unlock();
             break;
           case 'experiment':
-            if (currentView.experimentId !== state.windowLocked.target) unlock();
+            if (currentViewData.experimentId !== state.windowLocked.target) unlock();
             break;
           case 'project':
-            if (currentView.projectId !== state.windowLocked.target) unlock();
+            if (currentViewData.projectId !== state.windowLocked.target) unlock();
             break;
           default:
             break;

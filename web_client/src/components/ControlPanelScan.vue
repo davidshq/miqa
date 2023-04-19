@@ -11,7 +11,7 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'currentView',
+      'currentViewData',
       'nextFrame',
       'previousFrame',
     ]),
@@ -20,7 +20,7 @@ export default {
     // Link is name of link file
     // TODO: This doesn't seem to open the correct link
     openScanLink() {
-      window.open(this.currentView.scanLink, '_blank');
+      window.open(this.currentViewData.scanLink, '_blank');
     },
     /**
      * Change current frame view
@@ -28,7 +28,7 @@ export default {
      * @param framePosition
      */
     slideToFrame(framePosition) {
-      this.setCurrentFrameId(this.currentView.scanFramesList[framePosition - 1]);
+      this.setCurrentFrameId(this.currentViewData.scanFramesList[framePosition - 1]);
     },
   },
 };
@@ -56,23 +56,23 @@ export default {
             <div>
               Scan:
               <p
-                :class="currentView.scanLink ? 'link' : 'grey--text'"
+                :class="currentViewData.scanLink ? 'link' : 'grey--text'"
                 style="display:inline"
                 @click="openScanLink"
               >
-                <b>{{ currentView.scanName }}</b>
+                <b>{{ currentViewData.scanName }}</b>
               </p>
               <p
                 class="grey--text"
                 style="display:inline"
               >
-                ({{ currentView.scanPosition }} /
-                {{ currentView.experimentScansList.length }})
+                ({{ currentViewData.scanPosition }} /
+                {{ currentViewData.experimentScansList.length }})
               </p>
             </div>
             <div>
               <v-btn
-                :disabled="!currentView.upTo"
+                :disabled="!currentViewData.upTo"
                 small
                 depressed
                 class="transparent-btn"
@@ -81,7 +81,7 @@ export default {
                 <v-icon>fa-caret-up</v-icon>
               </v-btn>
               <v-btn
-                :disabled="!currentView.downTo"
+                :disabled="!currentViewData.downTo"
                 small
                 depressed
                 class="transparent-btn"
@@ -100,16 +100,16 @@ export default {
                 class="grey--text"
                 style="display:inline"
               >
-                ({{ currentView.framePosition }} /
-                {{ currentView.scanFramesList.length }})
+                ({{ currentViewData.framePosition }} /
+                {{ currentViewData.scanFramesList.length }})
               </p>
             </div>
             <v-slider
-              :value="currentView.framePosition"
+              :value="currentViewData.framePosition"
               ticks="always"
               tick-size="4"
               :min="1"
-              :max="currentView.scanFramesList.length"
+              :max="currentViewData.scanFramesList.length"
               @input="slideToFrame"
             />
             <div>
@@ -138,7 +138,7 @@ export default {
         <!-- Window Widget -->
         <window-widget
           :representation="representation"
-          :experiment-id="currentView.experimentId"
+          :experiment-id="currentViewData.experimentId"
         />
         <!-- End Window Widget -->
         <!-- ScanDecision -->
@@ -149,13 +149,13 @@ export default {
             style="height: 100px; overflow:auto; margin: 15px 0"
           >
             <ScanDecision
-              v-for="decision in currentView.scanDecisions"
+              v-for="decision in currentViewData.scanDecisions"
               :key="decision.id"
               :decision="decision"
             />
             <div
-              v-if="!currentView.scanDecisions
-                || currentView.scanDecisions.length === 0"
+              v-if="!currentViewData.scanDecisions
+                || currentViewData.scanDecisions.length === 0"
               class="grey--text"
             >
               This scan has no prior comments.

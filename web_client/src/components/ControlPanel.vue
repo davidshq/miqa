@@ -22,14 +22,14 @@ export default {
       'proxyManager',
     ]),
     ...mapGetters([
-      'currentView',
+      'currentViewData',
       'nextFrame',
       'previousFrame',
       'currentFrame',
       'editRights',
     ]),
     experimentId() {
-      return this.currentView.experimentId;
+      return this.currentViewData.experimentId;
     },
     representation() {
       return this.currentFrame && this.proxyManager[0].getRepresentations()[0];
@@ -41,14 +41,14 @@ export default {
       this.switchLock(newValue, oldValue);
       clearInterval(this.lockCycle);
     },
-    currentView() {
+    currentViewData() {
       this.navigateToNextIfCurrentScanNull();
     },
   },
   mounted() {
     if (!this.navigateToNextIfCurrentScanNull()) {
       // Switch the lock to the current experiment
-      this.switchLock(this.currentView.experimentId);
+      this.switchLock(this.currentViewData.experimentId);
       // Handles key presses
       window.addEventListener('keydown', (event) => {
         // @ts-ignore - TODO: Fix this
@@ -67,7 +67,7 @@ export default {
   },
   beforeDestroy() {
     // Remove lock
-    this.setLock({ experimentId: this.currentView.experimentId, lockExperiment: false });
+    this.setLock({ experimentId: this.currentViewData.experimentId, lockExperiment: false });
     clearInterval(this.lockCycle);
   },
   methods: {
@@ -103,7 +103,7 @@ export default {
             await this.setLock({ experimentId: newExperimentId, lockExperiment: true, forceToLock });
             this.lockCycle = setInterval(async (experimentId) => {
               await this.setLock({ experimentId, lockExperiment: true });
-            }, 1000 * 60 * 5, this.currentView.experimentId);
+            }, 1000 * 60 * 5, this.currentViewData.experimentId);
           } catch (err) {
             this.$snackbar({
               text: 'Failed to claim edit access on Experiment.',
@@ -118,7 +118,7 @@ export default {
       if (!location) location = 'complete';
       if (location && location !== this.$route.params.scanId) {
         this.$router
-          .push(`/${this.currentView.projectId}/${location}` || '')
+          .push(`/${this.currentViewData.projectId}/${location}` || '')
           .catch(this.handleNavigationError);
       }
     },
@@ -131,16 +131,16 @@ export default {
       } else if (this.direction === 'forward') {
         this.SET_CURRENT_FRAME_ID(this.nextFrame);
       } else if (this.direction === 'previous') {
-        this.navigateToScan(this.currentView.upTo);
+        this.navigateToScan(this.currentViewData.upTo);
       } else if (this.direction === 'next') {
-        this.navigateToScan(this.currentView.downTo);
+        this.navigateToScan(this.currentViewData.downTo);
       }
     },
 
-    // If there aren't at least two keys in `currentView` we know
+    // If there aren't at least two keys in `currentViewData` we know
     // that we aren't looking at a valid scan, so advance to next.
     navigateToNextIfCurrentScanNull() {
-      if (Object.keys(this.currentView).length < 2) {
+      if (Object.keys(this.currentViewData).length < 2) {
         this.handleKeyPress('next');
         return true;
       }

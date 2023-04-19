@@ -16,7 +16,7 @@ export default {
       'storeCrosshairs',
     ]),
     ...mapGetters([
-      'currentView',
+      'currentViewData',
       'experimentIsEditable',
     ]),
   },
@@ -30,7 +30,7 @@ export default {
      * After every keystroke into experiment notes, this updates the local component state.
      *
      * TODO: Why are we keeping both Vuex state and local state, e.g., we update
-     * this.currentView.experimentNote and the local this.newExperimentNote.
+     * this.currentViewData.experimentNote and the local this.newExperimentNote.
      *
      * @param value
      */
@@ -44,7 +44,7 @@ export default {
           // TODO: This shouldn't be necessary?
           // Save note using API
           const newExpData = await djangoRest.setExperimentNote(
-            this.currentView.experimentId, this.newExperimentNote,
+            this.currentViewData.experimentId, this.newExperimentNote,
           );
           this.$snackbar({
             text: 'Saved note successfully.',
@@ -83,7 +83,7 @@ export default {
               Project:
             </div>
             <div>
-              {{ currentView.projectName }}
+              {{ currentViewData.projectName }}
             </div>
           </div>
           <div class="current-info-container">
@@ -91,10 +91,10 @@ export default {
               Experiment:
             </div>
             <div>
-              {{ currentView.experimentName }}
+              {{ currentViewData.experimentName }}
               <UserAvatar
-                v-if="currentView.lockOwner"
-                :target-user="currentView.lockOwner"
+                v-if="currentViewData.lockOwner"
+                :target-user="currentViewData.lockOwner"
                 as-editor
               />
             </div>
@@ -104,7 +104,7 @@ export default {
               Subject:
             </div>
             <div>
-              <b>{{ currentView.scanSubject || 'None' }}</b>
+              <b>{{ currentViewData.scanSubject || 'None' }}</b>
             </div>
           </div>
           <div class="current-info-container">
@@ -112,7 +112,7 @@ export default {
               Session:
             </div>
             <div>
-              <b>{{ currentView.scanSession || 'None' }}</b>
+              <b>{{ currentViewData.scanSession || 'None' }}</b>
             </div>
           </div>
         </div>
@@ -128,7 +128,7 @@ export default {
         </div>
       </div>
       <v-textarea
-        v-model="currentView.experimentNote"
+        v-model="currentViewData.experimentNote"
         filled
         :disabled="!experimentIsEditable"
         no-resize

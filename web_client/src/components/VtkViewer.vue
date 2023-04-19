@@ -43,7 +43,7 @@ export default {
     ...mapGetters([
       'currentFrame',
       'currentScan',
-      'currentView',
+      'currentViewData',
     ]),
     // Returning representation from VTK
     representation() {
@@ -351,8 +351,8 @@ export default {
         this.drawLine(ctx, displayLine2);
       }
       this.SET_CURRENT_SCREENSHOT({
-        name: `${this.currentView.experimentName}/${
-          this.currentView.scanName
+        name: `${this.currentViewData.experimentName}/${
+          this.currentViewData.scanName
         }/${this.currentFrame.frame_number}/${this.displayName}`,
         dataURL: canvas.toDataURL('image/jpeg'),
       });

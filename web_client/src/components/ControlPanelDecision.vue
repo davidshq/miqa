@@ -37,14 +37,14 @@ export default {
   },
   computed: {
     ...mapState([
-      'currentView', // TODO: Remove this, it is a getter
+      'currentViewData', // TODO: Remove this, it is a getter
       'currentProject',
       'proxyManager',
       'vtkViews',
       'storeCrosshairs',
     ]),
     ...mapGetters([
-      'currentView',
+      'currentViewData',
       'myCurrentProjectRoles',
       'currentFrame',
       'experimentIsEditable',
@@ -80,14 +80,14 @@ export default {
     suggestedArtifacts() {
       // TODO: Should create reusable null check function
       // See: https://deviq.com/design-patterns/guard-clause
-      if (!this.currentView.scanDecisions) {
+      if (!this.currentViewData.scanDecisions) {
         return [];
       }
       // TODO: Same here.
-      if (this.currentView.scanDecisions.length > 0) {
+      if (this.currentViewData.scanDecisions.length > 0) {
         // Get the most recent decision
         const lastDecision = _.sortBy(
-          this.currentView.scanDecisions, (decision) => { Date.parse(decision.created); },
+          this.currentViewData.scanDecisions, (decision) => { Date.parse(decision.created); },
         )[0];
         // Gets the artifacts associated with the most recent decision
         // TODO: Are these actually user identified or are they also auto evaluation?
@@ -98,8 +98,8 @@ export default {
           ([, present]) => present === this.MIQAConfig.artifact_states.PRESENT,
         ).map(([artifactName]) => artifactName);
         // If a current auto evaluation exists
-      } if (this.currentView.currentAutoEvaluation) {
-        const predictedArtifacts = this.currentView.currentAutoEvaluation.results;
+      } if (this.currentViewData.currentAutoEvaluation) {
+        const predictedArtifacts = this.currentViewData.currentAutoEvaluation.results;
         // Of the results from the NN, filter these to
         // exclude overall_quality and normal_variants (not real artifacts)
         // and exclude anything under the suggestion threshold set by the server.
@@ -146,7 +146,7 @@ export default {
     },
   },
   watch: {
-    // Resets currentView for present/absent whenever image changes
+    // Resets currentViewData for present/absent whenever image changes
     // TODO: This causes the decision buttons to get out of sync if we aren't auto advancing scans
     currentFrame() {
       this.confirmedPresent = [];
@@ -165,7 +165,7 @@ export default {
   },
   mounted() {
     // Check every 10 secs for whether an auto evaluation has been completed
-    if (!this.currentView.currentAutoEvaluation) {
+    if (!this.currentViewData.currentAutoEvaluation) {
       this.pollInterval = setInterval(this.pollForEvaluation, 1000 * 10);
     }
   },
@@ -181,7 +181,7 @@ export default {
     ]),
     async pollForEvaluation() {
       // Get a frame from API
-      const frameData = await djangoRest.frame(this.currentView.currentFrame.id);
+      const frameData = await djangoRest.frame(this.currentViewData.currentFrame.id);
       // If there is a frame_evaluation
       // @ts-ignore - TODO: Fix this
       if (frameData.frame_evaluation) {
@@ -205,7 +205,7 @@ export default {
         );
     },
     switchLock() {
-      this.$emit('switchLock', this.currentView.experimentId, null, true);
+      this.$emit('switchLock', this.currentViewData.experimentId, null, true);
     },
     /**
      * Determines the styling of the four chip states
@@ -301,7 +301,7 @@ export default {
           );
           // Create new scan decision using API
           const savedObj = await djangoRest.setDecision(
-            this.currentView.scanId,
+            this.currentViewData.scanId,
             decision,
             this.newComment,
             userIdentifiedArtifacts,
@@ -313,7 +313,7 @@ export default {
           );
           // Update Vuex store with scan decision
           this.ADD_SCAN_DECISION({
-            currentScanId: this.currentView.scanId,
+            currentScanId: this.currentViewData.scanId,
             newScanDecision: savedObj,
           });
           this.refreshTaskOverview(); // TODO: Should this be await?
@@ -336,7 +336,7 @@ export default {
           //   (else we would already know about the lock owner and not attempt to lock).
           //   Thus, we need to update our experiment's info and check who the lock owner is
           if (err.toString().includes('lock')) {
-            this.UPDATE_EXPERIMENT(await djangoRest.experiment(this.currentView.experimentId));
+            this.UPDATE_EXPERIMENT(await djangoRest.experiment(this.currentViewData.experimentId));
           }
         }
       } else {
@@ -388,7 +388,7 @@ export default {
             </v-tooltip>
           </v-subheader>
           <v-col
-            v-if="currentView.currentAutoEvaluation"
+            v-if="currentViewData.currentAutoEvaluation"
             style="display: flex; align-items: flex-start; justify-content: flex-end"
           >
             <v-subheader
@@ -413,7 +413,7 @@ export default {
               </span>
             </v-tooltip>
             <EvaluationResults
-              :results="currentView.currentAutoEvaluation.results"
+              :results="currentViewData.currentAutoEvaluation.results"
             />
           </v-col>
           <v-col
@@ -536,27 +536,27 @@ export default {
               You {{ editRights ?'have not claimed' :'do not have' }}
               edit access on this Experiment.
               <div
-                v-if="currentView.lockOwner"
+                v-if="currentViewData.lockOwner"
                 class="my-3"
                 style="text-align:center"
               >
                 <UserAvatar
-                  :target-user="currentView.lockOwner"
+                  :target-user="currentViewData.lockOwner"
                   as-editor
                 />
                 <br>
-                {{ currentView.lockOwner.username }}
+                {{ currentViewData.lockOwner.username }}
                 <br>
                 currently has edit access.
               </div>
               <v-btn
-                v-if="editRights && (user.is_superuser || !currentView.lockOwner)"
+                v-if="editRights && (user.is_superuser || !currentViewData.lockOwner)"
                 :loading="loadingLock"
                 :disabled="loadingLock"
                 color="primary"
                 @click="switchLock"
               >
-                {{ currentView.lockOwner ?"Steal edit access" :"Claim edit access" }}
+                {{ currentViewData.lockOwner ?"Steal edit access" :"Claim edit access" }}
               </v-btn>
             </div>
           </v-col>
