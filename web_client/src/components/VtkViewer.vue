@@ -127,7 +127,7 @@ export default {
         // this.updateCrosshairs();
       }
     },
-    // Only run when changing scan
+    // Only runs when changing scans
     view(view, oldView) {
       console.log('VtkViewer - view changed: new, old', view, oldView);
       this.cleanup();
@@ -135,7 +135,7 @@ export default {
       this.initializeSlice();
       this.initializeView();
     },
-    // Only run when changing scan
+    // Only runs when changing scans
     currentFrame() {
       console.log('VtkViewer - currentFrame changed');
       this.prepareViewer();
@@ -232,7 +232,6 @@ export default {
         this.resized = true;
       });
     },
-    // Runs 6x
     initializeCamera() {
       console.group('VtkViewer - initializeCamera: Running');
       const camera = this.view.getCamera();
@@ -265,7 +264,6 @@ export default {
       console.debug('this.view', this.view);
       console.groupEnd();
     },
-    // Runs 12x
     findClosestColumnToVector(inputVector, matrix) {
       console.log('VtkViewer - findClosestColumnToVector: Running');
       let currClosest = null;
@@ -288,7 +286,6 @@ export default {
       }
       return currClosest;
     },
-    // Ran in infinite loop
     trueAxis(axisName) {
       console.log('VtkViewer - trueAxis: Running');
       if (!this.representation.getInputDataSet()) return undefined;
@@ -345,7 +342,8 @@ export default {
           Object.entries(originalColors).map(([axisName, hex]) => [this.trueAxis(axisName), hex]),
         );
         const [displayLine1, displayLine2] = crosshairSet.getCrosshairsForAxis(
-          this.trueAxis(this.name), trueColors,
+          this.trueAxis(this.name),
+          trueColors,
         );
         this.drawLine(ctx, displayLine1);
         this.drawLine(ctx, displayLine2);
@@ -364,12 +362,10 @@ export default {
         this.$refs.viewer.style.width = `${this.$refs.viewer.clientWidth - 3}px`;
       }, 100);
     },
-    // 8x
     changeSlice(newValue) {
       console.log('VtkViewer - changeSlice: Running');
       this.slice = newValue;
     },
-    // 12x
     roundSlice(value) {
       console.log('VtkViewer - roundSlice: Running');
       if (!value) return '';
@@ -427,13 +423,7 @@ export default {
         }
       }
     },
-    /**
-     * Place crosshairs at the location of a click event
-     *
-     * Only executed on click
-     *
-     * @param clickEvent
-     */
+    /** Place crosshairs at the location of a click event */
     placeCrosshairs(clickEvent) {
       console.group('VtkViewer - placeCrosshairs: Running');
       const crosshairSet = new CrosshairSet(

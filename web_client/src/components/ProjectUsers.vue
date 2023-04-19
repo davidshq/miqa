@@ -18,7 +18,7 @@ export default {
   computed: {
     ...mapState([
       'currentProject',
-      'allUsers'
+      'allUsers',
     ]),
     permissions() {
       return this.currentProject.settings.permissions;
@@ -66,10 +66,10 @@ export default {
   },
   methods: {
     ...mapActions([
-      'loadAllUsers'
+      'loadAllUsers',
     ]),
     ...mapMutations([
-      'SET_CURRENT_PROJECT'
+      'SET_CURRENT_PROJECT',
     ]),
     getGroup(user) {
       return Object.entries(this.permissions).filter(
@@ -107,7 +107,6 @@ export default {
         this.showAddMemberOverlay = false;
         this.showAddCollaboratorOverlay = false;
         const changedProject = { ...this.currentProject };
-        // @ts-ignore - TODO: Fix this
         changedProject.settings.permissions = resp.permissions;
         this.SET_CURRENT_PROJECT(changedProject);
       } catch (e) {
@@ -124,7 +123,6 @@ export default {
       try {
         const resp = await djangoRest.setProjectSettings(this.currentProject.id, newSettings);
         const changedProject = { ...this.currentProject };
-        // @ts-ignore - TODO: Fix this
         changedProject.settings.default_email_recipients = resp.default_email_recipients;
         this.SET_CURRENT_PROJECT(changedProject);
       } catch (e) {
@@ -169,7 +167,7 @@ export default {
       </v-row>
       <div
         v-for="(user, index) in members"
-        :key="'member_'+index"
+        :key="'member_' + index"
         class="py-1 d-flex"
       >
         <UserAvatar :target-user="user" />
@@ -205,7 +203,7 @@ export default {
       </v-row>
       <div
         v-for="(user, index) in collaborators"
-        :key="'collaborator_'+index"
+        :key="'collaborator_' + index"
         class="py-1 d-flex"
       >
         <UserAvatar :target-user="user" />
@@ -244,7 +242,7 @@ export default {
             v-model="emailList"
             :items="emailOptions"
             :disabled="!userCanEditProject"
-            :label="userCanEditProject ?'Select or type an email' :''"
+            :label="userCanEditProject ? 'Select or type an email' : ''"
             :rules="[allEmails]"
             multiple
             chips

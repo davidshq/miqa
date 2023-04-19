@@ -10,7 +10,7 @@ export default {
   }),
   computed: {
     ...mapState([
-      'currentScreenshot'
+      'currentScreenshot',
     ]),
     filename: {
       get() {
@@ -59,7 +59,7 @@ export default {
   methods: {
     ...mapMutations([
       'SET_CURRENT_SCREENSHOT',
-      'ADD_SCREENSHOT'
+      'ADD_SCREENSHOT',
     ]),
     save() {
       this.ADD_SCREENSHOT({
@@ -83,7 +83,7 @@ export default {
       <v-btn
         icon
         style="float:right"
-        @click="show=false"
+        @click="show = false"
       >
         <v-icon>mdi-close</v-icon>
       </v-btn>

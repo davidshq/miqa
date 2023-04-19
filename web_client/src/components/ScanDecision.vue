@@ -33,7 +33,7 @@ export default {
   },
   methods: {
     ...mapMutations([
-      'SET_SLICE_LOCATION'
+      'SET_SLICE_LOCATION',
     ]),
     convertDecisionToColor(decision) {
       if (decision === 'UN') return 'red--text text--darken-2';
@@ -98,7 +98,7 @@ export default {
     >
       <v-tooltip
         v-for="chip in artifactChips"
-        :key="'chip_'+ chip.value"
+        :key="'chip_' + chip.value"
         :v-bind="chip.code"
         bottom
       >

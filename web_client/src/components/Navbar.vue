@@ -11,7 +11,8 @@ import UserAvatar from '@/components/UserAvatar.vue';
 import djangoClient from '@/django';
 
 export default defineComponent({
-  name: 'NavbarView',
+  // eslint-disable-next-line vue/multi-word-component-names
+  name: 'Navbar',
   components: {
     UserAvatar,
     UserButton,

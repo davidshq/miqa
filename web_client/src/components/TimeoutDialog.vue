@@ -26,7 +26,8 @@ export default defineComponent({
     });
 
     window.addEventListener(
-      'unauthorized', () => {
+      'unauthorized',
+      () => {
         show.value = true;
         unauthorizedTriggered.value = true;
         timeRemaining.value = 30000;
@@ -82,8 +83,6 @@ export default defineComponent({
       }
       // Show the warning if the time remaining is getting close to 0
       show.value = timeRemaining.value < warningDuration;
-      // TODO: Could add an algorithm to determine time to timeout and set check x/2 etc.
-      //  from it instead of checking every 1 second, creates lots of unnecessary calls?
       setTimeout(updateCountdown, 1000);
     };
     updateCountdown();

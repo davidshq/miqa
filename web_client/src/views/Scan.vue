@@ -4,7 +4,7 @@ import {
   mapState,
 } from 'vuex';
 
-import NavbarView from '@/components/Navbar.vue';
+import Navbar from '@/components/Navbar.vue';
 import ControlPanel from '@/components/ControlPanel.vue';
 import ExperimentsView from '@/components/ExperimentsView.vue';
 import VtkViewer from '@/components/VtkViewer.vue';
@@ -14,7 +14,7 @@ export default {
   name: 'Scan',
   components: {
     LoadingMessage,
-    NavbarView,
+    Navbar,
     ExperimentsView,
     VtkViewer,
     ControlPanel,
@@ -96,7 +96,7 @@ export default {
     class="frame fill-height flex-column ma-0"
   >
     <!-- Top Navbar -->
-    <NavbarView frame-view />
+    <Navbar frame-view />
     <!-- Left Navigation Drawer -->
     <v-navigation-drawer
       expand-on-hover

@@ -10,7 +10,7 @@ import store from '@/store';
 import djangoRest from '@/django';
 import { Project, ScanState } from '@/types';
 import ExperimentsView from '@/components/ExperimentsView.vue';
-import NavbarView from '@/components/Navbar.vue';
+import Navbar from '@/components/Navbar.vue';
 import ProjectSettings from '@/components/ProjectSettings.vue';
 import ProjectUsers from '@/components/ProjectUsers.vue';
 
@@ -20,7 +20,7 @@ export default defineComponent({
   name: 'ProjectsView',
   components: {
     ExperimentsView,
-    NavbarView,
+    Navbar,
     ProjectSettings,
     ProjectUsers,
   },
@@ -236,7 +236,7 @@ export default defineComponent({
 
 <template>
   <div v-if="user">
-    <NavbarView />
+    <Navbar />
     <div class="d-flex">
       <v-card class="project-list-container">
         <v-navigation-drawer permanent>
