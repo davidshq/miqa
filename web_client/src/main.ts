@@ -11,7 +11,6 @@ import router from './router';
 import store from './store';
 import { STATIC_PATH } from './constants';
 
-import vMousetrap from './vue-utilities/v-mousetrap';
 import snackbarService from './vue-utilities/snackbar-service';
 import promptService from './vue-utilities/prompt-service';
 
@@ -19,9 +18,7 @@ import djangoRest, { oauthClient } from './django';
 import { setupHeartbeat } from './heartbeat';
 
 Vue.use(Vuetify);
-
 Vue.use(AsyncComputed);
-Vue.use(vMousetrap);
 
 const vuetify = new Vuetify();
 
@@ -61,7 +58,6 @@ Sentry.init({
       this.$promptAttach();
     },
     render: (h) => h(App),
-
   })
     .$mount('#app');
 })();
