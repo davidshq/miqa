@@ -1,7 +1,3 @@
-/**
- * Provides constants for Volume, Slice
- */
-
 const Volume = [
   { link: 'Visibility', property: 'visibility', updateOnBind: true },
   { link: 'WW', property: 'windowWidth', updateOnBind: true },

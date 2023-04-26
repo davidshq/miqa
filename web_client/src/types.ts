@@ -2,6 +2,10 @@
 /* eslint no-unused-vars: "off" */
 /* eslint no-shadow: "off" */
 
+// TODO: Throughout we have snake case properties, these
+// could be converted to camel case using:
+// https://morioh.com/p/8e8b33c25ea1
+
 interface User {
   id: number,
   username: string,

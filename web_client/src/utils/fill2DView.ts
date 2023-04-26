@@ -1,4 +1,3 @@
-// Used in VtkViewer
 export default function fill2DView(view, w?, h?, resize = true) {
   console.debug('fill2DView: Running');
   if (!view) return undefined;

@@ -1,6 +1,4 @@
-/**
- * Sets the crosshairs on the vtkViewer
- */
+/** Sets the crosshairs on the vtkViewer */
 import vtkCellPicker from 'vtk.js/Sources/Rendering/Core/CellPicker';
 
 class CrosshairSet {
@@ -123,7 +121,6 @@ class CrosshairSet {
     };
   }
 
-  // Used in VtkViewer
   getCrosshairsForAxis(axis, colors) {
     console.log('crosshairs.js - getCrosshairsForAxis: Running');
     const sliceLines = this.getSliceLines();
@@ -177,7 +174,6 @@ class CrosshairSet {
     return picker;
   }
 
-  // Used in VtkViewer
   locationOfClick(clickEvent) {
     console.log('crosshairs.js - locationOfClick: Running');
     const picker = this.getPicker();

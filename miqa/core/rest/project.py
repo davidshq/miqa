@@ -54,7 +54,6 @@ class ProjectSettingsSerializer(serializers.ModelSerializer):
         artifacts_list = [artifact for artifact in obj.artifacts]
         return artifacts_list
 
-
     def get_default_email_recipients(self, obj):
         if obj.default_email_recipients == '':
             return []

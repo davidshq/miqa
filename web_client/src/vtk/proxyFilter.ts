@@ -1,9 +1,6 @@
 import vtkProxySource from 'vtk.js/Sources/Proxy/Core/SourceProxy';
 import vtkImageMarchingCubes from 'vtk.js/Sources/Filters/General/ImageMarchingCubes';
 
-/**
- * Used by proxy.ts
- */
 const Contour = {
   class: vtkProxySource,
   options: {

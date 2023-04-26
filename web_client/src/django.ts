@@ -27,7 +27,7 @@ let s3ffClient;
 
 const oauthClient = new OAuthClient(OAUTH_API_ROOT, OAUTH_CLIENT_ID);
 const djangoClient = {
-  async restoreLogin(store) {
+  async restoreLogin(store: any) {
     await oauthClient.maybeRestoreLogin();
     if (oauthClient.isLoggedIn) {
       Object.assign(

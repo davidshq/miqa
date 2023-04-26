@@ -38,8 +38,6 @@ export default defineComponent({
     const currentTaskOverview = computed(() => store.state.currentTaskOverview);
     const projects = computed(() => store.state.projects);
     const isGlobal = computed(() => store.getters.isGlobal);
-    // TODO: Shouldn't we be able to get this from currentProject above?
-    // Get index of current project (is this different from id?)
     const selectedProjectIndex = ref(projects.value.findIndex(
       (project) => project.id === currentProject.value?.id,
     ));
@@ -53,13 +51,11 @@ export default defineComponent({
     // e.g., unreviewed, needs_2_tier_review, complete
     const scanStates = Object.keys(ScanState);
     const setOverviewSections = () => {
-      // If we have projects and a currentTaskOverview
       if (projects.value && currentTaskOverview.value) {
-        const scanStateCounts = ref(reactive( // TODO: Why ref and reactive?
+        const scanStateCounts = ref(reactive(
           scanStates.map(
             (stateString) => {
               // Replaces _ with a space, e.g. needs_2_tier_review becomes needs 2 tier review
-              // TODO: Understand better
               const stateCount = Object.entries(currentTaskOverview.value.scan_states).filter(
                 ([, scanState]) => scanState === stateString.replace(/_/g, ' '),
               ).length;
@@ -67,7 +63,6 @@ export default defineComponent({
             },
           ),
         ));
-        // TODO: Understand better
         overviewSections.value = scanStateCounts.value.map(
           ([stateString, scanCount]: [string, number]) => ({
             value: scanCount,
@@ -81,9 +76,7 @@ export default defineComponent({
     };
 
     async function refreshTaskOverview() {
-      // If there is a currentProject
       if (currentProject.value) {
-        // Pulls from API
         const taskOverview = await djangoRest.projectTaskOverview(currentProject.value.id);
         // If the store / API values differ, update store to API
         if (JSON.stringify(store.state.currentTaskOverview) !== JSON.stringify(taskOverview)) {
@@ -96,9 +89,8 @@ export default defineComponent({
       // For each project
       projects.value.forEach(
         async (project: Project) => {
-          // Get the latest projectTaskOverview for each project from the API
+          // Gets the latest projectTaskOverview for each project from the API
           const taskOverview = await djangoRest.projectTaskOverview(project.id);
-          // Update store with API values, this occurs even if same
           store.commit('SET_TASK_OVERVIEW', taskOverview);
         },
       );
@@ -115,8 +107,8 @@ export default defineComponent({
       }
     }
 
-    // TODO: Make this timeout customizable
     const overviewPoll = setInterval(refreshTaskOverview, 10000); // 10 secs
+
     // Triggers functions when specified state changes
     watch(currentTaskOverview, setOverviewSections);
     watch(currentProject, refreshTaskOverview);
@@ -169,10 +161,9 @@ export default defineComponent({
     clearInterval(this.overviewPoll);
   },
   methods: {
-    // TODO: Is below using both Options API and above Composition API?
     ...mapMutations([
       'SET_PROJECTS',
-      'SET_CURRENT_PROJECT'
+      'SET_CURRENT_PROJECT',
     ]),
     selectProject(project: Project) {
       if (this.complete) {
@@ -326,7 +317,7 @@ export default defineComponent({
           Perform Global Import / Export
         </v-card-title>
         <v-card-title v-else>
-          Project: {{ currentProject ?currentProject.name :'Global' }}
+          Project: {{ currentProject ? currentProject.name : 'Global' }}
         </v-card-title>
         <div class="flex-container">
           <v-card
@@ -390,7 +381,7 @@ export default defineComponent({
             <div
               v-if="selectedProjectIndex + 1 < projects.length"
             >
-              Proceed to next Project, {{ projects[selectedProjectIndex+1].name }}?
+              Proceed to next Project, {{ projects[selectedProjectIndex + 1].name }}?
               <br>
               <v-form @submit.prevent="proceedToNext">
                 <v-btn

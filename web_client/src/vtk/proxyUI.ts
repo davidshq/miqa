@@ -1,7 +1,3 @@
-/**
- * Constants for Volume, Geometry, Slice, Molecule, Glyph, View3D, View2D, and Skybox
- */
-
 const Volume = [
   {
     name: 'colorBy',

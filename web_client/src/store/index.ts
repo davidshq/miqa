@@ -12,7 +12,7 @@ import WorkerPool from 'itk/WorkerPool';
 import ITKHelper from 'vtk.js/Sources/Common/DataModel/ITKHelper';
 import djangoRest, { apiClient } from '@/django';
 import {
-  Project, ProjectTaskOverview, User, ProjectSettings, Scan,
+  Project, ProjectTaskOverview, ProjectSettings, Scan, User,
 } from '@/types';
 import axios from 'axios';
 import ReaderFactory from '../utils/ReaderFactory';
@@ -93,7 +93,7 @@ function getArrayNameFromFilename(filename) {
   return `Scalars ${name}`;
 }
 
-function getImageData(frameId, file, webWorker = null) {
+function getImageData(frameId: string, file, webWorker = null) {
   console.group('Vuex - getImageData: Running');
   return new Promise((resolve, reject) => {
     // 1. Check cache for copy of image
@@ -978,7 +978,7 @@ export const storeConfig = {
           queueLoadScan(newScan, 3);
         }
         let newProxyManager = false;
-        // Create new proxyManager if scans are different, retain proxyManager otherwise
+        // Create new proxyManager if scans are different, retain if same
         console.debug('Checking if we have a proxyManager');
         if (oldScan !== newScan && state.proxyManager[whichProxy]) {
           // If we don't shrink and reinitialize between scans

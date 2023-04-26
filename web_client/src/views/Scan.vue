@@ -71,7 +71,7 @@ export default {
       this.downloadLoaded = e.loaded;
       this.downloadTotal = e.total;
     },
-    // Loads a specific frame
+    /* Loads a specific frame */
     async swapToScan() {
       console.log('Scan.vue - swapToScan: Running');
       // Get the project/frame id's from the URL
