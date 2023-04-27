@@ -1,7 +1,7 @@
 <script lang="ts">
 import Vue, {
-  computed,
   defineComponent,
+  computed,
   ref,
   watch,
   onMounted,
@@ -134,7 +134,6 @@ export default defineComponent({
           creating.value = false;
           newName.value = '';
 
-          // Used to have a 6s timeout
           setSnackbar('New project created.');
         } catch (ex) {
           setSnackbar(ex || 'Project creation failed.');
@@ -177,13 +176,6 @@ export default defineComponent({
         if (proceed.value) proceed.value.focus();
       });
     });
-    /**
-    projects() {
-      this.$nextTick(() => {
-        if (this.$refs.proceed) this.$refs.proceed.$el.focus();
-      });
-    },
-     */
 
     onMounted(() => {
       loadProjects().then(() => {
@@ -197,7 +189,6 @@ export default defineComponent({
         }
       });
       window.addEventListener('unauthorized', () => {
-        // Used to have a six second timer.
         setSnackbar('Server session expired. Try again.');
       });
     });

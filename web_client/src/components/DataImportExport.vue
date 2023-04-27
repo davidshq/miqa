@@ -52,7 +52,6 @@ export default defineComponent({
             importErrorText.value = response.detail;
             importErrorList.value = response.errors;
           } else {
-            // Had 6 sec timeout
             setSnackbar('Import finished.');
           }
 
@@ -89,7 +88,6 @@ export default defineComponent({
             importErrorText.value = response.detail;
             importErrorList.value = response.warnings;
           } else {
-            // Had 6 sec timeout
             setSnackbar('Saved data to file successfully.');
           }
         } catch (ex) {

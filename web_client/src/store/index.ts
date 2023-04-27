@@ -369,12 +369,7 @@ const initState = {
     NORMAL_USERS_CAN_CREATE_PROJECTS: false,
     S3_SUPPORT: true,
   },
-  me: {
-    username: null,
-    id: null,
-    is_superuser: false,
-    email: null,
-  },
+  me: null,
   snackbar: null,
   allUsers: [],
   reviewMode: true,
@@ -508,14 +503,6 @@ export const storeConfig:StoreOptions<MIQAStore> = {
     /** Returns true if no project has been selected */
     isGlobal(state) {
       return state.currentProject === null;
-    },
-    editRights(state, getters) {
-      return getters.myCurrentProjectRoles.includes('tier_1_reviewer')
-        || getters.myCurrentProjectRoles.includes('tier_2_reviewer')
-        || getters.myCurrentProjectRoles.includes('superuser');
-    },
-    experimentIsEditable(state, getters) {
-      return getters.currentView.lockOwner && getters.currentView.lockOwner.id === state.me.id;
     },
   },
   mutations: {
@@ -857,12 +844,9 @@ export const storeConfig:StoreOptions<MIQAStore> = {
       }
       return state.scans[scanId];
     },
-    async setCurrentFrame({ commit }, frameId) {
-      commit('SET_CURRENT_FRAME_ID', frameId);
-    },
     /** Handles the process of changing frames */
     async swapToFrame({
-      state, dispatch, getters, commit,
+      state, getters, commit,
     }, { frame, onDownloadProgress = null, loadAll = true }) {
       if (!frame) {
         throw new Error("frame id doesn't exist");
@@ -931,7 +915,7 @@ export const storeConfig:StoreOptions<MIQAStore> = {
         state.vtkViews = [];
         commit('SET_ERROR_LOADING_FRAME', true);
       } finally {
-        dispatch('setCurrentFrame', frame.id);
+        commit('SET_CURRENT_FRAME_ID', frame.id);
         commit('SET_LOADING_FRAME', false);
       }
 

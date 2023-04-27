@@ -45,7 +45,6 @@ export default defineComponent({
     function initialize() {
       if (initialized.value) return;
       if (form.value) {
-        // TODO: Where is resetValidation defined?
         form.value.resetValidation();
       }
       if (!currentScan.value) {
@@ -118,7 +117,6 @@ export default defineComponent({
     }
 
     watch(user, initialize);
-    // Originally this was conditional if value && !this.initialized)
     watch(currentFrame, initialize);
 
     return {

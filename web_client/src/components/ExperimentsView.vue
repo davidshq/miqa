@@ -54,7 +54,7 @@ export default defineComponent({
 
     const setReviewMode = (mode) => store.commit('SET_REVIEW_MODE', mode);
     const loadProject = (project) => store.dispatch('loadProject', project);
-    // includeScan,
+
     /** Assigns a color and character if a decision has been rendered on a given scan */
     function decisionToRating(decisions) {
       // decisions are an array of objects
@@ -99,13 +99,6 @@ export default defineComponent({
     function getURLForScan(scanId) {
       return `/${currentProject.value.id}/${scanId}`;
     }
-    /**
-    function scanIsCurrent(scan) {
-      if (scan === this.currentScan) {
-        return ' current';
-      }
-      return '';
-    }*/
     function scanState(scan) {
       let scanTaskState;
       if (currentTaskOverview.value) {

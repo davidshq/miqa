@@ -11,9 +11,6 @@ import router from './router';
 import store from './store';
 import { STATIC_PATH } from './constants';
 
-import snackbarService from './vue-utilities/snackbar-service';
-import promptService from './vue-utilities/prompt-service';
-
 import djangoRest, { oauthClient } from './django';
 import { setupHeartbeat } from './heartbeat';
 
@@ -21,9 +18,6 @@ Vue.use(Vuetify);
 Vue.use(AsyncComputed);
 
 const vuetify = new Vuetify();
-
-Vue.use(snackbarService(vuetify));
-Vue.use(promptService(vuetify));
 
 config.itkModulesPath = STATIC_PATH + config.itkModulesPath;
 
@@ -48,15 +42,6 @@ Sentry.init({
     vuetify,
     router,
     store,
-    provide: {
-      user: store.state.me,
-      MIQAConfig: store.state.MIQAConfig,
-      $snackbar: Vue.prototype.$snackbar,
-    },
-    mounted() {
-      this.$snackbarAttach();
-      this.$promptAttach();
-    },
     render: (h) => h(App),
   })
     .$mount('#app');
