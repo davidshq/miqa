@@ -17,8 +17,6 @@ function createProxyDefinition(
   definitionOptions = {},
   props = {},
 ) {
-  console.log('vtk/configUtils.js - createProxyDefinition: Running');
-  // console.log('vtk/configUtils.js - createProxyDefinition: class, options, props', classFactory, { links, ui, ...definitionOptions }, props);
   return {
     class: classFactory,
     options: { links, ui, ...definitionOptions },
@@ -26,13 +24,9 @@ function createProxyDefinition(
   };
 }
 
-/**
- *
- * @param def
- * @returns {*}
- */
+// ----------------------------------------------------------------------------
+
 function activateOnCreate(def) {
-  console.log('vtk/configUtils.js - activateOnCreate: Running');
   /* eslint-disable no-param-reassign */
   def.options.activateOnCreate = true;
   return def;

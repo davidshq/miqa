@@ -11,7 +11,7 @@ import vtkView from 'vtk.js/Sources/Proxy/Core/ViewProxy';
 import vtkVolumeRepresentationProxy from 'vtk.js/Sources/Proxy/Representations/VolumeRepresentationProxy';
 import 'vtk.js/Sources/Rendering/Profiles/All';
 
-import ConfigUtils from './configUtils.js';
+import ConfigUtils from './configUtils';
 
 import proxyUI from './proxyUI';
 import proxyLinks from './proxyLinks';
@@ -20,7 +20,7 @@ import proxyViewRepresentationMapping from './proxyViewRepresentationMapping';
 
 const { createProxyDefinition, activateOnCreate } = ConfigUtils;
 
-function createDefaultView(classFactory, ui, options?, props?) {
+function createDefaultView(classFactory, ui, options, props) {
   return activateOnCreate(
     createProxyDefinition(
       classFactory,

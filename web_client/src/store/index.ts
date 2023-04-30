@@ -5,7 +5,7 @@ import vtkProxyManager from 'vtk.js/Sources/Proxy/Core/ProxyManager';
 import macro from 'vtk.js/Sources/macros';
 import { InterpolationType } from 'vtk.js/Sources/Rendering/Core/ImageProperty/Constants';
 
-import '../utils/registerReaders.js';
+import '../utils/registerReaders';
 
 import readImageArrayBuffer from 'itk/readImageArrayBuffer';
 import WorkerPool from 'itk/WorkerPool';
@@ -15,11 +15,11 @@ import djangoRest, { apiClient } from '@/django';
 import {
   MIQAStore, Project, ProjectTaskOverview, ProjectSettings, Scan, User,
 } from '@/types';
-import ReaderFactory from '../utils/ReaderFactory.js';
+import ReaderFactory from '../utils/ReaderFactory';
 
-import { proxy } from '../vtk/index.js';
-import { getView } from '../vtk/viewManager.js';
-import { ijkMapping } from '../vtk/constants.js';
+import { proxy } from '../vtk';
+import { getView } from '../vtk/viewManager';
+import { ijkMapping } from '../vtk/constants';
 
 import {
   RESET_STATE, SET_MIQA_CONFIG, SET_ME, SET_SNACKBAR,
@@ -879,14 +879,14 @@ export const storeConfig:StoreOptions<MIQAStore> = {
           newProxyManager = true;
         }
         // Handles shrinking and/or instantiating a new proxyManager instance
-        await dispatch('setupProxyManager', newProxyManager);
+        await store.dispatch('setupProxyManager', newProxyManager);
       }
 
       try {
         // Gets the data we need to display
-        const frameData = await dispatch('getFrameData', { frame, onDownloadProgress });
+        const frameData = await store.dispatch('getFrameData', { frame, onDownloadProgress });
         // Handles configuring the sourceProxy and getting the views
-        await dispatch('setupSourceProxy', { frame, frameData });
+        await store.dispatch('setupSourceProxy', { frame, frameData });
       }
       catch (err) {
         console.error('Vuex - Action - swapToFrame: Caught exception loading next frame', err);
@@ -897,7 +897,7 @@ export const storeConfig:StoreOptions<MIQAStore> = {
         commit('SET_LOADING_FRAME', false);
       }
 
-      await dispatch('updateLock');
+      await store.dispatch('updateLock');
       console.groupEnd();
     },
     async loadFrame({state, dispatch, commit }, { frame, onDownloadProgress = null, whichProxy = 0 }) {

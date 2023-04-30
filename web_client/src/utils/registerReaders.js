@@ -1,7 +1,7 @@
 import vtkITKImageReader from 'vtk.js/Sources/IO/Misc/ITKImageReader';
 import readImageArrayBuffer from 'itk/readImageArrayBuffer';
 
-import ReaderFactory from './ReaderFactory.js';
+import ReaderFactory from './ReaderFactory';
 
 vtkITKImageReader.setReadImageArrayBufferFromITK(readImageArrayBuffer);
 
