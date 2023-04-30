@@ -1,41 +1,14 @@
-import { VIEW_ORIENTATIONS, ANNOTATIONS } from './constants';
+import { VIEW_ORIENTATIONS } from './constants';
 
-// ----------------------------------------------------------------------------
-
-function getNumberOfVisibleViews(proxyManager) {
-  let nbViews = 0;
-  proxyManager.getViews().forEach((v) => {
-    nbViews += v.getContainer() ? 1 : 0;
-  });
-  return nbViews;
-}
-
-// ----------------------------------------------------------------------------
-
-function getViewActions(proxyManager) {
-  const possibleActions = {
-    crop: false,
-  };
-
-  // To crop we need at list an image data
-  proxyManager.getSources().forEach((s) => {
-    const ds = s.getFrame();
-    if (ds && ds.isA && ds.isA('vtkImageData')) {
-      possibleActions.crop = true;
-    }
-  });
-
-  return possibleActions;
-}
-
-// ----------------------------------------------------------------------------
-
-function getViewType(view) {
-  return `${view.getProxyName()}:${view.getName()}`;
-}
-
-// ----------------------------------------------------------------------------
-
+/**
+ * Gets views from proxyManager
+ *
+ * Used in Vuex Store
+ *
+ * @param proxyManager
+ * @param viewType  e.g., View2D_Z:z, View2D_X:x, View2D_Y:y
+ * @returns {null}
+ */
 function getView(proxyManager, viewType) {
   const [type, name] = viewType.split(':');
   let view = null;
@@ -77,38 +50,10 @@ function getView(proxyManager, viewType) {
   return view;
 }
 
-// ----------------------------------------------------------------------------
-
-function updateViewsAnnotation(proxyManager) {
-  const hasImageData = proxyManager
-    .getSources()
-    .find((s) => s.getFrame().isA && s.getFrame().isA('vtkImageData'));
-  const views = proxyManager.getViews();
-
-  for (let i = 0; i < views.length; i += 1) {
-    const view = views[i];
-    view.setCornerAnnotation('se', '');
-    if (view.getProxyName().indexOf('2D') !== -1 && hasImageData) {
-      view.setCornerAnnotations(ANNOTATIONS, true);
-    } else {
-      view.setCornerAnnotation('nw', '');
-    }
-  }
-}
-
-// ----------------------------------------------------------------------------
 export default {
-  getViewType,
   getView,
-  getViewActions,
-  getNumberOfVisibleViews,
-  updateViewsAnnotation,
 };
 
 export {
-  getViewType,
   getView,
-  getViewActions,
-  getNumberOfVisibleViews,
-  updateViewsAnnotation,
 };

@@ -64,9 +64,11 @@ export default {
       LookupTable: createProxyDefinition(vtkLookupTableProxy, [], [], {
         presetName: 'Default (Cool to Warm)',
       }),
+      // Controls the appearance of the volume.
       PiecewiseFunction: createProxyDefinition(vtkPiecewiseFunctionProxy),
     },
     Sources: {
+      // For stand-alone data objects
       TrivialProducer: activateOnCreate(createProxyDefinition(vtkProxySource)),
       Contour: proxyFilter.Contour,
     },
