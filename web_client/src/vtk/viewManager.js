@@ -31,7 +31,7 @@ function getView(proxyManager, viewType) {
     // Make sure representation is created for new view
     proxyManager
       .getSources()
-      .forEach((s) => proxyManager.getRepresentation(s, view));
+      .forEach((source) => proxyManager.getRepresentation(source, view));
 
     // Update orientation
     //   LPS is the default of the view constructor

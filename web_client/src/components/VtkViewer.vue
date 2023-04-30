@@ -21,6 +21,11 @@ export default defineComponent({
       required: true,
       type: Object,
     },
+    proxyNum: {
+      default: 0,
+      required: false,
+      type: Number,
+    },
   },
   setup(props) {
     const viewer = ref();
