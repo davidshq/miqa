@@ -11,7 +11,7 @@ import vtkView from 'vtk.js/Sources/Proxy/Core/ViewProxy';
 import vtkVolumeRepresentationProxy from 'vtk.js/Sources/Proxy/Representations/VolumeRepresentationProxy';
 import 'vtk.js/Sources/Rendering/Profiles/All';
 
-import ConfigUtils from './configUtils';
+import ConfigUtils from './configUtils.js';
 
 import proxyUI from './proxyUI';
 import proxyLinks from './proxyLinks';

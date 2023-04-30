@@ -5,7 +5,7 @@ import vtkProxyManager from 'vtk.js/Sources/Proxy/Core/ProxyManager';
 import macro from 'vtk.js/Sources/macros';
 import { InterpolationType } from 'vtk.js/Sources/Rendering/Core/ImageProperty/Constants';
 
-import '../utils/registerReaders';
+import '../utils/registerReaders.js';
 
 import readImageArrayBuffer from 'itk/readImageArrayBuffer';
 import WorkerPool from 'itk/WorkerPool';
@@ -15,11 +15,11 @@ import djangoRest, { apiClient } from '@/django';
 import {
   MIQAStore, Project, ProjectTaskOverview, ProjectSettings, Scan, User,
 } from '@/types';
-import ReaderFactory from '../utils/ReaderFactory';
+import ReaderFactory from '../utils/ReaderFactory.js';
 
-import { proxy } from '../vtk';
-import { getView } from '../vtk/viewManager';
-import { ijkMapping } from '../vtk/constants';
+import { proxy } from '../vtk/index.js';
+import { getView } from '../vtk/viewManager.js';
+import { ijkMapping } from '../vtk/constants.js';
 
 import {
   RESET_STATE, SET_MIQA_CONFIG, SET_ME, SET_SNACKBAR,
