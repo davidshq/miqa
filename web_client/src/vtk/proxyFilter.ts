@@ -12,7 +12,6 @@ const Contour = {
       mergePoints: { modelKey: 'algo', property: 'mergePoints' },
     },
     updateDomain(self, frame) {
-      console.log('vtk/proxyFilter.js - updateDomain: Running');
       const arrayToProcess = frame.getPointData().getScalars();
       frame.getPointData().getArrayByIndex(0);
       if (!arrayToProcess) {

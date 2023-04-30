@@ -1,11 +1,14 @@
 import vtk2DView from 'vtk.js/Sources/Proxy/Core/View2DProxy';
+import vtkGeometryRepresentationProxy from 'vtk.js/Sources/Proxy/Representations/GeometryRepresentationProxy';
+import vtkSkyboxRepresentationProxy from 'vtk.js/Sources/Proxy/Representations/SkyboxRepresentationProxy';
+import vtkGlyphRepresentationProxy from 'vtk.js/Sources/Proxy/Representations/GlyphRepresentationProxy';
 import vtkLookupTableProxy from 'vtk.js/Sources/Proxy/Core/LookupTableProxy';
+import vtkMoleculeRepresentationProxy from 'vtk.js/Sources/Proxy/Representations/MoleculeRepresentationProxy';
 import vtkPiecewiseFunctionProxy from 'vtk.js/Sources/Proxy/Core/PiecewiseFunctionProxy';
 import vtkProxySource from 'vtk.js/Sources/Proxy/Core/SourceProxy';
 import vtkSliceRepresentationProxy from 'vtk.js/Sources/Proxy/Representations/SliceRepresentationProxy';
 import vtkView from 'vtk.js/Sources/Proxy/Core/ViewProxy';
 import vtkVolumeRepresentationProxy from 'vtk.js/Sources/Proxy/Representations/VolumeRepresentationProxy';
-import vtkGeometryRepresentationProxy from 'vtk.js/Sources/Proxy/Representations/GeometryRepresentationProxy';
 import 'vtk.js/Sources/Rendering/Profiles/All';
 
 import ConfigUtils from './configUtils';
@@ -17,21 +20,7 @@ import proxyViewRepresentationMapping from './proxyViewRepresentationMapping';
 
 const { createProxyDefinition, activateOnCreate } = ConfigUtils;
 
-/**
- * Sets up the default rendered volume view
- *
- * Note: The options set here include annotation opacity,
- * visibility of orientation axes, orientation axes preset,
- * and orientation axes type.
- *
- * @param classFactory  e.g., vtkView, vtk2DView
- * @param ui            e.g., proxyUI.View3D, proxyUI.View2D
- * @param options       e.g., { axis: 0 }, { axis: 1 }, ...
- * @param props         Never passed
- * @returns {*}
- */
-function createDefaultView(classFactory, ui, options?, props?) {
-  console.log('vtk/proxy.js - createDefaultView: Running');
+function createDefaultView(classFactory, ui, options, props) {
   return activateOnCreate(
     createProxyDefinition(
       classFactory,
@@ -68,6 +57,7 @@ function createDefaultView(classFactory, ui, options?, props?) {
   );
 }
 
+// ----------------------------------------------------------------------------
 export default {
   definitions: {
     Proxy: {
@@ -87,6 +77,11 @@ export default {
         vtkGeometryRepresentationProxy,
         proxyUI.Geometry,
         proxyLinks.Geometry,
+      ),
+      Skybox: createProxyDefinition(
+        vtkSkyboxRepresentationProxy,
+        proxyUI.Skybox,
+        proxyLinks.Skybox,
       ),
       Slice: createProxyDefinition(
         vtkSliceRepresentationProxy,
@@ -118,6 +113,16 @@ export default {
         vtkVolumeRepresentationProxy,
         proxyUI.Volume,
         proxyLinks.Volume,
+      ),
+      Molecule: createProxyDefinition(
+        vtkMoleculeRepresentationProxy,
+        proxyUI.Molecule,
+        proxyLinks.Molecule,
+      ),
+      Glyph: createProxyDefinition(
+        vtkGlyphRepresentationProxy,
+        proxyUI.Glyph,
+        proxyLinks.Glyph,
       ),
     },
     Views: {
@@ -160,6 +165,9 @@ export default {
     },
   },
   filters: {
+    vtkPolyData: [],
     vtkImageData: ['Contour'],
+    vtkMolecule: [],
+    Glyph: [],
   },
 };

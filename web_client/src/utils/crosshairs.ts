@@ -11,62 +11,45 @@ class CrosshairSet {
     jSlice,
     kSlice,
   ) {
-    console.group('Crosshairs.js - CrosshairSet - constructor: Running');
     this.xyzName = xyzName;
-    console.debug('constructor: xyzName: ', xyzName);
     this.ijkName = ijkName;
-    console.debug('constructor: ijkName: ', ijkName);
     this.imageRepresentation = imageRepresentation;
-    this.imageData = this.imageRepresentation.getImageData; // .getInputDataSet()
-    console.debug('constructor: imageRepresentation', imageRepresentation);
-    console.debug('constructor: imageData', this.imageData);
-    console.debug('className:', imageRepresentation.getClassName());
+    this.imageData = this.imageRepresentation.getInputDataSet();
     this.imageView = imageView;
     this.renderer = this.imageView.getRenderer();
     this.renderWindow = this.imageView.getOpenglRenderWindow();
     this.imageCanvas = imageCanvas;
-    console.debug('constructor: imageCanvas: ', imageCanvas);
     this.iSlice = iSlice;
-    console.debug('constructor: iSlice: ', iSlice);
     this.jSlice = jSlice;
-    console.debug('constructor: jSlice: ', jSlice);
     this.kSlice = kSlice;
-    console.debug('constructor: kSlice: ', kSlice);
     this.ijkMapping = {
       x: 'i',
       y: 'j',
       z: 'k',
     };
-    console.groupEnd()
   }
 
   getOrientation() {
-    console.log('crosshairs.js - getOrientation: Running');
     if (!this.imageRepresentation.getInputDataSet()) return undefined;
     return this.imageRepresentation.getInputDataSet().getDirection();
   }
 
   getSliceLines() {
-    console.group('crosshairs.js - getSliceLines: Running');
     if (!this.imageData) return undefined;
     const [iMax, jMax, kMax] = this.imageData.getDimensions();
-    console.debug('iMax, jMax, kMax', iMax, jMax, kMax);
 
     const iRepresentation = [
       [0, this.jSlice, this.kSlice],
       [iMax - 1, this.jSlice, this.kSlice],
     ];
-    console.debug('iRepresentation', iRepresentation);
     const jRepresentation = [
       [this.iSlice, 0, this.kSlice],
       [this.iSlice, jMax - 1, this.kSlice],
     ];
-    console.debug('jRepresentation', jRepresentation);
     const kRepresentation = [
       [this.iSlice, this.jSlice, 0],
       [this.iSlice, this.jSlice, kMax - 1],
     ];
-    console.debug('kRepresentation', kRepresentation);
     const [iPoints, jPoints, kPoints] = [iRepresentation, jRepresentation, kRepresentation].map(
       (representation) => [
         this.imageData.indexToWorld(representation[0]),
@@ -76,10 +59,6 @@ class CrosshairSet {
           .map((c) => c / devicePixelRatio).slice(0, 2),
       ).map((point) => [point[0], this.imageCanvas.height - point[1]]),
     );
-    console.debug('iPoints', iPoints);
-    console.debug('jPoints', jPoints);
-    console.debug('kPoints', kPoints);
-    console.groupEnd();
     return {
       i: {
         start: iPoints[0],
@@ -97,7 +76,6 @@ class CrosshairSet {
   }
 
   getCrosshairsForAxis(axis, colors) {
-    console.log('crosshairs.js - getCrosshairsForAxis: Running');
     const sliceLines = this.getSliceLines();
     let horizontalLine = null;
     let verticalLine = null;
@@ -116,7 +94,6 @@ class CrosshairSet {
   }
 
   trueAxis(axisName) {
-    console.log('crosshairs.js - trueAxis: Running');
     const xyzAxisOrdering = ['x', 'y', 'z'];
     const ijkAxisOrdering = ['i', 'j', 'k'];
     let axisOrdering = xyzAxisOrdering;
@@ -140,7 +117,6 @@ class CrosshairSet {
   }
 
   getPicker() {
-    console.log('crosshairs.js - getPicker: Running');
     const picker = vtkCellPicker.newInstance();
     picker.setPickFromList(1);
     picker.setTolerance(0);
@@ -150,7 +126,6 @@ class CrosshairSet {
   }
 
   locationOfClick(clickEvent) {
-    console.log('crosshairs.js - locationOfClick: Running');
     const picker = this.getPicker();
     picker.pick([clickEvent.position.x, clickEvent.position.y, 0], this.renderer);
     if (picker.getActors().length === 0) return { i: undefined, j: undefined, k: undefined };

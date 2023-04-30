@@ -95,6 +95,34 @@ const Slice = [
   },
 ];
 
+const Molecule = [
+  {
+    name: 'tolerance',
+    domain: { min: 0, max: 0.5, step: 0.01 },
+  },
+  {
+    name: 'atomicRadiusScaleFactor',
+    domain: { min: 0, max: 0.5, step: 0.01 },
+  },
+  {
+    name: 'bondRadius',
+    domain: { min: 0, max: 0.5, step: 0.01 },
+  },
+  {
+    name: 'deltaBondFactor',
+    domain: { min: 0, max: 0.5, step: 0.01 },
+  },
+  {
+    name: 'hideElements',
+  },
+];
+
+const Glyph = [
+  {
+    name: 'edgeVisibility',
+  },
+];
+
 const View3D = [
   { name: 'name' },
   {
@@ -143,10 +171,15 @@ const View2D = [
   },
 ];
 
+const Skybox = [{ name: 'position' }];
+
 export default {
   Volume,
   Geometry,
   Slice,
+  Molecule,
+  Glyph,
   View3D,
   View2D,
+  Skybox,
 };
