@@ -201,9 +201,9 @@ interface MIQAStore {
   sliceLocation: {
     [key: string]: number;
   };
-  iIndexSlice: number;
-  jIndexSlice: number;
-  kIndexSlice: number;
+  iIndexSlice: object;
+  jIndexSlice: object;
+  kIndexSlice: object;
   currentWindowWidth: number;
   currentWindowLevel: number;
   renderOrientation: string;

@@ -49,12 +49,14 @@ const setCurrentScreenshot = (ss) => store.commit('SET_CURRENT_SCREENSHOT', ss);
 const setCurrentVtkIndexSlices = (slices) => store.commit('SET_CURRENT_VTK_INDEX_SLICES', slices);
 const setSliceLocation = (loc) => store.commit('SET_SLICE_LOCATION', loc);
 
+console.log(props.view);
 const representation = computed(
   // Returning representation from VTK
   // force add dependency on currentFrame
   () => currentFrame.value
-    && proxyManager.value.getRepresentation(null, props.view),
+    && proxyManager.value[0].getRepresentation(null, props.view),
 );
+console.log(representation);
 const sliceDomain = computed(() => {
   // Returns the range of valid values and their step for the slice property
   if (!representation.value) return null;

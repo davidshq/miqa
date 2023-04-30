@@ -384,7 +384,7 @@ const initState = {
   scans: {},
   scanFrames: {},
   frames: {},
-  proxyManager: null,
+  proxyManager: [],
   vtkViews: [],
   currentFrameId: null,
   loadingFrame: false,
@@ -396,9 +396,24 @@ const initState = {
   showCrosshairs: true,
   storeCrosshairs: true,
   sliceLocation: {},
-  iIndexSlice: 0,
-  jIndexSlice: 0,
-  kIndexSlice: 0,
+  iIndexSlice: {
+    0: 0,
+    1: 0,
+    2: 0,
+    3: 0,
+  },
+  jIndexSlice: {
+    0: 0,
+    1: 0,
+    2: 0,
+    3: 0,
+  },
+  kIndexSlice: {
+    0: 0,
+    1: 0,
+    2: 0,
+    3: 0,
+  },
   currentWindowWidth: 256,
   currentWindowLevel: 150,
   windowLocked: {
@@ -649,19 +664,20 @@ export const storeConfig:StoreOptions<MIQAStore> = {
       state.scanCachedPercentage = percentComplete;
     },
     /** Saves the location of the cursor click related to a specific scan and decision */
-    [SET_SLICE_LOCATION](state, ijkLocation) {
+    [SET_SLICE_LOCATION](state, ijkLocation, whichProxy = 0) {
       if (Object.values(ijkLocation).every((value) => value !== undefined)) {
-        state.vtkViews.forEach(
+        state.vtkViews[whichProxy].forEach(
           (view) => {
-            state.proxyManager.getRepresentation(null, view).setSlice(
+            state.proxyManager[whichProxy].getRepresentation(null, view).setSlice(
               ijkLocation[ijkMapping[view.getName()]],
             );
           },
         );
       }
     },
-    [SET_CURRENT_VTK_INDEX_SLICES](state, { indexAxis, value }) {
-      state[`${indexAxis}IndexSlice`] = value;
+    [SET_CURRENT_VTK_INDEX_SLICES](state, { indexAxis, value, whichProxy = 0 }) {
+      const currentAxis = `${indexAxis}IndexSlice`;
+      state[currentAxis][whichProxy] = value;
       state.sliceLocation = undefined;
     },
     [SET_SHOW_CROSSHAIRS](state, show: boolean) {
@@ -847,7 +863,9 @@ export const storeConfig:StoreOptions<MIQAStore> = {
     /** Handles the process of changing frames */
     async swapToFrame({
       state, getters, commit,
-    }, { frame, onDownloadProgress = null, loadAll = true }) {
+    }, {
+      frame, onDownloadProgress = null, loadAll = true, whichProxy = 0,
+    }) {
       if (!frame) {
         throw new Error("frame id doesn't exist");
       }
@@ -868,13 +886,13 @@ export const storeConfig:StoreOptions<MIQAStore> = {
         }
         let newProxyManager = false;
         // Create new proxyManager if scans are different, retain if same
-        if (oldScan !== newScan && state.proxyManager) {
+        if (oldScan !== newScan && state.proxyManager[whichProxy]) {
           // If we don't shrink and reinitialize between scans
           // we sometimes end up with no frame slices displayed.
           // This may be due to the extents changing between scans,
           // the extents do not change from one timestep to another
           // in a single scan.
-          shrinkProxyManager(state.proxyManager);
+          shrinkProxyManager(state.proxyManager[whichProxy]);
           newProxyManager = true;
         }
         // Handles shrinking and/or instantiating a new proxyManager instance
@@ -888,7 +906,7 @@ export const storeConfig:StoreOptions<MIQAStore> = {
         await store.dispatch('setupSourceProxy', { frame, frameData });
       } catch (err) {
         console.error('Vuex - Action - swapToFrame: Caught exception loading next frame', err);
-        state.vtkViews = [];
+        state.vtkViews[whichProxy] = [];
         commit('SET_ERROR_LOADING_FRAME', true);
       } finally {
         commit('SET_CURRENT_FRAME_ID', frame.id);
@@ -898,7 +916,7 @@ export const storeConfig:StoreOptions<MIQAStore> = {
       await store.dispatch('updateLock');
       console.groupEnd();
     },
-    async loadFrame({ state, commit }, { frame, onDownloadProgress = null }) {
+    async loadFrame({ state, commit }, { frame, onDownloadProgress = null, whichProxy = 0 }) {
       // Guard clauses
       if (!frame) {
         throw new Error("Vuex - Action - loadFrame: frame id doesn't exist");
@@ -913,42 +931,42 @@ export const storeConfig:StoreOptions<MIQAStore> = {
 
       let newProxyManager = false;
 
-      if (state.proxyManager) {
-        shrinkProxyManager(state.proxyManager);
+      if (state.proxyManager[whichProxy]) {
+        shrinkProxyManager(state.proxyManager[whichProxy]);
         newProxyManager = true;
       }
 
-      await store.dispatch('setupProxyManager', { newProxyManager });
+      await store.dispatch('setupProxyManager', { newProxyManager, whichProxy });
 
       const frameData = await store.dispatch('getFrameData', { frame, onDownloadProgress });
 
       try {
-        await store.dispatch('setupSourceProxy', { frame, frameData });
+        await store.dispatch('setupSourceProxy', { frame, frameData, whichProxy });
       } catch (err) {
         console.error('Vuex - Action - loadFrame: Caught exception loading frame', err);
-        state.vtkViews = [];
+        state.vtkViews[whichProxy] = [];
         commit('SET_ERROR_LOADING_FRAME', true);
       } finally {
         commit('SET_CURRENT_FRAME_ID', frame.id);
         commit('SET_LOADING_FRAME', false);
       }
     },
-    async setupProxyManager({ state }, { newProxyManager }) {
+    async setupProxyManager({ state }, { newProxyManager, whichProxy = 0 }) {
       // If it doesn't exist, create new instance of proxyManager
       // Also, if it does exist but was used for a different scan, create a new one
-      if (!state.proxyManager || newProxyManager) {
-        state.proxyManager = vtkProxyManager.newInstance({
+      if (!state.proxyManager[whichProxy] || newProxyManager) {
+        state.proxyManager[whichProxy] = vtkProxyManager.newInstance({
           proxyConfiguration: proxy,
         });
-        state.vtkViews = [];
+        state.vtkViews[whichProxy] = [];
       }
     },
-    async setupSourceProxy({ state }, { frameData }) {
+    async setupSourceProxy({ state }, { frameData, whichProxy = 0 }) {
       // get the source from which we are loading the images
-      let sourceProxy = state.proxyManager.getActiveSource();
+      let sourceProxy = state.proxyManager[whichProxy].getActiveSource();
       let needPrep = false;
       if (!sourceProxy) {
-        sourceProxy = state.proxyManager.createProxy(
+        sourceProxy = state.proxyManager[whichProxy].createProxy(
           'Sources',
           'TrivialProducer',
         );
@@ -958,12 +976,12 @@ export const storeConfig:StoreOptions<MIQAStore> = {
       // This try catch and within logic are mainly for handling data doesn't exist issue
       // We set the source equal to the frameData we've loaded
       sourceProxy.setInputData(frameData);
-      if (needPrep || !state.proxyManager.getViews().length) {
-        prepareProxyManager(state.proxyManager);
-        state.vtkViews = state.proxyManager.getViews();
+      if (needPrep || !state.proxyManager[whichProxy].getViews().length) {
+        prepareProxyManager(state.proxyManager[whichProxy]);
+        state.vtkViews[whichProxy] = state.proxyManager[whichProxy].getViews();
       }
-      if (!state.vtkViews.length) {
-        state.vtkViews = state.proxyManager.getViews();
+      if (!state.vtkViews[whichProxy].length) {
+        state.vtkViews[whichProxy] = state.proxyManager[whichProxy].getViews();
       }
     },
     async getFrameData({}, { frame, onDownloadProgress = null }) {

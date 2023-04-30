@@ -269,8 +269,8 @@ export default defineComponent({
             present: confirmedPresent.value,
             absent: confirmedAbsent.value,
           };
-          const zxyLocation = vtkViews.value.map(
-            (view) => proxyManager.value.getRepresentation(null, view).getSlice(),
+          const zxyLocation = vtkViews.value[0].map(
+            (view) => proxyManager.value[0].getRepresentation(null, view).getSlice(),
           );
           // Create new scan decision using API
           const savedObj = await djangoRest.setDecision(

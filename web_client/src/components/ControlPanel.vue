@@ -57,7 +57,7 @@ export default defineComponent({
       () => lockOwner.value && lockOwner.value.id === user.value.id,
     );
     const representation = computed(
-      () => currentFrame.value && proxyManager.value.getRepresentations()[0],
+      () => currentFrame.value && proxyManager.value[0].getRepresentations()[0],
     );
 
     function openScanLink() {
