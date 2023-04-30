@@ -1,13 +1,19 @@
 <script lang="ts">
+import {
+  defineComponent,
+  ref,
+  computed,
+  watch,
+  onMounted,
+  onBeforeUnmount,
+} from 'vue';
 import { vec3 } from 'gl-matrix';
-
-import { mapState, mapGetters, mapMutations } from 'vuex';
-
+import store from '@/store';
 import CrosshairSet from '../utils/crosshairs';
 import fill2DView from '../utils/fill2DView';
 import { VIEW_ORIENTATIONS, ijkMapping } from '../vtk/constants';
 
-export default {
+export default defineComponent({
   name: 'VtkViewer',
   components: {},
   props: {
@@ -21,53 +27,47 @@ export default {
       type: Number,
     },
   },
-  data: () => ({
-    slice: null,
-    // helper to avoid size flickering
-    resized: false,
-    fullscreen: false,
-    screenshotContainer: document.createElement('div'),
-  }),
-  computed: {
-    ...mapState([
-      'proxyManager',
-      'loadingFrame',
-      'showCrosshairs',
-      'iIndexSlice',
-      'jIndexSlice',
-      'kIndexSlice',
-      'currentWindowWidth',
-      'currentWindowLevel',
-      'renderOrientation',
-    ]),
-    ...mapGetters([
-      'currentFrame',
-      'currentScan',
-      'currentViewData',
-    ]),
-    // Returning representation from VTK
-    representation() {
-      console.log('VtkViewer - representation: Running');
-      console.debug('representation: getRepresentation', this.proxyManager[this.proxyNum].getRepresentation(null, this.view));
-      return (
-        // force add dependency on currentFrame
-        this.currentFrame
-        && this.proxyManager[this.proxyNum].getRepresentation(null, this.view)
-      );
-    },
-    // Returns the range of valid values and their step for the slice property
-    sliceDomain() {
-      console.group('sliceDomain: Running');
-      if (!this.representation) return null;
-      console.debug('PropertyDomainByName', this.representation.getPropertyDomainByName('slice'));
-      console.groupEnd()
-      return this.representation.getPropertyDomainByName('slice');
-    },
-    name() : ('x' | 'y' | 'z') {
-      return this.view.getName();
-    },
-    displayName() {
-      switch (this.name) {
+  setup(props) {
+    const viewer = ref();
+    const crosshairsCanvas = ref();
+    const slice = ref(null);
+    const resized = ref(false); // helper to avoid size flickering
+    const fullscreen = ref(false);
+    const renderSubscription = ref();
+    const resizeObserver = ref();
+    const screenshotContainer = document.createElement('div');
+
+    const proxyManager = computed(() => store.state.proxyManager);
+    const loadingFrame = computed(() => store.state.loadingFrame);
+    const showCrosshairs = computed(() => store.state.showCrosshairs);
+    const iIndexSlice = computed(() => store.state.iIndexSlice);
+    const jIndexSlice = computed(() => store.state.jIndexSlice);
+    const kIndexSlice = computed(() => store.state.kIndexSlice);
+    const currentWindowWidth = computed(() => store.state.currentWindowWidth);
+    const currentWindowLevel = computed(() => store.state.currentWindowLevel);
+    const renderOrientation = computed(() => store.state.renderOrientation);
+
+    const currentFrame = computed(() => store.getters.currentFrame);
+    const currentViewData = computed(() => store.getters.currentViewData);
+
+    const setCurrentScreenshot = (ss) => store.commit('SET_CURRENT_SCREENSHOT', ss);
+    const setCurrentVtkIndexSlices = (slices) => store.commit('SET_CURRENT_VTK_INDEX_SLICES', slices);
+    const setSliceLocation = (loc) => store.commit('SET_SLICE_LOCATION', loc);
+
+    const representation = computed(
+      // Returning representation from VTK
+      // force add dependency on currentFrame
+      () => currentFrame.value
+        && proxyManager[props.proxyNum].value.getRepresentation(null, props.view),
+    );
+    const sliceDomain = computed(() => {
+      // Returns the range of valid values and their step for the slice property
+      if (!representation.value) return null;
+      return representation.value.getPropertyDomainByName('slice');
+    });
+    const name = computed(() => props.view.getName() as ('x' | 'y' | 'z'));
+    const displayName = computed(() => {
+      switch (name.value) {
         case 'x':
           return 'Sagittal';
         case 'y':
@@ -77,12 +77,10 @@ export default {
         default:
           return '';
       }
-    },
-    ijkName() : ('i' | 'j' | 'k') {
-      return ijkMapping[this.name];
-    },
-    keyboardBindings() {
-      switch (this.name) {
+    });
+    const ijkName = computed(() => ijkMapping[name.value] as ('i' | 'j' | 'k'));
+    const keyboardBindings = computed(() => {
+      switch (name.value) {
         case 'z':
           return ['q', 'w', 'e'];
         case 'x':
@@ -92,180 +90,9 @@ export default {
         default:
           return '';
       }
-    },
-  },
-  watch: {
-    slice(newSlice) {
-      console.log('VtkViewer - slice: value changed, newSlice: ', newSlice);
-      this.representation.setSlice(newSlice);
-      if (this.SET_CURRENT_VTK_INDEX_SLICES) {
-        console.debug('VtkViewer - slice: whichProxy', this.proxyNum);
-        this.SET_CURRENT_VTK_INDEX_SLICES({
-          indexAxis: ijkMapping[this.trueAxis(this.name)],
-          value: this.representation.getSliceIndex(),
-        });
-      }
-    },
-    iIndexSlice: {
-      deep: true,
-      handler(newValue, oldValue) {
-        console.log('VtkViewer - iIndexSlice: value changed, newValue, oldValue', newValue, oldValue);
-        // this.updateCrosshairs();
-      }
-    },
-    jIndexSlice: {
-      deep: true,
-      handler(newValue, oldValue) {
-        console.log('VtkViewer - jIndexSlice: value changed, newValue, oldValue', newValue, oldValue);
-        // this.updateCrosshairs();
-      },
-    },
-    kIndexSlice: {
-      deep: true,
-      handler(newValue, oldValue) {
-        console.log('VtkViewer - kIndexSlice: value changed, newValue, oldValue', newValue, oldValue);
-        // this.updateCrosshairs();
-      }
-    },
-    // Only runs when changing scans
-    view(view, oldView) {
-      console.log('VtkViewer - view changed: new, old', view, oldView);
-      this.cleanup();
-      oldView.setContainer(null);
-      this.initializeSlice();
-      this.initializeView();
-    },
-    // Only runs when changing scans
-    currentFrame() {
-      console.log('VtkViewer - currentFrame changed');
-      this.prepareViewer();
-      this.representation.setSlice(this.slice);
-    },
-    // Only run when changing scan
-    currentScan() {
-      console.log('VtkViewer - currentScan: value changed');
-      this.initializeSlice();
-      this.initializeCamera();
-    },
-    showCrosshairs() {
-      console.log('VtkViewer - showCrosshairs: value changed');
-      this.updateCrosshairs();
-    },
-  },
-  mounted() {
-    console.log('VtkViewer - mounted');
-    this.prepareViewer();
-  },
-  beforeUnmount() {
-    console.log('VtkViewer - before unmount');
-    this.cleanup();
-  },
-  methods: {
-    ...mapMutations([
-      'SET_CURRENT_SCREENSHOT',
-      'SET_CURRENT_VTK_INDEX_SLICES',
-      'SET_SLICE_LOCATION',
-    ]),
-    prepareViewer() {
-      console.group('VtkViewer - prepareViewer: Running');
-      this.initializeView();
-      this.initializeSlice();
-      this.initializeCamera();
-      this.updateCrosshairs();
-      this.renderSubscription = this.view.getInteractor().onRenderEvent(() => {
-        console.debug('renderSubscription kicked off');
-        this.updateCrosshairs();
-      });
-      this.resizeObserver = new window.ResizeObserver((entries) => {
-        console.debug('resizeObserver kicked off');
-        if (entries.length === 1 && this.$refs.viewer && this.$refs.crosshairsCanvas) {
-          // Getting the width of the viewer element.
-          const width = this.$refs.viewer.clientWidth;
-          console.debug('resizeObserver - width', width);
-          const height = this.$refs.viewer.clientHeight;
-          console.debug('resizeObserver - height', height)
-          this.$refs.crosshairsCanvas.width = width;
-          this.$refs.crosshairsCanvas.height = height;
-          this.$refs.crosshairsCanvas.style.width = `${width}px`;
-          this.$refs.crosshairsCanvas.style.height = `${height}px`;
-          this.initializeCamera();
-          this.updateCrosshairs();
-        }
-      });
-      this.resizeObserver.observe(this.$refs.viewer);
-      const representationProperty = this.representation.getActors()[0].getProperty();
-      console.debug('representationProperty', representationProperty);
-      representationProperty.setColorWindow(this.currentWindowWidth);
-      representationProperty.setColorLevel(this.currentWindowLevel);
-      console.groupEnd();
-    },
-    initializeSlice() {
-      console.log('VtkViewer - initializeSlice: Running');
-      if (this.name !== 'default') {
-        console.debug('VtkViewer - initializeSlice: this.name', this.name);
-        this.slice = this.representation.getSlice();
-      }
-    },
-    initializeView() {
-      console.log('VtkViewer - initializeView: Running');
-      this.view.setContainer(this.$refs.viewer);
-      console.debug('VtkViewer - initializeView: this.view', this.view);
-      fill2DView(this.view);
-      if (this.name !== 'default') {
-        this.modifiedSubscription = this.representation.onModified(() => {
-          if (!this.loadingFrame) {
-            this.slice = this.representation.getSlice();
-          }
-        });
-      }
-      // add click interaction to place crosshairs
-      this.view.getInteractor().onLeftButtonPress((event) => this.placeCrosshairs(event));
-      // remove drag interaction to change window
-      const targetManipulator = this.view.getInteractor()
-        .getInteractorStyle().getMouseManipulators().find(
-          (manipulator) => manipulator.getClassName() === 'vtkMouseRangeManipulator',
-        );
-      if (targetManipulator) {
-        targetManipulator.setDragEnabled(false);
-      }
-      setTimeout(() => {
-        this.resized = true;
-      });
-    },
-    initializeCamera() {
-      console.group('VtkViewer - initializeCamera: Running');
-      const camera = this.view.getCamera();
-      console.debug('camera', camera);
-      const orientation = this.representation.getInputDataSet().getDirection();
-      console.debug('orientation', orientation);
+    });
 
-      let newViewUp = VIEW_ORIENTATIONS[this.renderOrientation][this.name].viewUp.slice();
-      console.debug('newViewUp', newViewUp);
-      let newDirectionOfProjection = VIEW_ORIENTATIONS[
-        this.renderOrientation
-      ][this.name].directionOfProjection
-      console.debug('newDirectionOfProjection', newDirectionOfProjection);
-      newViewUp = this.findClosestColumnToVector(
-        newViewUp,
-        orientation,
-      );
-      console.debug('newViewUp Updated', newViewUp);
-      newDirectionOfProjection = this.findClosestColumnToVector(
-        newDirectionOfProjection,
-        orientation,
-      );
-      console.debug('newDirectionOfProjection', newDirectionOfProjection);
-
-      camera.setDirectionOfProjection(...newDirectionOfProjection);
-      camera.setViewUp(...newViewUp);
-
-      this.view.resetCamera();
-      fill2DView(this.view);
-      console.debug('this.view', this.view);
-      console.groupEnd();
-    },
-    findClosestColumnToVector(inputVector, matrix) {
-      console.log('VtkViewer - findClosestColumnToVector: Running');
+    function findClosestColumnToVector(inputVector, matrix) {
       let currClosest = null;
       let currMax = 0;
       const inputVectorAxis = inputVector.findIndex((value) => value !== 0);
@@ -285,12 +112,16 @@ export default {
         currClosest = currClosest.map((value) => value * -1);
       }
       return currClosest;
-    },
-    trueAxis(axisName) {
-      console.log('VtkViewer - trueAxis: Running');
-      if (!this.representation.getInputDataSet()) return undefined;
-      const orientation = this.representation.getInputDataSet().getDirection();
-      const axisNumber = VIEW_ORIENTATIONS[this.renderOrientation][axisName].axis;
+    }
+    function applyCurrentWindowLevel() {
+      const representationProperty = representation.value.getActors()[0].getProperty();
+      representationProperty.setColorWindow(currentWindowWidth.value);
+      representationProperty.setColorLevel(currentWindowLevel.value);
+    }
+    function trueAxis(axisName) {
+      if (!representation.value.getInputDataSet()) return undefined;
+      const orientation = representation.value.getInputDataSet().getDirection();
+      const axisNumber = VIEW_ORIENTATIONS[renderOrientation.value][axisName].axis;
       const axisOrientation = [
         orientation[axisNumber],
         orientation[3 + axisNumber],
@@ -299,13 +130,20 @@ export default {
         (val) => Math.abs(val),
       );
       const axisOrdering = ['x', 'y', 'z'];
-      const trueAxis = axisOrdering[
+      return axisOrdering[
         axisOrientation.indexOf(Math.max(...axisOrientation))
       ];
-      return trueAxis;
-    },
-    async takeScreenshot() {
-      const dataURL = await this.view.captureImage();
+    }
+    function drawLine(ctx, displayLine) {
+      if (!displayLine) return;
+      ctx.strokeStyle = displayLine.color;
+      ctx.beginPath();
+      ctx.moveTo(...displayLine.start);
+      ctx.lineTo(...displayLine.end);
+      ctx.stroke();
+    }
+    async function takeScreenshot() {
+      const dataURL = await props.view.captureImage();
 
       const imageOutput = await (
         async (file) : Promise<HTMLImageElement> => new Promise<HTMLImageElement>((resolve) => {
@@ -322,16 +160,16 @@ export default {
       const ctx = canvas.getContext('2d');
       ctx.drawImage(imageOutput, 0, 0);
 
-      if (this.showCrosshairs) {
+      if (showCrosshairs.value) {
         const crosshairSet = new CrosshairSet(
-          this.name,
-          this.ijkName,
-          this.representation,
-          this.view,
+          name.value,
+          ijkName.value,
+          representation.value,
+          props.view,
           canvas,
-          this.iIndexSlice,
-          this.jIndexSlice,
-          this.kIndexSlice,
+          iIndexSlice.value,
+          jIndexSlice.value,
+          kIndexSlice.value,
         );
         const originalColors = {
           x: '#fdd835',
@@ -339,120 +177,241 @@ export default {
           z: '#b71c1c',
         };
         const trueColors = Object.fromEntries(
-          Object.entries(originalColors).map(([axisName, hex]) => [this.trueAxis(axisName), hex]),
+          Object.entries(originalColors).map(([axisName, hex]) => [trueAxis(axisName), hex]),
         );
         const [displayLine1, displayLine2] = crosshairSet.getCrosshairsForAxis(
-          this.trueAxis(this.name),
+          trueAxis(name.value),
           trueColors,
         );
-        this.drawLine(ctx, displayLine1);
-        this.drawLine(ctx, displayLine2);
+        drawLine(ctx, displayLine1);
+        drawLine(ctx, displayLine2);
       }
-      this.SET_CURRENT_SCREENSHOT({
-        name: `${this.currentViewData.experimentName}/${
-          this.currentViewData.scanName
-        }/${this.currentFrame.frame_number}/${this.displayName}`,
+      setCurrentScreenshot({
+        name: `${currentViewData.value.experimentName}/${
+          currentViewData.value.scanName
+        }/${currentFrame.value.frame_number}/${displayName.value}`,
         dataURL: canvas.toDataURL('image/jpeg'),
       });
-    },
-    toggleFullscreen() {
-      this.fullscreen = !this.fullscreen;
+    }
+    function toggleFullscreen() {
+      fullscreen.value = !fullscreen.value;
       setTimeout(() => {
-        this.$refs.viewer.style.width = 'inherit';
-        this.$refs.viewer.style.width = `${this.$refs.viewer.clientWidth - 3}px`;
+        viewer.value.style.width = 'inherit';
+        viewer.value.style.width = `${viewer.value.clientWidth - 3}px`;
       }, 100);
-    },
-    changeSlice(newValue) {
-      console.log('VtkViewer - changeSlice: Running');
-      this.slice = newValue;
-    },
-    roundSlice(value) {
-      console.log('VtkViewer - roundSlice: Running');
+    }
+    function changeSlice(newValue) {
+      slice.value = newValue;
+    }
+    function roundSlice(value) {
       if (!value) return '';
       return Math.round(value * 100) / 100;
-    },
-    drawLine(ctx, displayLine) {
-      console.group('VtkViewer - drawLine: Running');
-      if (!displayLine) return;
-      ctx.strokeStyle = displayLine.color;
-      ctx.strokeStyle = displayLine.color;
-      ctx.beginPath();
-      ctx.moveTo(...displayLine.start);
-      console.log('displayLine.start', displayLine.start);
-      ctx.lineTo(...displayLine.end);
-      console.log('displayLine.end', displayLine.end);
-      ctx.stroke();
-      console.groupEnd();
-    },
-    updateCrosshairs() {
-      console.group('VtkViewer - updateCrosshairs: Running');
-      console.debug('proxyNum', this.proxyNum);
-      const myCanvas: HTMLCanvasElement = document.getElementById(`crosshairs-${this.name}`) as HTMLCanvasElement;
+    }
+    function updateCrosshairs() {
+      const myCanvas: HTMLCanvasElement = document.getElementById(`crosshairs-${name.value}`) as HTMLCanvasElement;
       if (myCanvas && myCanvas.getContext) {
         const ctx = myCanvas.getContext('2d');
         ctx.clearRect(0, 0, myCanvas.width, myCanvas.height);
 
-        if (this.showCrosshairs) {
+        if (showCrosshairs.value) {
           const crosshairSet = new CrosshairSet(
-            this.name,
-            this.ijkName,
-            this.representation,
-            this.view,
+            name.value,
+            ijkName.value,
+            representation.value,
+            props.view,
             myCanvas,
-            this.iIndexSlice[this.proxyNum],
-            this.jIndexSlice[this.proxyNum],
-            this.kIndexSlice[this.proxyNum],
+            iIndexSlice.value[props.proxyNum],
+            jIndexSlice.value[props.proxyNum],
+            kIndexSlice.value[props.proxyNum],
           );
-          console.debug(`this.crosshairSet`, this.crosshairSet)
           const originalColors = {
             x: '#fdd835',
             y: '#4caf50',
             z: '#b71c1c',
           };
           const trueColors = Object.fromEntries(
-            Object.entries(originalColors).map(([axisName, hex]) => [this.trueAxis(axisName), hex]),
+            Object.entries(originalColors).map(([axisName, hex]) => [trueAxis(axisName), hex]),
           );
           const [displayLine1, displayLine2] = crosshairSet.getCrosshairsForAxis(
-            this.trueAxis(this.name),
+            trueAxis(name.value),
             trueColors,
           );
-          console.debug('displayLine1, displayLine2', displayLine1, displayLine2);
-          this.drawLine(ctx, displayLine1);
-          this.drawLine(ctx, displayLine2);
-          console.groupEnd();
+          drawLine(ctx, displayLine1);
+          drawLine(ctx, displayLine2);
         }
       }
-    },
+    }
     /** Place crosshairs at the location of a click event */
-    placeCrosshairs(clickEvent) {
-      console.group('VtkViewer - placeCrosshairs: Running');
+    function placeCrosshairs(clickEvent) {
       const crosshairSet = new CrosshairSet(
-        this.name,
-        this.ijkName,
-        this.representation,
-        this.view,
+        name.value,
+        ijkName.value,
+        representation.value,
+        props.view,
         null,
-        this.iIndexSlice[this.proxyNum],
-        this.jIndexSlice[this.proxyNum],
-        this.kIndexSlice[this.proxyNum],
+        iIndexSlice.value[props.proxyNum],
+        jIndexSlice.value[props.proxyNum],
+        kIndexSlice.value[props.proxyNum],
       );
-      console.debug('crosshairSet', crosshairSet)
       const location = crosshairSet.locationOfClick(clickEvent);
-      this.SET_SLICE_LOCATION(location);
-      console.groupEnd();
-    },
-    cleanup() {
-      console.log('VtkViewer - cleanup: Running');
-      if (this.renderSubscription) {
-        this.renderSubscription.unsubscribe();
-        this.resizeObserver.unobserve(this.$refs.viewer);
+      setSliceLocation(location);
+    }
+    function cleanup() {
+      props.view.setContainer(null);
+      if (renderSubscription.value) {
+        renderSubscription.value.unsubscribe();
+        resizeObserver.value.unobserve(viewer.value);
       }
-      if (this.modifiedSubscription) {
-        this.modifiedSubscription.unsubscribe();
+    }
+    function initializeSlice() {
+      slice.value = representation.value.getSlice();
+    }
+    function initializeView() {
+      props.view.setContainer(viewer.value);
+      fill2DView(props.view);
+      // add scroll interaction to change slice
+      props.view.getInteractor().onMouseWheel(() => {
+        if (!loadingFrame.value) {
+          slice.value = representation.value.getSlice();
+        }
+      });
+      // add click interaction to place crosshairs
+      props.view.getInteractor().onLeftButtonPress((event) => placeCrosshairs(event));
+      // remove drag interaction to change window
+      const targetManipulator = props.view.getInteractor()
+        .getInteractorStyle().getMouseManipulators().find(
+          (manipulator) => manipulator.getClassName() === 'vtkMouseRangeManipulator',
+        );
+      if (targetManipulator) {
+        targetManipulator.setDragEnabled(false);
       }
-    },
+      setTimeout(() => {
+        resized.value = true;
+      });
+    }
+    function initializeCamera() {
+      const camera = props.view.getCamera();
+      const orientation = representation.value.getInputDataSet().getDirection();
+
+      let newViewUp = VIEW_ORIENTATIONS[renderOrientation.value][name.value].viewUp.slice();
+      let newDirectionOfProjection = VIEW_ORIENTATIONS[
+        renderOrientation.value
+      ][name.value].directionOfProjection;
+      newViewUp = findClosestColumnToVector(
+        newViewUp,
+        orientation,
+      );
+      newDirectionOfProjection = findClosestColumnToVector(
+        newDirectionOfProjection,
+        orientation,
+      );
+
+      camera.setDirectionOfProjection(...newDirectionOfProjection);
+      camera.setViewUp(...newViewUp);
+
+      props.view.resetCamera();
+      fill2DView(props.view);
+    }
+    function prepareViewer() {
+      initializeView();
+      initializeSlice();
+      initializeCamera();
+      updateCrosshairs();
+      renderSubscription.value = props.view.getInteractor().onRenderEvent(() => {
+        updateCrosshairs();
+      });
+      resizeObserver.value = new window.ResizeObserver((entries) => {
+        if (entries.length === 1 && viewer.value && crosshairsCanvas.value) {
+          const width = viewer.value.clientWidth;
+          const height = viewer.value.clientHeight;
+          crosshairsCanvas.value.width = width;
+          crosshairsCanvas.value.height = height;
+          crosshairsCanvas.value.style.width = `${width}px`;
+          crosshairsCanvas.value.style.height = `${height}px`;
+          initializeCamera();
+          updateCrosshairs();
+        }
+      });
+      resizeObserver.value.observe(viewer.value);
+      applyCurrentWindowLevel();
+    }
+    function keyPress(event) {
+      if (['TEXTAREA', 'INPUT'].includes(document.activeElement.tagName)) return;
+      switch (event.key) {
+        case keyboardBindings.value[0]:
+          changeSlice(slice.value - 1);
+          break;
+        case keyboardBindings.value[1]:
+          changeSlice(slice.value + 1);
+          break;
+        case keyboardBindings.value[2]:
+          toggleFullscreen();
+          break;
+        default:
+          break;
+      }
+    }
+
+    watch(slice, (newSlice) => {
+      representation.value.setSlice(newSlice);
+      if (setCurrentVtkIndexSlices) {
+        setCurrentVtkIndexSlices({
+          indexAxis: ijkMapping[trueAxis(name.value)],
+          value: representation.value.getSliceIndex(),
+        });
+      }
+    });
+    watch(iIndexSlice, updateCrosshairs);
+    watch(jIndexSlice, updateCrosshairs);
+    watch(kIndexSlice, updateCrosshairs);
+    watch(showCrosshairs, updateCrosshairs);
+    watch(representation, () => {
+      cleanup();
+      initializeSlice();
+      initializeView();
+    });
+    watch(currentFrame, (oldFrame, newFrame) => {
+      // Only runs when changing scans
+      representation.value.setSlice(slice.value);
+      applyCurrentWindowLevel();
+      updateCrosshairs();
+      // use this instead of currentScan watcher
+      // currentScan is computed from currentFrame and technically
+      // will change every time currentFrame has changed
+      if (oldFrame.scan !== newFrame.scan) {
+        initializeSlice();
+        initializeCamera();
+      }
+    });
+
+    onMounted(() => {
+      prepareViewer();
+      window.addEventListener('keypress', keyPress);
+    });
+
+    onBeforeUnmount(() => {
+      cleanup();
+      window.removeEventListener('keypress', keyPress);
+    });
+
+    return {
+      viewer,
+      name,
+      displayName,
+      sliceDomain,
+      crosshairsCanvas,
+      slice,
+      resized,
+      fullscreen,
+      screenshotContainer,
+      changeSlice,
+      roundSlice,
+      keyboardBindings,
+      toggleFullscreen,
+      takeScreenshot,
+    };
   },
-};
+});
 </script>
 
 <template>
@@ -462,16 +421,11 @@ export default {
     style="font-size: 20px"
   >
     <div
-      v-if="name !== 'default'"
       :class="name"
       class="header"
     >
-      <v-row class="align-center ma-0">
+      <v-layout align-center>
         <v-slider
-          v-mousetrap="[
-            { bind: keyboardBindings[1], handler: () => changeSlice(slice + 1) },
-            { bind: keyboardBindings[0], handler: () => changeSlice(slice - 1) },
-          ]"
           :value="slice"
           :min="sliceDomain.min"
           :max="sliceDomain.max"
@@ -480,10 +434,10 @@ export default {
           hide-details
           @input="changeSlice"
         />
-        <div class="slice text-caption px-2">
+        <div class="slice caption px-2">
           {{ roundSlice(slice) }} mm
         </div>
-      </v-row>
+      </v-layout>
     </div>
     <div
       class="viewer"
@@ -508,13 +462,12 @@ export default {
     >
       <div
         :class="name"
-        class="indicator text-body-2"
+        class="indicator body-2"
       >
         {{ displayName }}
       </div>
       <v-spacer />
       <v-btn
-        v-mousetrap="{ bind: keyboardBindings[2], handler: toggleFullscreen }"
         icon
         @click="toggleFullscreen"
       >
@@ -554,10 +507,6 @@ export default {
     bottom: 0;
     right: 0;
     z-index: 2;
-  }
-
-  .slice-slider .v-slider {
-    height: 23px;
   }
 
   .header {
@@ -646,5 +595,22 @@ export default {
   bottom: 0;
   left: 0;
   right: 0;
+}
+</style>
+
+<style lang="scss">
+.vtk-viewer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  .slice-slider .v-slider {
+    height: 23px;
+  }
 }
 </style>

@@ -302,7 +302,7 @@ export default {
             this.jIndexSlice[this.proxyNum],
             this.kIndexSlice[this.proxyNum],
           );
-          console.log(`VtkViewerCompare - updateCrosshairs: this.crosshairSet[proxyNum], proxyNum is ${proxyNum}`, this.crosshairSet[proxyNum])
+          console.log(`VtkViewerCompare - updateCrosshairs: this.crosshairSet[proxyNum], proxyNum is ${proxyNum}`, this.crosshairSet[proxyNum]);
           const originalColors = {
             x: '#fdd835',
             y: '#4caf50',
@@ -315,7 +315,8 @@ export default {
             this.trueAxis(this.name),
             trueColors,
           );
-          // console.log('VtkViewerCompare - updateCrosshairs - displayLine1, displayLine2', displayLine1, displayLine2);
+          // console.log('VtkViewerCompare - updateCrosshairs - displayLine1, displayLine2',
+          // displayLine1, displayLine2);
           this.drawLine(ctx, displayLine1);
           this.drawLine(ctx, displayLine2);
         }
@@ -339,7 +340,7 @@ export default {
         this.jIndexSlice[this.proxyNum],
         this.kIndexSlice[this.proxyNum],
       );
-      console.debug('VtkViewerCompare - placeCrosshairs: this.crosshairSet[this.proxyNum]', this.crosshairSet[this.proxyNum])
+      console.debug('VtkViewerCompare - placeCrosshairs: this.crosshairSet[this.proxyNum]', this.crosshairSet[this.proxyNum]);
       const location = this.crosshairSet[this.proxyNum].locationOfClick(clickEvent);
       this.SET_SLICE_LOCATION(location, this.proxyNum);
       console.groupEnd();
