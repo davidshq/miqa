@@ -851,6 +851,9 @@ export const storeConfig:StoreOptions<MIQAStore> = {
       if (!frame) {
         throw new Error("frame id doesn't exist");
       }
+      if (getters.currentFrame === frame) {
+        return;
+      }
       commit('SET_LOADING_FRAME', true);
       commit('SET_ERROR_LOADING_FRAME', false);
 
@@ -874,14 +877,74 @@ export const storeConfig:StoreOptions<MIQAStore> = {
           shrinkProxyManager(state.proxyManager);
           newProxyManager = true;
         }
-        if (!state.proxyManager || newProxyManager) {
-          state.proxyManager = vtkProxyManager.newInstance({
-            proxyConfiguration: proxy,
-          });
-          state.vtkViews = [];
-        }
+        // Handles shrinking and/or instantiating a new proxyManager instance
+        await store.dispatch('setupProxyManager', newProxyManager);
       }
 
+      try {
+        // Gets the data we need to display
+        const frameData = await store.dispatch('getFrameData', { frame, onDownloadProgress });
+        // Handles configuring the sourceProxy and getting the views
+        await store.dispatch('setupSourceProxy', { frame, frameData });
+      } catch (err) {
+        console.error('Vuex - Action - swapToFrame: Caught exception loading next frame', err);
+        state.vtkViews = [];
+        commit('SET_ERROR_LOADING_FRAME', true);
+      } finally {
+        commit('SET_CURRENT_FRAME_ID', frame.id);
+        commit('SET_LOADING_FRAME', false);
+      }
+
+      await store.dispatch('updateLock');
+      console.groupEnd();
+    },
+    async loadFrame({ state, commit }, { frame, onDownloadProgress = null }) {
+      // Guard clauses
+      if (!frame) {
+        throw new Error("Vuex - Action - loadFrame: frame id doesn't exist");
+      }
+
+      commit('SET_LOADING_FRAME', true);
+      commit('SET_ERROR_LOADING_FRAME', false);
+
+      const newScan = state.scans[frame.scan];
+
+      queueLoadScan(newScan, 0);
+
+      let newProxyManager = false;
+
+      if (state.proxyManager) {
+        shrinkProxyManager(state.proxyManager);
+        newProxyManager = true;
+      }
+
+      await store.dispatch('setupProxyManager', { newProxyManager });
+
+      const frameData = await store.dispatch('getFrameData', { frame, onDownloadProgress });
+
+      try {
+        await store.dispatch('setupSourceProxy', { frame, frameData });
+      } catch (err) {
+        console.error('Vuex - Action - loadFrame: Caught exception loading frame', err);
+        state.vtkViews = [];
+        commit('SET_ERROR_LOADING_FRAME', true);
+      } finally {
+        commit('SET_CURRENT_FRAME_ID', frame.id);
+        commit('SET_LOADING_FRAME', false);
+      }
+    },
+    async setupProxyManager({ state }, { newProxyManager }) {
+      // If it doesn't exist, create new instance of proxyManager
+      // Also, if it does exist but was used for a different scan, create a new one
+      if (!state.proxyManager || newProxyManager) {
+        state.proxyManager = vtkProxyManager.newInstance({
+          proxyConfiguration: proxy,
+        });
+        state.vtkViews = [];
+      }
+    },
+    async setupSourceProxy({ state }, { frameData }) {
+      // get the source from which we are loading the images
       let sourceProxy = state.proxyManager.getActiveSource();
       let needPrep = false;
       if (!sourceProxy) {
@@ -893,34 +956,32 @@ export const storeConfig:StoreOptions<MIQAStore> = {
       }
 
       // This try catch and within logic are mainly for handling data doesn't exist issue
-      try {
-        let frameData = null;
-        if (frameCache.has(frame.id)) {
-          frameData = frameCache.get(frame.id).frameData;
-        } else {
-          const result = await loadFileAndGetData(frame, { onDownloadProgress });
-          frameData = result.frameData;
-        }
-        sourceProxy.setInputData(frameData);
-        if (needPrep || !state.proxyManager.getViews().length) {
-          prepareProxyManager(state.proxyManager);
-          state.vtkViews = state.proxyManager.getViews();
-        }
-        if (!state.vtkViews.length) {
-          state.vtkViews = state.proxyManager.getViews();
-        }
-      } catch (err) {
-        console.log('Caught exception loading next frame');
-        console.log(err);
-        state.vtkViews = [];
-        commit('SET_ERROR_LOADING_FRAME', true);
-      } finally {
-        commit('SET_CURRENT_FRAME_ID', frame.id);
-        commit('SET_LOADING_FRAME', false);
+      // We set the source equal to the frameData we've loaded
+      sourceProxy.setInputData(frameData);
+      if (needPrep || !state.proxyManager.getViews().length) {
+        prepareProxyManager(state.proxyManager);
+        state.vtkViews = state.proxyManager.getViews();
       }
-
+      if (!state.vtkViews.length) {
+        state.vtkViews = state.proxyManager.getViews();
+      }
+    },
+    async getFrameData({}, { frame, onDownloadProgress = null }) {
+      let frameData = null;
+      // load from cache if possible
+      if (frameCache.has(frame.id)) {
+        frameData = await frameCache.get(frame.id).frameData;
+      } else {
+        // download from server if not cached
+        const result = await loadFileAndGetData(frame, { onDownloadProgress });
+        frameData = await result.frameData;
+      }
+      return frameData;
+    },
+    /** Determines what lock status should be and updates accordingly */
+    async updateLock({ state, getters, commit }) {
       // check for window lock expiry
-      if (loadAll && state.windowLocked.lock) {
+      if (state.windowLocked.lock) {
         const { currentViewData } = getters;
         // Handles unlocking if necessary
         const unlock = () => {
