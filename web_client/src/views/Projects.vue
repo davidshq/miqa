@@ -257,8 +257,8 @@ export default defineComponent({
                         {{ project.name }}
                       </v-col>
                       <v-col
-                        class="align"
                         cols="4"
+                        align="right"
                       >
                         ({{ project.status.total_complete }}/{{ project.status.total_scans }})
                       </v-col>
@@ -329,14 +329,14 @@ export default defineComponent({
               Settings
             </v-subheader>
 
-            <v-row class="pa-5">
-              <v-col>
+            <v-layout class="pa-5">
+              <v-flex>
                 <ProjectSettings />
-              </v-col>
-            </v-row>
+              </v-flex>
+            </v-layout>
           </v-card>
           <v-card
-            v-if="currentTaskOverview && currentTaskOverview.total_scans > 0"
+            v-if="currentTaskOverview && currentTaskOverview.total_scans > 0 && !isGlobal"
             class="flex-card"
           >
             <v-subheader>Overview</v-subheader>
@@ -366,10 +366,10 @@ export default defineComponent({
         v-else
         class="flex-grow-1 ma-3"
       >
-        <v-row
-          class="fill-height"
-          align="center"
-          justify="center"
+        <v-layout
+          align-center
+          justify-center
+          fill-height
         >
           <div
             v-if="complete"
@@ -383,7 +383,6 @@ export default defineComponent({
               <br>
               <v-form @submit.prevent="proceedToNext">
                 <v-btn
-                  ref="proceed"
                   class="my-3"
                   type="submit"
                 >
@@ -422,7 +421,7 @@ export default defineComponent({
             />
             <span v-else>You have not been added to any projects yet.</span>
           </div>
-        </v-row>
+        </v-layout>
       </v-card>
     </div>
   </div>

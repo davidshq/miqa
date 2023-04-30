@@ -1,31 +1,6 @@
-/** Sets the crosshairs on the vtkViewer */
 import vtkCellPicker from 'vtk.js/Sources/Rendering/Core/CellPicker';
 
 class CrosshairSet {
-  xyzName: string;
-
-  ijkName: string;
-
-  imageRepresentation: any;
-
-  imageView: any;
-
-  imageData: any;
-
-  imageCanvas: HTMLCanvasElement;
-
-  iSlice: number;
-
-  jSlice: number;
-
-  kSlice: number;
-
-  renderer: any;
-
-  renderWindow: any;
-
-  ijkMapping: object;
-
   constructor(
     xyzName,
     ijkName,

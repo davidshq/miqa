@@ -1,6 +1,4 @@
-/** Calculate the size of the images being downloaded */
 export default function formatSize(size, { base = 1024, unit = 'B' } = {}) {
-  console.log('helper.js - formatSize: Running');
   if (size < base) {
     return `${size} ${unit}`;
   }
