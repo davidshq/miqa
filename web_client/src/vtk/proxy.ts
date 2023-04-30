@@ -20,7 +20,7 @@ import proxyViewRepresentationMapping from './proxyViewRepresentationMapping';
 
 const { createProxyDefinition, activateOnCreate } = ConfigUtils;
 
-function createDefaultView(classFactory, ui, options, props) {
+function createDefaultView(classFactory, ui, options?, props?) {
   return activateOnCreate(
     createProxyDefinition(
       classFactory,
