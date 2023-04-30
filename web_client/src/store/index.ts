@@ -887,8 +887,7 @@ export const storeConfig:StoreOptions<MIQAStore> = {
         const frameData = await store.dispatch('getFrameData', { frame, onDownloadProgress });
         // Handles configuring the sourceProxy and getting the views
         await store.dispatch('setupSourceProxy', { frame, frameData });
-      }
-      catch (err) {
+      } catch (err) {
         console.error('Vuex - Action - swapToFrame: Caught exception loading next frame', err);
         state.vtkViews[whichProxy] = [];
         commit('SET_ERROR_LOADING_FRAME', true);
@@ -900,7 +899,7 @@ export const storeConfig:StoreOptions<MIQAStore> = {
       await store.dispatch('updateLock');
       console.groupEnd();
     },
-    async loadFrame({state, dispatch, commit }, { frame, onDownloadProgress = null, whichProxy = 0 }) {
+    async loadFrame({ state, commit }, { frame, onDownloadProgress = null, whichProxy = 0 }) {
       // Guard clauses
       if (!frame) {
         throw new Error("Vuex - Action - loadFrame: frame id doesn't exist");
@@ -920,12 +919,12 @@ export const storeConfig:StoreOptions<MIQAStore> = {
         newProxyManager = true;
       }
 
-      await dispatch('setupProxyManager', { newProxyManager, whichProxy });
+      await store.dispatch('setupProxyManager', { newProxyManager, whichProxy });
 
-      const frameData = await dispatch('getFrameData', { frame, onDownloadProgress });
+      const frameData = await store.dispatch('getFrameData', { frame, onDownloadProgress });
 
       try {
-        await dispatch('setupSourceProxy', { frame, frameData, whichProxy });
+        await store.dispatch('setupSourceProxy', { frame, frameData, whichProxy });
       } catch (err) {
         console.error('Vuex - Action - loadFrame: Caught exception loading frame', err);
         state.vtkViews[whichProxy] = [];
@@ -968,16 +967,14 @@ export const storeConfig:StoreOptions<MIQAStore> = {
         state.vtkViews[whichProxy] = state.proxyManager[whichProxy].getViews();
       }
     },
-    async getFrameData( {}, { frame, onDownloadProgress = null }) {
+    async getFrameData({}, { frame, onDownloadProgress = null }) {
       let frameData = null;
       // load from cache if possible
       if (frameCache.has(frame.id)) {
         frameData = await frameCache.get(frame.id).frameData;
       } else {
         // download from server if not cached
-        const result = await loadFileAndGetData(
-          frame, { onDownloadProgress },
-        );
+        const result = await loadFileAndGetData(frame, { onDownloadProgress });
         frameData = await result.frameData;
       }
       return frameData;
