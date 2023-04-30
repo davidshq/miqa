@@ -396,7 +396,7 @@ export default defineComponent({
 
     return {
       viewer,
-      name,
+      viewName,
       displayName,
       sliceDomain,
       crosshairsCanvas,
@@ -421,7 +421,7 @@ export default defineComponent({
     style="font-size: 20px"
   >
     <div
-      :class="name"
+      :class="viewName"
       class="header"
     >
       <v-layout align-center>
@@ -447,7 +447,7 @@ export default defineComponent({
         :style="{ visibility: resized ? 'unset' : 'hidden' }"
       />
       <canvas
-        :id="'crosshairs-' + name"
+        :id="'crosshairs-' + viewName"
         ref="crosshairsCanvas"
         class="crosshairs"
       />
@@ -461,7 +461,7 @@ export default defineComponent({
       max-height="46"
     >
       <div
-        :class="name"
+        :class="viewName"
         class="indicator body-2"
       >
         {{ displayName }}
