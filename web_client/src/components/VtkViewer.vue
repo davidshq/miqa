@@ -60,9 +60,9 @@ export default defineComponent({
       if (!representation.value) return null;
       return representation.value.getPropertyDomainByName('slice');
     });
-    const name = computed(() => props.view.getName() as ('x' | 'y' | 'z'));
+    const viewName = computed(() => props.view.getName() as ('x' | 'y' | 'z'));
     const displayName = computed(() => {
-      switch (name.value) {
+      switch (viewName.value) {
         case 'x':
           return 'Sagittal';
         case 'y':
@@ -73,9 +73,9 @@ export default defineComponent({
           return '';
       }
     });
-    const ijkName = computed(() => ijkMapping[name.value] as ('i' | 'j' | 'k'));
+    const ijkName = computed(() => ijkMapping[viewName.value] as ('i' | 'j' | 'k'));
     const keyboardBindings = computed(() => {
-      switch (name.value) {
+      switch (viewName.value) {
         case 'z':
           return ['q', 'w', 'e'];
         case 'x':
@@ -157,7 +157,7 @@ export default defineComponent({
 
       if (showCrosshairs.value) {
         const crosshairSet = new CrosshairSet(
-          name.value,
+          viewName.value,
           ijkName.value,
           representation.value,
           props.view,
@@ -175,7 +175,7 @@ export default defineComponent({
           Object.entries(originalColors).map(([axisName, hex]) => [trueAxis(axisName), hex]),
         );
         const [displayLine1, displayLine2] = crosshairSet.getCrosshairsForAxis(
-          trueAxis(name.value),
+          trueAxis(viewName.value),
           trueColors,
         );
         drawLine(ctx, displayLine1);
@@ -203,14 +203,14 @@ export default defineComponent({
       return Math.round(value * 100) / 100;
     }
     function updateCrosshairs() {
-      const myCanvas: HTMLCanvasElement = document.getElementById(`crosshairs-${name.value}`) as HTMLCanvasElement;
+      const myCanvas: HTMLCanvasElement = document.getElementById(`crosshairs-${viewName.value}`) as HTMLCanvasElement;
       if (myCanvas && myCanvas.getContext) {
         const ctx = myCanvas.getContext('2d');
         ctx.clearRect(0, 0, myCanvas.width, myCanvas.height);
 
         if (showCrosshairs.value) {
           const crosshairSet = new CrosshairSet(
-            name.value,
+            viewName.value,
             ijkName.value,
             representation.value,
             props.view,
@@ -228,7 +228,7 @@ export default defineComponent({
             Object.entries(originalColors).map(([axisName, hex]) => [trueAxis(axisName), hex]),
           );
           const [displayLine1, displayLine2] = crosshairSet.getCrosshairsForAxis(
-            trueAxis(name.value),
+            trueAxis(viewName.value),
             trueColors,
           );
           drawLine(ctx, displayLine1);
@@ -239,7 +239,7 @@ export default defineComponent({
     /** Place crosshairs at the location of a click event */
     function placeCrosshairs(clickEvent) {
       const crosshairSet = new CrosshairSet(
-        name.value,
+        viewName.value,
         ijkName.value,
         representation.value,
         props.view,
@@ -288,10 +288,10 @@ export default defineComponent({
       const camera = props.view.getCamera();
       const orientation = representation.value.getInputDataSet().getDirection();
 
-      let newViewUp = VIEW_ORIENTATIONS[renderOrientation.value][name.value].viewUp.slice();
+      let newViewUp = VIEW_ORIENTATIONS[renderOrientation.value][viewName.value].viewUp.slice();
       let newDirectionOfProjection = VIEW_ORIENTATIONS[
         renderOrientation.value
-      ][name.value].directionOfProjection;
+      ][viewName.value].directionOfProjection;
       newViewUp = findClosestColumnToVector(
         newViewUp,
         orientation,
@@ -351,7 +351,7 @@ export default defineComponent({
       representation.value.setSlice(newSlice);
       if (setCurrentVtkIndexSlices) {
         setCurrentVtkIndexSlices({
-          indexAxis: ijkMapping[trueAxis(name.value)],
+          indexAxis: ijkMapping[trueAxis(viewName.value)],
           value: representation.value.getSliceIndex(),
         });
       }
