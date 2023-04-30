@@ -5,12 +5,10 @@ module.exports = {
   },
   extends: [
     'plugin:vue/recommended',
-    'plugin:vuetify/recommended',
-    '@vue/airbnb',
+    // 'plugin:vuetify/recommended',
     '@vue/typescript/recommended',
-    'prettier',
+    '@vue/airbnb',
   ],
-  plugins: ['@typescript-eslint', 'prettier'],
   parser: 'vue-eslint-parser',
   parserOptions: {
     parser: {
@@ -26,6 +24,18 @@ module.exports = {
     'vue/valid-template-root': 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'import/extensions': 'off',
+    'import/no-extraneous-dependencies': [
+      'error',
+      {
+        devDependencies: [
+          '**/*.test.ts',
+          '**/*.test.tsx',
+          '**/*.spec.ts',
+          '**/*.spec.tsx',
+          '**/vue.config.js',
+        ],
+      },
+    ],
   },
   ignorePatterns: [
     'src/shims-*.d.ts',
