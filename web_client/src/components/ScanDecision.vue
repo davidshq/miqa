@@ -1,9 +1,13 @@
 <script lang="ts">
-import { mapMutations } from 'vuex';
+import {
+  defineComponent,
+  computed,
+} from 'vue';
+import store from '@/store';
 import { decisionOptions } from '@/constants';
 import UserAvatar from './UserAvatar.vue';
 
-export default {
+export default defineComponent({
   name: 'ScanDecision',
   components: {
     UserAvatar,
@@ -14,41 +18,43 @@ export default {
       required: true,
     },
   },
-  data() {
-    return {
-      decisionOptions,
-    };
-  },
-  computed: {
-    artifactChips() {
-      return Object.entries(this.decision.user_identified_artifacts).filter(
+  setup(props) {
+    const setSliceLocation = (loc) => store.commit('SET_SLICE_LOCATION', loc);
+
+    const artifactChips = computed(
+      () => Object.entries(
+        props.decision.user_identified_artifacts,
+      ).filter(
         ([, selected]) => selected === 1,
       ).map(
         ([artifactName]) => ({
           code: artifactName.toUpperCase().slice(0, 3),
           value: artifactName.replace(/_/g, ' '),
         }),
-      );
-    },
-  },
-  methods: {
-    ...mapMutations([
-      'SET_SLICE_LOCATION',
-    ]),
-    convertDecisionToColor(decision) {
+      ),
+    );
+    function convertDecisionToColor(decision) {
       if (decision === 'UN') return 'red--text text--darken-2';
       if (decision === 'U') return 'green--text text--darken-2';
       return 'grey--text text--darken-2';
-    },
-    goToLocation() {
-      this.SET_SLICE_LOCATION(this.decision.location);
-    },
+    }
+    function goToLocation() {
+      setSliceLocation(props.decision.location);
+    }
+
+    return {
+      decisionOptions,
+      setSliceLocation,
+      artifactChips,
+      convertDecisionToColor,
+      goToLocation,
+    };
   },
-};
+});
 </script>
 
 <template>
-  <v-col
+  <v-flex
     class="d-flex"
     style="flex-direction:row; column-gap: 5px; margin-bottom: 10px;"
   >
@@ -87,14 +93,15 @@ export default {
         <span>View location saved with decision</span>
       </v-tooltip>
     </div>
-    <v-col
+    <v-flex
       :class="decision.note ? 'black--text' : 'grey--text'"
       class="d-flex justify-space-between"
     >
       {{ decision.note ? decision.note : "No comment" }}
-    </v-col>
-    <v-col
-      class="d-flex flex-wrap justify-end flex-shrink-1 shrink"
+    </v-flex>
+    <v-flex
+      shrink
+      class="d-flex flex-wrap justify-end flex-shrink-1"
     >
       <v-tooltip
         v-for="chip in artifactChips"
@@ -113,14 +120,14 @@ export default {
         </template>
         <span>{{ chip.value }}</span>
       </v-tooltip>
-    </v-col>
+    </v-flex>
     <div
       class="grey--text"
-      style="text-align: right"
+      style="text-align: right; max-width: 100px"
     >
       {{ decision.created }}
     </div>
-  </v-col>
+  </v-flex>
 </template>
 
 <style scoped>

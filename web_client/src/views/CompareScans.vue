@@ -102,7 +102,7 @@ export default {
   },
   mounted() {
     /** Wait until the view is mounted before attempting to load projects. */
-    console.log('CompareScans.vue - mounted, now loadProjects')
+    console.log('CompareScans.vue - mounted, now loadProjects');
     this.loadProjects();
   },
   methods: {
@@ -149,9 +149,9 @@ export default {
     openWindow(proxyNum) {
       console.log('CompareScans.vue - openWindow: Running');
       const project = this.selectedProject;
-      const scan = this[`selectedScan${ proxyNum}`];
+      const scan = this[`selectedScan${proxyNum}`];
       window.open(`/#/${project}/${scan.id}`, '_blank');
-    }
+    },
   },
 };
 </script>
@@ -215,19 +215,25 @@ export default {
         <v-btn
           elevation="2"
           @click="openWindow(1)"
-        >Select Scan Left</v-btn>
+        >
+          Select Scan Left
+        </v-btn>
       </div>
       <div class="OpenButton2">
         <v-btn
           elevation="2"
           @click="openWindow(2)"
-        >Select Scan Middle</v-btn>
+        >
+          Select Scan Middle
+        </v-btn>
       </div>
       <div class="OpenButton3">
         <v-btn
           elevation="2"
           @click="openWindow(3)"
-          >Select Scan Right</v-btn>
+        >
+          Select Scan Right
+        </v-btn>
       </div>
     </div>
     <div class="vtkViewsContainer">

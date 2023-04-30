@@ -1,103 +1,139 @@
 <script lang="ts">
 import {
-  mapActions,
-  mapState,
-} from 'vuex';
+  defineComponent,
+  computed,
+  ref,
+  watch,
+  onMounted,
+} from 'vue';
+import _ from 'lodash';
+import router from '@/router';
+import store from '@/store';
 
 import Navbar from '@/components/Navbar.vue';
 import ControlPanel from '@/components/ControlPanel.vue';
 import ExperimentsView from '@/components/ExperimentsView.vue';
 import VtkViewer from '@/components/VtkViewer.vue';
-import LoadingMessage from '@/components/LoadingMessage.vue';
+import { ScanDecision } from '@/types';
+import formatSize from '@/utils/helper';
 
-export default {
+export default defineComponent({
   name: 'ScanView',
   components: {
-    LoadingMessage,
     Navbar,
     ExperimentsView,
     VtkViewer,
     ControlPanel,
   },
-  inject: ['user'],
-  data() {
+  setup() {
+    const user = computed(() => store.state.me);
+    const downloadLoaded = ref(0);
+    const downloadTotal = ref(0);
+    const decision = ref();
+    const decisionChanged = ref(false);
+    const newNote = ref('');
+
+    const currentFrameId = computed(() => store.state.currentFrameId);
+    const vtkViews = computed(() => store.state.vtkViews);
+    const frames = computed(() => store.state.frames);
+    const scanFrames = computed(() => store.state.scanFrames);
+    const loadingFrame = computed(() => store.state.loadingFrame);
+    const errorLoadingFrame = computed(() => store.state.errorLoadingFrame);
+    const currentScan = computed(() => store.getters.currentScan);
+
+    const loadScan = (scan) => store.dispatch('loadScan', scan);
+    const swapToFrame = (info) => store.dispatch('swapToFrame', info);
+    const setSnackbar = (text) => store.commit('SET_SNACKBAR', text);
+
+    const currentFrame = computed(() => frames.value[currentFrameId.value]);
+    const currentScanFrames = computed(() => scanFrames[currentScan.value.id]);
+    const downloadProgressPercent = computed(
+      () => (downloadTotal.value ? 100 * (downloadLoaded.value / downloadTotal.value) : 0),
+    );
+    const loadProgressMessage = computed(() => {
+      if (downloadTotal.value && downloadLoaded.value === downloadTotal.value) {
+        return 'Loading image viewer...';
+      }
+      return `Downloading image ${formatSize(downloadLoaded.value)} / ${formatSize(downloadTotal.value)}`;
+    });
+
+    /** Update the download progress */
+    function onFrameDownloadProgress(e) {
+      downloadLoaded.value = e.loaded;
+      downloadTotal.value = e.total;
+    }
+    /** Loads a specific frame */
+    async function swapToScan() {
+      // Get the project/frame id's from the URL
+      const { projectId, scanId } = router.app.$route.params;
+      const scan = await loadScan({ scanId, projectId });
+      const frame = frames.value[scanFrames.value[scan.id][0]];
+      if (frame) {
+        await swapToFrame({
+          frame,
+          onDownloadProgress: onFrameDownloadProgress,
+        });
+      } else {
+        router.replace('/');
+      }
+    }
+
+    watch(currentScan, (scan) => {
+      if (scan) {
+        const last: ScanDecision = _.head(scan.decisions);
+        decision.value = last ? last.decision : null;
+        decisionChanged.value = false;
+        newNote.value = '';
+      }
+    });
+    watch(currentFrameId, (frameId) => {
+      swapToFrame({
+        frame: frames.value[frameId],
+        onDownloadProgress: onFrameDownloadProgress,
+        loadAll: false,
+      });
+    });
+
+    onMounted(() => {
+      window.addEventListener('unauthorized', () => {
+        setSnackbar('Server session expired. Try again.');
+      });
+    });
+
     return {
-      downloadLoaded: 0,
-      downloadTotal: 0,
+      user,
+      downloadLoaded,
+      downloadTotal,
+      currentFrameId,
+      vtkViews,
+      frames,
+      scanFrames,
+      loadingFrame,
+      errorLoadingFrame,
+      currentFrame,
+      currentScanFrames,
+      downloadProgressPercent,
+      loadProgressMessage,
+      swapToScan,
     };
   },
-  computed: {
-    ...mapState([
-      'currentFrameId',
-      'vtkViews',
-      'frames',
-      'scanFrames',
-      'errorLoadingFrame',
-    ]),
-    currentFrame() {
-      return this.frames[this.currentFrameId];
-    },
-  },
   watch: {
-    async currentFrameId(frameId) {
-      console.log('Scan.vue - currentFrameId: value changed');
-      await this.swapToFrame({
-        frame: this.frames[frameId],
-        onDownloadProgress: this.onFrameDownloadProgress,
-      });
-    },
     // Replaces `beforeRouteUpdate` and code in `created` handling frame load
     '$route.params.scanId': {
       handler: 'swapToScan',
       immediate: true,
     },
   },
-  mounted() {
-    window.addEventListener('unauthorized', () => {
-      this.$snackbar({
-        text: 'Server session expired. Try again.',
-        timeout: 6000,
-      });
-    });
-  },
-  methods: {
-    ...mapActions([
-      'swapToFrame',
-      'loadScan',
-    ]),
-    /** Update the download progress */
-    onFrameDownloadProgress(e) {
-      console.log('Scan.vue - onFrameDownloadProgress: value changed', e);
-      this.downloadLoaded = e.loaded;
-      this.downloadTotal = e.total;
-    },
-    /* Loads a specific frame */
-    async swapToScan() {
-      console.log('Scan.vue - swapToScan: Running');
-      // Get the project/frame id's from the URL
-      const { projectId, scanId } = this.$route.params;
-      const scan = await this.loadScan({ scanId, projectId });
-      const frame = this.frames[this.scanFrames[scan.id][0]];
-      if (frame) {
-        await this.swapToFrame({
-          frame,
-          onDownloadProgress: this.onFrameDownloadProgress,
-        });
-      } else {
-        this.$router.replace('/').catch(this.handleNavigationError);
-      }
-    },
-  },
-};
+});
 </script>
 
 <template>
-  <v-row
-    class="frame fill-height flex-column ma-0"
+  <v-layout
+    class="frame"
+    fill-height
+    column
   >
-    <!-- Top Navbar -->
     <Navbar frame-view />
-    <!-- Left Navigation Drawer -->
     <v-navigation-drawer
       expand-on-hover
       permanent
@@ -120,14 +156,38 @@ export default {
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
-    <!-- Show Loading Message -->
-    <LoadingMessage
-      :download-loaded="downloadLoaded"
-      :download-total="downloadTotal"
-    />
-    <!-- Show VTK Viewers -->
+    <v-layout
+      v-if="loadingFrame"
+      class="loading-indicator-container"
+      align-center
+      justify-center
+      fill-height
+    >
+      <v-col>
+        <v-row justify="center">
+          <v-progress-circular
+            :width="4"
+            :size="56"
+            :rotate="-90"
+            :value="downloadProgressPercent"
+            :indeterminate="downloadTotal === 0 || downloadTotal === downloadLoaded"
+            color="primary"
+          >
+            {{ Math.round(downloadProgressPercent || 0) }}%
+          </v-progress-circular>
+        </v-row>
+        <v-row
+          justify="center"
+          class="mt-2"
+        >
+          <div class="text-center">
+            {{ loadProgressMessage }}
+          </div>
+        </v-row>
+      </v-col>
+    </v-layout>
     <template v-if="currentFrame">
-      <v-col
+      <v-flex
         class="layout-container"
       >
         <div class="my-layout">
@@ -143,21 +203,20 @@ export default {
           </div> -->
         </div>
         <!-- Show Error Loading Frame -->
-        <v-row
+        <v-layout
           v-if="errorLoadingFrame"
-          class="align-center justify-center fill-height"
+          align-center
+          justify-center
+          fill-height
         >
           <div class="text-h6">
             Error loading this frame
           </div>
-        </v-row>
-        <!-- End Error Loading Frame -->
-      </v-col>
-      <!-- End Show VTK Viewers -->
-      <!-- Show Bottom Control Panel -->
+        </v-layout>
+      </v-flex>
       <ControlPanel />
     </template>
-  </v-row>
+  </v-layout>
 </template>
 
 <style lang="scss" scoped>
@@ -203,6 +262,16 @@ export default {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  .loading-indicator-container {
+    background: #ffffffcc;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1;
   }
 
   .layout-container {
