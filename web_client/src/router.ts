@@ -3,6 +3,7 @@ import Router from 'vue-router';
 
 import ProjectsView from './views/Projects.vue';
 import ScanView from './views/Scan.vue';
+import CompareScans from './views/CompareScans.vue';
 
 Vue.use(Router);
 
@@ -12,6 +13,11 @@ export default new Router({
       path: '/',
       name: 'projects',
       component: ProjectsView,
+    },
+    {
+      path: '/comparescans',
+      name: 'comparescans',
+      component: CompareScans,
     },
     // Order matters
     {
