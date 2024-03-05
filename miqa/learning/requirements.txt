@@ -1,4 +1,4 @@
-numpy>=1.21.1
+numpy>=1.22.2
 itk>=5.3rc4
 torch
 torchio
