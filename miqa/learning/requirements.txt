@@ -7,3 +7,4 @@ monai>=0.6.0
 pandas
 scikit-learn
 wandb
+wheel>=0.38.0 # not directly required, pinned by Snyk to avoid a vulnerability
