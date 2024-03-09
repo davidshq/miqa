@@ -23,7 +23,7 @@
     "polyfill-object.fromentries": "^1.0.1",
     "uuid": "^3.4.0",
     "vtk.js": "22.5.7",
-    "vue": "^2.7.14",
+    "vue": "^2.7.16",
     "vue-async-computed": "^3.5.1",
     "vue-css-donut-chart": "^1.3.2",
     "vue-router": "^3.6.5",
