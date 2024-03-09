@@ -12,7 +12,7 @@
   "dependencies": {
     "@girder/oauth-client": "^0.7.7",
     "@mdi/font": "^6.5.95",
-    "@sentry/vue": "^7.54.0",
+    "@sentry/vue": "^7.101.1",
     "axios": "^0.24.0",
     "core-js": "^3.29.1",
     "django-s3-file-field": "^0.3.0",
