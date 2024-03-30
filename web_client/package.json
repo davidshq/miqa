@@ -13,7 +13,7 @@
     "@girder/oauth-client": "^0.7.7",
     "@mdi/font": "^6.5.95",
     "axios": "^0.28.0",
-    "@sentry/vue": "^7.105.0",
+    "@sentry/vue": "^7.106.0",
     "core-js": "^3.36.0",
     "django-s3-file-field": "^0.3.0",
     "gl-matrix": "^3.4.3",
