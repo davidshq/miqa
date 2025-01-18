@@ -1,4 +1,4 @@
-FROM python:3.13.0b4-slim
+FROM python:3.14.0a1-slim
 # Install nodejs + npm for building client library
 # Install system libraries for Python packages:
 # * psycopg2
